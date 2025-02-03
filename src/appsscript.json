@@ -1,0 +1,19 @@
+{
+  "timeZone": "America/New_York",
+  "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "QUnit",
+        "version": "0",
+        "libraryId": "1jvNKvJric7Kbc6wWphMJZIfJ0w8wurlHymoGpkE-i26P_srJifxQhFr1",
+        "developmentMode": true
+      }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "webapp": {
+    "executeAs": "USER_ACCESSING",
+    "access": "ANYONE"
+  }
+}
