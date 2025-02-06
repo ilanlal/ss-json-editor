@@ -1,6 +1,9 @@
 // Code.gs
 var selectedRange = null;
-
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename)
+    .getContent();
+}
 function getSelectedRange() {
   return selectedRange;
 }
@@ -14,21 +17,11 @@ function openSidebar(e) {
   if (e && e.authMode !== ScriptApp.AuthMode.NONE) {
     return;
   }
-  const htmlOutput = HtmlService.createHtmlOutputFromFile('html/summaryReport')
-    .setTitle('JSON Editor for Google Sheets™️')
-    // Set maximum width
-    .setWidth(400);
-
+  const htmlOutput = HtmlService
+    .createTemplateFromFile('html/sidebar/Page')
+    .evaluate();
   SpreadsheetApp.getUi().showSidebar(htmlOutput);
-}
 
-function onSelectionChange(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const range = sheet.getActiveRange();
-  const values = range.getValues();
-  selectedRange = values;
-  const ui = SpreadsheetApp.getUi();
-  ui.alert('Selected range', values);
 }
 
 function validateJsonOnServer() {
@@ -79,9 +72,9 @@ function validateJsonOnServerSummaryReport() {
       for (let j = 0; j < values[i].length; j++) {
         try {
           JSON.parse(values[i][j]);
-          summaryReport.results[i][j] = '✅';
+          summaryReport.results[i][j] = {'icon':'✅', 'range': range.getCell(i + 1, j + 1).getA1Notation()};
         } catch (error) {
-          summaryReport.results[i][j] = '❌';
+          summaryReport.results[i][j] = {'icon':'❌', 'range': range.getCell(i + 1, j + 1).getA1Notation(), 'error': error.toString()};
         }
       }
     }
