@@ -1,153 +1,156 @@
 <!-- JavaScript -->
 <script>
-    const renderPage = () => {
-        const container = document.getElementById("app");
-        container.innerHTML = '<h1>JSON Editor for Google Sheets™️</h1>';
-        container.innerHTML += '<p>JSON Editor for Google Sheets™️ is a Google Sheets Add-on that allows you to edit JSON data in a spreadsheet.</p>';
-        container.innerHTML += '<input class="button" type="button" value="Validate" onclick="onValidateClick(this)" />';
-        container.innerHTML += '<input class="button warn" type="button" value="Close" onclick="google.script.host.close()" />';
-        container.innerHTML += '<div id="res1"></div>';
-        container.innerHTML += '<div id="range" class="range"></div>';
-        container.innerHTML += '<div id="report" class="report"></div>';
-    };
-
-    const renderRange = (response) => {
-        const container = document.getElementById("range");
-        const totalCells = (response?.range?.numRows || 1) * (response?.range?.numColumns || 1);
-        container.innerHTML = '<div>';
-        container.innerHTML += '<h4> Range info...</h4>';
-        container.innerHTML += '<span>A1N: ' + response?.range?.a1n + '</span>';
-        container.innerHTML += '<span>Total: ' + totalCells + '</span>';
-        container.innerHTML += '</div>';
-    };
-
-    const renderTabelReport = (response) => {
-        console.log('😀 renderTabelReport', response);
-        const container = document.getElementById("report");
-        if (!response?.report) {
-            container.innerHTML = 'No values in the selected range';
-            return;
-        }
-        const table = document.createElement('table');
-        table.style.width = '100%';
-        table.setAttribute('border', '1');
-        const thead = document.createElement('thead');
-        const tr = document.createElement('tr');
-        const th1 = document.createElement('th');
-        th1.appendChild(document.createTextNode('Row'));
-        tr.appendChild(th1);
-        const th2 = document.createElement('th');
-        th2.appendChild(document.createTextNode('Cells'));
-        tr.appendChild(th2);
-        thead.appendChild(tr);
-        table.appendChild(thead);
-        const tbody = document.createElement('tbody');
-        for (const [key, value] of Object.entries(response.report)) {
-            const tr = document.createElement('tr');
-            const td1 = document.createElement('td');
-            td1.appendChild(document.createTextNode(parseInt(key) + 1));
-            tr.appendChild(td1);
-            const td2 = document.createElement('td');
-            td2.appendChild(document.createTextNode(JSON.stringify(value)));
-            tr.appendChild(td2);
-            tbody.appendChild(tr);
-        }
-        table.appendChild(tbody);
-        container.innerHTML = '';
-        container.appendChild(table);
-    };
-
-    const renderListReport = (response) => {
-        console.log('😀 renderListReport', response);
-        const container = document.getElementById("report");
-        if (!response?.report) {
-            container.innerHTML = 'No values in the selected range';
-            return;
-        }
-        container.innerHTML = '<div>';
-        container.innerHTML += '<h4> Summary report...</h4>';
-        container.innerHTML += '<ul class="report-list">';
-        for (const [key, value] of Object.entries(response.report)) {
-            for (const [key2, item] of Object.entries(value)) {
-                container.innerHTML += '<li class="list-item">' + item.icon + ': ' + item.range + ': ' + item.error + '</li>';
+    // namespace SidebarValidator
+    var AddOns = AddOns || {};
+    AddOns.ViewModel = AddOns.ViewModel || {};
+    // ViewModel class
+    AddOns.ViewModel = function () {
+        this.renderSidebar = ({
+            container = document.getElementById("app"),
+            loading = false,
+            response
+        }) => {
+            console.log('😀 renderSidebar', { container, loading, response });
+            if (!container) {
+                return;
             }
+            container.innerHTML = '';
+            container.innerHTML += '<h1>JSON Editor for Google Sheets™️</h1>';
+            container.innerHTML += '<p>JSON Editor for Google Sheets™️ is a Google Sheets Add-on that allows you to edit JSON data in a spreadsheet.</p>';
+            container.innerHTML += '<input class="button" type="button" id="validate" value="Validate"'
+                + ' onclick="AppHandler.onToolbarClick(event)" />';
+            container.innerHTML += `<div id="message" class="message" >${loading ? 'Loading... please wait' : '😀'}</div>`;
+            container.innerHTML += '<div id="range" class="range"></div>';
+            container.innerHTML += '<div id="report" class="report"></div>';
+
+            if (response?.range) {
+                this.renderRange(response.range);
+            }
+
+            if (response?.report) {
+                this.renderTabelReport(response);
+            }
+        };
+
+        this.renderRange = (range) => {
+            console.log('😀 renderRange', range);
+            const container = document.getElementById("range");
+            container.innerHTML = '';
+            container.innerHTML += '<h2>Selected Range</h2>';
+            container.innerHTML += '<p>a1n: ' + range.a1n + '</p>';
+            container.innerHTML += '<p>total: ' + (range.numRows || 1) * (range.numColumns || 1) + '</p>';
+        };
+
+        this.renderTabelReport = (response) => {
+            console.log('😀 renderTabelReport', response);
+            const container = document.getElementById("report");
+            container.innerHTML = '';
+            if (!response?.report) {
+                container.innerHTML = 'No values in the selected range';
+                return;
+            }
+
+            // build columns array (like: ['C','D','E']) from the response range like 'C1:E3'
+            const columns = ['#'];
+            const range = response.range;
+            const start = range.a1n.split(':').shift();
+            const end = range.a1n.split(':').pop();
+            const startCol = start.match(/[A-Z]+/g).shift();
+            const endCol = end.match(/[A-Z]+/g).pop();
+            const startRow = start.match(/\d+/g).shift();
+            const endRow = end.match(/\d+/g).pop();
+            for (let i = startCol.charCodeAt(0); i <= endCol.charCodeAt(0); i++) {
+                columns.push(String.fromCharCode(i));
+            }
+            // build list of rows from the response report range
+            const rows = [];
+            for (let i = startRow; i <= endRow; i++) {
+                rows.push(i);
+            }
+
+            const table = document.createElement('table');
+            table.style.width = '100%';
+            table.setAttribute('border', '1');
+            const thead = document.createElement('thead');
+            const trh = document.createElement('tr');
+            columns.forEach((col) => {
+                const th = document.createElement('th');
+                th.appendChild(document.createTextNode(col));
+                trh.appendChild(th);
+            });
+            thead.appendChild(trh);
+            table.appendChild(thead);
+            const tbody = document.createElement('tbody');
+            for (const [key1, row] of Object.entries(response.report)) {
+                const tr = document.createElement('tr');
+                const td1 = document.createElement('td');
+                td1.appendChild(document.createTextNode(rows[key1]));
+                tr.appendChild(td1);
+                // loop through the columns
+                for(const [key2, col] of Object.entries(row)){
+                    const td2 = document.createElement('td');
+                    td2.appendChild(document.createTextNode(col.icon));
+                    tr.appendChild(td2);
+                }
+                tbody.appendChild(tr);
+            }
+            table.appendChild(tbody);
+            container.appendChild(table);
+        };
+
+        this.renderLoading = (element) => {
+            console.log('😀 renderLoading', element);
+            element.innerHTML = '<div class="loading" id="loading">Loading... please wait</div>';
+        };
+    };
+    // event handler
+    const AppHandler = {
+        start: (e) => {
+            console.log('😀 start', e);
+            const viewModel = new AddOns.ViewModel();
+            viewModel.renderSidebar({ loading: false });
+        },
+        onToolbarClick: (e) => {
+            console.log('😀 onClick', e);
+            switch (e.target.id) {
+                case 'validate':
+                    AppHandler.handleValidateEvent(e);
+                    break;
+                case 'close':
+                    google.script.host.close();
+                    break;
+                default:
+                    break;
+            }
+
+        },
+        handleValidateEvent: (e) => {
+            console.log('😀 handleValidateEvent', e);
+            let viewModel = new AddOns.ViewModel();
+            viewModel.renderSidebar({ loading: true });
+            const onServerSuccess = (response) => {
+                console.log('😀 onServerSuccess', response);
+                // render the page with the response
+                viewModel.renderSidebar({ loading: false, response });
+            };
+
+            const onServerFailure = (response) => {
+                console.log('😀 onServerFailure', response);
+                // render the page with the response
+                viewModel.renderSidebar({ loading: false, response });
+            };
+
+            // call the server
+            google.script.run
+                .withSuccessHandler(onServerSuccess)
+                .withFailureHandler(onServerFailure)
+                .validateJsonOnServerSummaryReport();
         }
-        container.innerHTML += '</ul>';
-        container.innerHTML += '</div>';
     };
 
-    const _renderListReport = (response) => {
-        console.log('😀 setValidationReport', response);
-        isLoading = false;
-        const container = document.getElementById("report");
-        if (!response?.report) {
-            container.innerHTML = 'No values in the selected range';
-            return;
-        }
-        const table = document.createElement('table');
-        table.style.width = '100%';
-        table.setAttribute('border', '1');
-        const thead = document.createElement('thead');
-        const tr = document.createElement('tr');
-        const th1 = document.createElement('th');
-        th1.appendChild(document.createTextNode('Field'));
-        tr.appendChild(th1);
-        const th2 = document.createElement('th');
-        th2.appendChild(document.createTextNode('Count'));
-        tr.appendChild(th2);
-        thead.appendChild(tr);
-        table.appendChild(thead);
-        const tbody = document.createElement('tbody');
-        for (const [key, value] of Object.entries(response)) {
-            const tr = document.createElement('tr');
-            const td1 = document.createElement('td');
-            td1.appendChild(document.createTextNode(key));
-            tr.appendChild(td1);
-            const td2 = document.createElement('td');
-            td2.appendChild(document.createTextNode(JSON.stringify(value)));
-            tr.appendChild(td2);
-            tbody.appendChild(tr);
-        }
-        table.appendChild(tbody);
-        container.innerHTML = '';
-        container.appendChild(table);
-    };
 
     window.addEventListener('load', function () {
         console.log('Page is loaded');
-        renderPage();
+        AppHandler.start();
     });
-
-    var isLoading = false;
-    function onServerSuccess(summaryReport, button) {
-        const e1 = document.getElementById('res1');
-        try {
-            renderRange(summaryReport);
-            renderTabelReport(summaryReport);
-            //setValidationReport(summaryReport.resoults);
-            e1.innerHTML = 'Success 😀';
-        } catch (error) {
-            e1.innerHTML = 'Head Error: ' + error.message;
-            renderRange(null);
-            //setValidationReport(null);
-            renderTabelReport(null);
-        }
-    }
-
-    function onServerFailure(error, button) {
-        const e1 = document.getElementById('res1');
-        e1.innerHTML = 'Error: ' + error.message;
-        renderRange(null);
-        renderTabelReport(null);
-        //setValidationReport(null);
-    }
-
-    function onValidateClick(e) {
-        console.log('😀 onValidateClick', e);
-        isLoading = true;
-        google.script.run
-            .withSuccessHandler(onServerSuccess)
-            .withFailureHandler(onServerFailure)
-            .validateJsonOnServerSummaryReport();
-    }
 </script>
