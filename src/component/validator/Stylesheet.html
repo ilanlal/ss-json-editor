@@ -14,6 +14,12 @@
         margin-bottom: 10px;
     }
 
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        
+    }
+
     .button {
         background-color: #4CAF50;
         /* Green */
@@ -36,6 +42,29 @@
         background-color: #45a049;
         box-shadow: 0 5px #666;
         transform: translateY(4px);
+    }
+
+    .checkboxes {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .checkboxes input[type="checkbox"] {
+        margin-right: 10px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .checkboxes label {
+        margin-right: 20px;
+    }
+
+    .button:focus {
+        outline: 0;
+    }
+
+    .message {
+        margin-top: 20px;
     }
 
     .warn {
@@ -72,9 +101,10 @@
         background-color: #AAA;
     }
 
-    table thead tr td {
-        padding: 8px;
-        text-align: left;
+    table thead tr th {
+        font-size: small;
+        text-align: center;
+        cursor: default;
     }
 
     table tbody tr:nth-child(odd) {
@@ -86,7 +116,18 @@
     }
 
     table tbody tr td {
-        padding: 8px;
-        text-align: left;
+        text-align: center;
     }
+
+    table tbody tr td:first-child {
+        background-color: #AAA;
+        font-size: small;
+        cursor: default;
+    }
+
+    .report-cell {
+        text-align: center;
+        cursor: pointer;
+    }
+
 </style>

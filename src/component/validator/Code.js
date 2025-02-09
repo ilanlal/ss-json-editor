@@ -67,9 +67,9 @@ function validateJsonOnServerSummaryReport() {
       for (let j = 0; j < values[i].length; j++) {
         try {
           JSON.parse(values[i][j]);
-          response.report[i][j] = { 'icon': '✅', 'range': range.getCell(i + 1, j + 1).getA1Notation() };
+          response.report[i][j] = { 'icon': '✅', 'range': range.getCell(i + 1, j + 1).getA1Notation(), 'message': 'Valid JSON' };  
         } catch (error) {
-          response.report[i][j] = { 'icon': '❌', 'range': range.getCell(i + 1, j + 1).getA1Notation(), 'error': error.toString() };
+          response.report[i][j] = { 'icon': '❌', 'range': range.getCell(i + 1, j + 1).getA1Notation(), 'message': error.toString() };
         }
       }
     }
@@ -84,4 +84,10 @@ function validateJsonOnServerSummaryReport() {
     range.setBackground('#FFFF00');
     throw error;
   }
+}
+
+function focusCell(a1n) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const range = sheet.getRange(a1n);
+  range.activate();
 }

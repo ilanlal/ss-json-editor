@@ -17,33 +17,63 @@
             container.innerHTML = '';
             container.innerHTML += '<h1>JSON Editor for Google Sheets™️</h1>';
             container.innerHTML += '<p>JSON Editor for Google Sheets™️ is a Google Sheets Add-on that allows you to edit JSON data in a spreadsheet.</p>';
-            container.innerHTML += '<input class="button" type="button" id="validate" value="Validate"'
-                + ' onclick="AppHandler.onToolbarClick(event)" />';
+            container.innerHTML += '<div id="toolbar" class="toolbar"></div>';
+            this.renderToolbar({ container: document.getElementById("toolbar"), loading, response });
             container.innerHTML += `<div id="message" class="message" >${loading ? 'Loading... please wait' : '😀'}</div>`;
-            container.innerHTML += '<div id="range" class="range"></div>';
+            container.innerHTML += '<div id="summary" class="summary"></div>';
             container.innerHTML += '<div id="report" class="report"></div>';
 
             if (response?.range) {
-                this.renderRange(response.range);
+                this.renderSummary({
+                    container: document.getElementById("summary"),
+                    loading,
+                    response
+                });
             }
 
             if (response?.report) {
-                this.renderTabelReport(response);
+                this.renderTabelReport({
+                    container: document.getElementById("report"),
+                    loading,
+                    response
+                });
             }
         };
 
-        this.renderRange = (range) => {
-            console.log('😀 renderRange', range);
-            const container = document.getElementById("range");
+        this.renderSummary = ({ container, loading, response }) => {
+            console.log('😀 renderSummary', { container, loading, response });
+            if (!container) {
+                return;
+            }
             container.innerHTML = '';
-            container.innerHTML += '<h2>Selected Range</h2>';
-            container.innerHTML += '<p>a1n: ' + range.a1n + '</p>';
-            container.innerHTML += '<p>total: ' + (range.numRows || 1) * (range.numColumns || 1) + '</p>';
+            if (!response?.range) {
+                container.innerHTML = 'No values in the selected range';
+                return;
+            }
+            const range = response.range;
+            const totalCells = (range.numRows || 1) * (range.numColumns || 1);
+            const totalSuccess = response.report.reduce((acc, row) => {
+                return acc + row.reduce((acc, col) => {
+                    return acc + (col.icon === '✅' ? 1 : 0);
+                }, 0);
+            }, 0);
+
+            const totalFail = totalCells - totalSuccess;
+            container.innerHTML += `<span>${range.a1n}</span>`;
+            container.innerHTML += `<span>total: ${totalCells}</span>`;
+            if (totalFail > 0) {
+                container.innerHTML += `<span class="warn">${totalFail}</span>`;
+            }
+            if (totalSuccess > 0) {
+                container.innerHTML += `<span class="success">${totalSuccess}</span>`;
+            }
         };
 
-        this.renderTabelReport = (response) => {
-            console.log('😀 renderTabelReport', response);
-            const container = document.getElementById("report");
+        this.renderTabelReport = ({ container, loading, response }) => {
+            console.log('😀 renderTabelReport', { container, loading, response });
+            if (!container) {
+                return;
+            }
             container.innerHTML = '';
             if (!response?.report) {
                 container.innerHTML = 'No values in the selected range';
@@ -51,7 +81,7 @@
             }
 
             // build columns array (like: ['C','D','E']) from the response range like 'C1:E3'
-            const columns = ['#'];
+            const columns = [''];
             const range = response.range;
             const start = range.a1n.split(':').shift();
             const end = range.a1n.split(':').pop();
@@ -87,15 +117,41 @@
                 td1.appendChild(document.createTextNode(rows[key1]));
                 tr.appendChild(td1);
                 // loop through the columns
-                for(const [key2, col] of Object.entries(row)){
+                for (const [key2, col] of Object.entries(row)) {
                     const td2 = document.createElement('td');
                     td2.appendChild(document.createTextNode(col.icon));
+                    // set class for the text node
+                    td2.classList.add('report-cell');
+                    // set tooltip for the td2
+                    td2.title = col.message;
+                    // set click event for the td2
+                    td2.addEventListener('click', (e) => {
+                        console.log('😀 report-cell click', e);
+                        // focus the sheet cellfrom col.range
+                        google.script.run.focusCell(col.range);
+                    });
                     tr.appendChild(td2);
                 }
                 tbody.appendChild(tr);
             }
             table.appendChild(tbody);
             container.appendChild(table);
+        };
+
+        this.renderToolbar = ({ container, loading, response }) => {
+            console.log('😀 renderToolbar', container);
+            container.innerHTML = '';
+            // Validate button
+            container.innerHTML += '<input class="button" type="button" id="validate" value="Validate"'
+                + ' onclick="AppHandler.onToolbarClick(event)" />';
+
+            // Checkboxes
+            container.innerHTML += '<div class="checkboxes">';
+            container.innerHTML += '<input type="checkbox" id="check1" name="check1" value="check1">';
+            container.innerHTML += '<label for="check1">Check 1</label>';
+            container.innerHTML += '<input type="checkbox" id="check2" name="check2" value="check2">';
+            container.innerHTML += '<label for="check2">Check 2</label>';
+            container.innerHTML += '</div>';
         };
 
         this.renderLoading = (element) => {
