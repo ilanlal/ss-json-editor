@@ -14,49 +14,12 @@
         margin-bottom: 10px;
     }
 
-    .toolbar {
-        display: flex;
-        justify-content: space-between;
-        
-    }
-
-    .button {
-        background-color: #4CAF50;
-        /* Green */
-        border: none;
-        color: white;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-    }
-
     .button:hover {
-        background-color: #45a049;
+        background-color: #3e8e41;
     }
 
     .button:active {
-        background-color: #45a049;
-        box-shadow: 0 5px #666;
-        transform: translateY(4px);
-    }
-
-    .checkboxes {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .checkboxes input[type="checkbox"] {
-        margin-right: 10px;
-        font-size: 16px;
-        font-weight: bold;
-    }
-
-    .checkboxes label {
-        margin-right: 20px;
+        background-color: #3e8e41;
     }
 
     .button:focus {
@@ -67,29 +30,18 @@
         margin-top: 20px;
     }
 
-    .warn {
-        background-color: #f44336;
-        /* Red */
-    }
-
-    .range {
-        margin-top: 20px;
-    }
-
-    .report {
-        margin-top: 20px;
-    }
-
-    .loading {
-        margin-top: 20px;
-    }
-    
-    .report {
-        margin-top: 20px;
-    }
-
-    .range {
-        background-color: #6F6;
+    .button {
+        background-color: #4CAF50;
+        /* Green */
+        border: none;
+        color: white;
+        padding: 4px 12px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        margin: 4px 2px;
+        cursor: pointer;
     }
 
     table {
@@ -111,12 +63,12 @@
         background-color: #f1f1f1;
     }
 
-    table tbody tr:hover {
-        background-color: #4CAF50;
-    }
-
     table tbody tr td {
         text-align: center;
+    }
+
+    table tbody tr td:hover {
+        background-color: #4CAF50;
     }
 
     table tbody tr td:first-child {
@@ -125,9 +77,102 @@
         cursor: default;
     }
 
+    .caption {
+        width: 100%;
+        font-size: 14px;
+        font-weight: normal;
+        background-color: #AAA;
+        text-align: center;
+    }
+
     .report-cell {
         text-align: center;
         cursor: pointer;
     }
 
+    .text-editor {
+        margin-top: 20px;
+    }
+
+    .text-editor label {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .text-editor textarea {
+        width: 100%;
+        height: 150px;
+        padding: 6px;
+        box-sizing: border-box;
+    }
+
+    .text-editor .toolbar {
+        display: block;
+        margin-top: 10px;
+
+    }
+
+    .text-editor .text-editor .button {
+        background-color: #47a7ac;
+        /* Green */
+        border: none;
+        color: white;
+        padding: 4px 12px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        margin: 4px 2px;
+        cursor: pointer;
+    }
+
+    .success {
+        background-color: #4CAF50;
+        /* Green */
+    }
+
+    .error {
+        background-color: #f44336;
+        /* Red */
+    }
+
+    .warn {
+        background-color: #ff9800;
+        /* Red */
+    }
+
+    .primary {
+        background-color: #2196F3;
+        /* Blue */
+    }
+
+    .primary-dark {
+        background-color: #1976d2;
+        /* Blue */
+    }
+
+    .accent {
+        background-color: #ff4081;
+        /* Blue */
+    }
+    
+    .info {
+        background-color: #00bcd4;
+        /* Blue */
+    }
+
+    .secondary {
+        background-color: #607d8b;
+        /* Blue */
+    }
+
+    .dark {
+        background-color: #333;
+        /* Blue */
+    }
+
+    .light {
+        background-color: #f1f1f1;
+        /* Blue */
+    }
 </style>

@@ -6,42 +6,56 @@
     // ViewModel class
     AddOns.ViewModel = function () {
         this.renderSidebar = ({
-            container = document.getElementById("app"),
-            loading = false,
-            response
+            container = document.getElementById("app")
         }) => {
-            console.log('😀 renderSidebar', { container, loading, response });
+            console.log('😀 renderSidebar', { container });
             if (!container) {
                 return;
             }
-            container.innerHTML = '';
-            container.innerHTML += '<h1>JSON Editor for Google Sheets™️</h1>';
-            container.innerHTML += '<p>JSON Editor for Google Sheets™️ is a Google Sheets Add-on that allows you to edit JSON data in a spreadsheet.</p>';
-            container.innerHTML += '<div id="toolbar" class="toolbar"></div>';
-            this.renderToolbar({ container: document.getElementById("toolbar"), loading, response });
-            container.innerHTML += `<div id="message" class="message" >${loading ? 'Loading... please wait' : '😀'}</div>`;
-            container.innerHTML += '<div id="summary" class="summary"></div>';
-            container.innerHTML += '<div id="report" class="report"></div>';
+            let html = '';
+
+            html += '<h1>JSON Editor for Google Sheets™️</h1>';
+            html += '<p>JSON Editor for Google Sheets™️ is a Google Sheets Add-on that allows you to edit JSON data in a spreadsheet.</p>';
+            html += '<div id="primary-action" class="primary-action"></div>';
+            // render the response container
+            html += '<div id="response" class="response">';
+            html += '   <div id="summary" class="summary"></div>';
+            html += '   <div id="report" class="report"></div>';
+            html += '   <div id="text-editor" class="text-editor"></div>';
+            html += '</div>';
+            container.innerHTML = html;
+            this.renderToolbar({ container: document.getElementById("primary-action") });
+        };
+
+        this.renderValidationResponse = ({ container, response }) => {
+            console.log('😀 renderValidationResponse', { container, response });
+            if (!container) {
+                return;
+            }
+
+            if (!response) {
+                const summary = document.getElementById("summary");
+                summary.innerHTML = 'No values in the selected range';
+                return;
+            }
 
             if (response?.range) {
                 this.renderSummary({
-                    container: document.getElementById("summary"),
-                    loading,
+                    container: container.querySelector('#summary'),
                     response
                 });
             }
 
             if (response?.report) {
                 this.renderTabelReport({
-                    container: document.getElementById("report"),
-                    loading,
+                    container: container.querySelector('#report'),
                     response
                 });
             }
         };
 
-        this.renderSummary = ({ container, loading, response }) => {
-            console.log('😀 renderSummary', { container, loading, response });
+        this.renderSummary = ({ container, response }) => {
+            console.log('😀 renderSummary', { container, response });
             if (!container) {
                 return;
             }
@@ -59,18 +73,14 @@
             }, 0);
 
             const totalFail = totalCells - totalSuccess;
-            container.innerHTML += `<span>${range.a1n}</span>`;
-            container.innerHTML += `<span>total: ${totalCells}</span>`;
-            if (totalFail > 0) {
-                container.innerHTML += `<span class="warn">${totalFail}</span>`;
-            }
-            if (totalSuccess > 0) {
-                container.innerHTML += `<span class="success">${totalSuccess}</span>`;
-            }
+            container.innerHTML += `<span class="info">Sum. ${totalCells}</span>`;
+            container.innerHTML += ` (<span class="success">${totalSuccess}</span>`;
+            container.innerHTML += `/<span class="error">${totalFail}</span>)`;
+            container.innerHTML += `<div class="caption">${range.a1n}</div>`;
         };
 
-        this.renderTabelReport = ({ container, loading, response }) => {
-            console.log('😀 renderTabelReport', { container, loading, response });
+        this.renderTabelReport = ({ container, response }) => {
+            console.log('😀 renderTabelReport', { container, response });
             if (!container) {
                 return;
             }
@@ -128,7 +138,12 @@
                     td2.addEventListener('click', (e) => {
                         console.log('😀 report-cell click', e);
                         // focus the sheet cellfrom col.range
-                        google.script.run.focusCell(col.range);
+                        //google.script.run.focusCell(col.range);
+                        // render the text editor
+                        TextEditorHandler.start({
+                            e: document.getElementById("text-editor"),
+                            cell: col
+                        });
                     });
                     tr.appendChild(td2);
                 }
@@ -138,20 +153,56 @@
             container.appendChild(table);
         };
 
-        this.renderToolbar = ({ container, loading, response }) => {
+        this.renderToolbar = ({ container }) => {
             console.log('😀 renderToolbar', container);
-            container.innerHTML = '';
-            // Validate button
-            container.innerHTML += '<input class="button" type="button" id="validate" value="Validate"'
-                + ' onclick="AppHandler.onToolbarClick(event)" />';
+            if (!container) {
+                return;
+            }
+            let html = '';
+            // render validate button
+            html += '<input class="button primary" type="button" id="validate" value="Validate" '
+                + 'onclick="AppHandler.handleValidateEvent(event)" />';
 
-            // Checkboxes
-            container.innerHTML += '<div class="checkboxes">';
-            container.innerHTML += '<input type="checkbox" id="check1" name="check1" value="check1">';
-            container.innerHTML += '<label for="check1">Check 1</label>';
-            container.innerHTML += '<input type="checkbox" id="check2" name="check2" value="check2">';
-            container.innerHTML += '<label for="check2">Check 2</label>';
-            container.innerHTML += '</div>';
+            // render minify alls button
+            html += '<input class="button primary" type="button" id="minifyAll" value="Minify All" '
+                + 'onclick="AppHandler.handleMinifyAllEvent(event)" />';
+            // render prittfy all button
+            html += '<input class="button primary" type="button" id="prittfyAll" value="Prittfy All" '
+                + 'onclick="AppHandler.handlePrettyPrintAllEvent(event)" />';
+            container.innerHTML = html;
+
+        };
+
+        this.renderTextEditor = ({ container, a1nRange, input, message }) => {
+            console.log('😀 renderTextEditor', { container, a1nRange, input });
+            if (!container) {
+                return;
+            }
+
+            let html = '';
+            html += `<div class="caption">${a1nRange}</div>`;
+            html += `<textarea id="textArea" name="textArea" rows="20" cols="30" `
+                + `onkeyup="TextEditorHandler.onKeyUp(event)" `
+                + `>${input || ''}</textarea>`;
+            html += `<div class="feedback">${message}</div>`
+            html += '<div class="toolbar">';
+            // render prittfy button
+            html += '<input class="button primary" type="button" id="prittfy" value="Prittfy" '
+                + `onclick="TextEditorHandler.onClick(event, '${a1nRange}')" />`;
+            // render minify button
+            html += '<input class="button primary" type="button" id="minify" value="Minify" '
+                + `onclick="TextEditorHandler.onClick(event, '${a1nRange}')" />`;
+            //render highlight button
+            html += '<input class="button info" type="button" id="highlight" value="Highlight" '
+                + `onclick="TextEditorHandler.onClick(event, '${a1nRange}')" />`;
+            // render cancel button
+            html += '<input class="button accent" type="button" id="cancel" value="Cancel" '
+                + `onclick="TextEditorHandler.onClick(event, '${a1nRange}')" />`;
+            // render save button
+            html += '<input class="button accent" type="button" id="save" value="Save" '
+                + `onclick="TextEditorHandler.onClick(event, '${a1nRange}')" />`;
+            html += '</div>';
+            container.innerHTML = html;
         };
 
         this.renderLoading = (element) => {
@@ -164,46 +215,185 @@
         start: (e) => {
             console.log('😀 start', e);
             const viewModel = new AddOns.ViewModel();
-            viewModel.renderSidebar({ loading: false });
-        },
-        onToolbarClick: (e) => {
-            console.log('😀 onClick', e);
-            switch (e.target.id) {
-                case 'validate':
-                    AppHandler.handleValidateEvent(e);
-                    break;
-                case 'close':
-                    google.script.host.close();
-                    break;
-                default:
-                    break;
-            }
-
+            viewModel.renderSidebar({ container: document.getElementById("app") });
         },
         handleValidateEvent: (e) => {
             console.log('😀 handleValidateEvent', e);
             let viewModel = new AddOns.ViewModel();
-            viewModel.renderSidebar({ loading: true });
+            viewModel.renderSidebar({ container: document.getElementById("app") });
             const onServerSuccess = (response) => {
                 console.log('😀 onServerSuccess', response);
                 // render the page with the response
-                viewModel.renderSidebar({ loading: false, response });
+                viewModel.renderValidationResponse({
+                    container: document.getElementById("response"),
+                    response
+                });
             };
 
             const onServerFailure = (response) => {
                 console.log('😀 onServerFailure', response);
                 // render the page with the response
-                viewModel.renderSidebar({ loading: false, response });
+                viewModel.renderValidationResponse({
+                    container: document.getElementById("response"),
+                    response
+                });
             };
 
             // call the server
             google.script.run
                 .withSuccessHandler(onServerSuccess)
                 .withFailureHandler(onServerFailure)
-                .validateJsonOnServerSummaryReport();
+                .doValidationReport();
+        },
+        handleMinifyAllEvent: (e) => {
+            console.log('😀 handleMinifyAllEvent', e);
+            let viewModel = new AddOns.ViewModel();
+            viewModel.renderSidebar({ container: document.getElementById("app") });
+            const onServerSuccess = (response) => {
+                console.log('😀 onServerSuccess', response);
+                // render the page with the response
+                viewModel.renderValidationResponse({
+                    container: document.getElementById("response"),
+                    response
+                });
+            };
+
+            const onServerFailure = (response) => {
+                console.log('😀 onServerFailure', response);
+                // render the page with the response
+                viewModel.renderValidationResponse({
+                    container: document.getElementById("response"),
+                    response
+                });
+            };
+
+            // call the server
+            google.script.run
+                .withSuccessHandler(onServerSuccess)
+                .withFailureHandler(onServerFailure)
+                .minifyAllJsonOnServer();
+        },
+
+        handlePrettyPrintAllEvent: (e) => {
+            console.log('😀 handlePrettyPrintAllEvent', e);
+            let viewModel = new AddOns.ViewModel();
+            viewModel.renderSidebar({ container: document.getElementById("app") });
+            const onServerSuccess = (response) => {
+                console.log('😀 onServerSuccess', response);
+                // render the page with the response
+                viewModel.renderValidationResponse({
+                    container: document.getElementById("response"),
+                    response
+                });
+            };
+
+            const onServerFailure = (response) => {
+                console.log('😀 onServerFailure', response);
+                // render the page with the response
+                viewModel.renderValidationResponse({
+                    container: document.getElementById("response"),
+                    response
+                });
+            };
+
+            // call the server
+            google.script.run
+                .withSuccessHandler(onServerSuccess)
+                .withFailureHandler(onServerFailure)
+                .prettyPrintAllJsonOnServer();
         }
     };
 
+    const TextEditorHandler = {
+        start: ({ e, cell }) => {
+            console.log('😀 TextEditorHandler.start', { e, cell });
+            // render the text editor using viewModel
+            const viewModel = new AddOns.ViewModel();
+            viewModel.renderTextEditor({
+                container: e,
+                a1nRange: cell.range,
+                input: cell.input,
+                message: cell.message
+            });
+        },
+        onKeyUp: (e) => {
+            console.log('😀 TextEditorHandler.onKeyUp', e);
+            // validate the input
+            const text = e.target.value;
+            let isValid = true;
+            try {
+                JSON.parse(text);
+                e.target.nextElementSibling.innerHTML = '';
+            } catch (error) {
+                isValid = false;
+                // show the error message
+                e.target.nextElementSibling.innerHTML = error.message;
+            }
+            if (isValid) {
+                e.target.classList.remove('error');
+            } else {
+                e.target.classList.add('error');
+            }
+
+        },
+        onClick: (e, a1n) => {
+            console.log('😀 TextEditorHandler.onClick', { e, a1n });
+            const viewModel = new AddOns.ViewModel();
+            const target = e.target;
+            if (target.id === 'prittfy') {
+                console.log('😀 prittfy', a1n);
+                const text = document.getElementById('textArea').value;
+                google.script.run
+                    .withSuccessHandler((response) => {
+                        console.log('😀 prettyPrintCell', response);
+                        viewModel.renderTextEditor({
+                            container: document.getElementById("text-editor"),
+                            a1nRange: a1n,
+                            input: response.input,
+                            message: response.message
+                        });
+                    })
+                    .withFailureHandler((response) => {
+                        console.log('😀 prettyPrintCell', response);
+                    })
+                    .prettyPrintCell(a1n, text);
+            } else if (target.id === 'minify') {
+                console.log('😀 minify', a1n);
+                const text = document.getElementById('textArea').value;
+                google.script.run
+                    .withSuccessHandler((response) => {
+                        console.log('😀 minifyCell', response);
+                        viewModel.renderTextEditor({
+                            container: document.getElementById("text-editor"),
+                            a1nRange: a1n,
+                            input: text,
+                            message: response.message
+                        });
+                    })
+                    .withFailureHandler((response) => {
+                        console.log('😀 minifyCell', response);
+                    })
+                    .minifyCell(a1n, text);
+            } else if (target.id === 'highlight') {
+                console.log('😀 highlight', a1n);
+                google.script.run.highlightCell(a1n);
+            } else if (target.id === 'cancel') {
+                console.log('😀 cancel');
+
+            } else if (target.id === 'save') {
+                console.log('😀 save');
+                const text = document.getElementById('textArea').value;
+                google.script.run
+                    .withSuccessHandler((response) => {
+                        console.log('😀 saveCell', response);
+                    })
+                    .withFailureHandler((response) => {
+                        console.log('😀 saveCell', response);
+                    })
+                    .saveCell(a1n, text);
+            }
+        }
+    }
 
     window.addEventListener('load', function () {
         console.log('Page is loaded');
