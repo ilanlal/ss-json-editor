@@ -14,13 +14,14 @@
             }
             let html = '';
 
-            html += '<h1>JSON Editor for Google Sheets™️</h1>';
-            html += '<p>JSON Editor for Google Sheets™️ is a Google Sheets Add-on that allows you to edit JSON data in a spreadsheet.</p>';
+            html += '<h1>JSON Studio</h1>';
+            html += '<p class="subtitle">To start, select a range of cells and click the "Validate" button.</p>';
             html += '<div id="primary-action" class="primary-action"></div>';
             // render the response container
             html += '<div id="response" class="response">';
             html += '   <div id="summary" class="summary"></div>';
             html += '   <div id="report" class="report"></div>';
+            html += '   <div id="pagination" class="pagination"></div>';
             html += '   <div id="text-editor" class="text-editor"></div>';
             html += '</div>';
             container.innerHTML = html;
@@ -52,6 +53,28 @@
                     response
                 });
             }
+
+            // render pagination if needed
+            this.renderPagination({
+                container: container.querySelector('#pagination')
+                , response
+            });
+        };
+
+        this.renderPagination = ({ container, response }) => {
+            console.log('😀 renderPagination', { container, response });
+            if (!container) {
+                return;
+            }
+
+            if (!response?.nextRowOffset) {
+                return;
+            }
+
+            if (response.nextRowOffset) {
+                container.innerHTML += `<input class="button primary" type="button" id="next" value="Next" `
+                    + `onclick="AppHandler.handleNextPageEvent(event, ${response.nextRowOffset}, '${response.range.a1n}')" />`;
+            }
         };
 
         this.renderSummary = ({ container, response }) => {
@@ -64,8 +87,8 @@
                 container.innerHTML = 'No values in the selected range';
                 return;
             }
-            const range = response.range;
-            const totalCells = (range.numRows || 1) * (range.numColumns || 1);
+            const page = response.page;
+            const totalCells = (page.rows?.length || 1) * (page.columns?.length || 1);
             const totalSuccess = response.report.reduce((acc, row) => {
                 return acc + row.reduce((acc, col) => {
                     return acc + (col.icon === '✅' ? 1 : 0);
@@ -73,10 +96,11 @@
             }, 0);
 
             const totalFail = totalCells - totalSuccess;
+            container.innerHTML = '<h2>Summary</h2>';
             container.innerHTML += `<span class="info">Sum. ${totalCells}</span>`;
             container.innerHTML += ` (<span class="success">${totalSuccess}</span>`;
             container.innerHTML += `/<span class="error">${totalFail}</span>)`;
-            container.innerHTML += `<div class="caption">${range.a1n}</div>`;
+            container.innerHTML += `<div class="caption">${page.a1n}</div>`;
         };
 
         this.renderTabelReport = ({ container, response }) => {
@@ -89,30 +113,16 @@
                 container.innerHTML = 'No values in the selected range';
                 return;
             }
-
-            // build columns array (like: ['C','D','E']) from the response range like 'C1:E3'
-            const columns = [''];
-            const range = response.range;
-            const start = range.a1n.split(':').shift();
-            const end = range.a1n.split(':').pop();
-            const startCol = start.match(/[A-Z]+/g).shift();
-            const endCol = end.match(/[A-Z]+/g).pop();
-            const startRow = start.match(/\d+/g).shift();
-            const endRow = end.match(/\d+/g).pop();
-            for (let i = startCol.charCodeAt(0); i <= endCol.charCodeAt(0); i++) {
-                columns.push(String.fromCharCode(i));
-            }
-            // build list of rows from the response report range
-            const rows = [];
-            for (let i = startRow; i <= endRow; i++) {
-                rows.push(i);
-            }
+            const columns = response?.page?.columns || [];
+            const rows = response?.page?.rows || [];
 
             const table = document.createElement('table');
             table.style.width = '100%';
             table.setAttribute('border', '1');
             const thead = document.createElement('thead');
             const trh = document.createElement('tr');
+            // first column is the row number (empty)
+            trh.appendChild(document.createElement('th'));
             columns.forEach((col) => {
                 const th = document.createElement('th');
                 th.appendChild(document.createTextNode(col));
@@ -160,15 +170,11 @@
             }
             let html = '';
             // render validate button
-            html += '<input class="button primary" type="button" id="validate" value="Validate" '
-                + 'onclick="AppHandler.handleValidateEvent(event)" />';
-
+            html += '<input class="button primary" type="button" id="validate" value="Validate" onclick="AppHandler.onClick(event)" />';
             // render minify alls button
-            html += '<input class="button primary" type="button" id="minifyAll" value="Minify All" '
-                + 'onclick="AppHandler.handleMinifyAllEvent(event)" />';
+            html += '<input class="button primary" type="button" id="minifyAll" value="Minify All" onclick="AppHandler.onClick(event)" />';
             // render prittfy all button
-            html += '<input class="button primary" type="button" id="prittfyAll" value="Prittfy All" '
-                + 'onclick="AppHandler.handlePrettyPrintAllEvent(event)" />';
+            html += '<input class="button primary" type="button" id="prittfyAll" value="Prittfy All" onclick="AppHandler.onClick(event)" />';
             container.innerHTML = html;
 
         };
@@ -179,28 +185,40 @@
                 return;
             }
 
+            if (!a1nRange) {
+                container.innerHTML = '';
+                return;
+            }
+
             let html = '';
+            html += '<h2>Text Editor</h2>';
             html += `<div class="caption">${a1nRange}</div>`;
-            html += `<textarea id="textArea" name="textArea" rows="20" cols="30" `
+            html += '<div>';
+            // render text area
+            html += `<textarea class="textarea" id="textArea" name="textArea" rows="20" cols="30" `
                 + `onkeyup="TextEditorHandler.onKeyUp(event)" `
                 + `>${input || ''}</textarea>`;
+            html += '<div>';
+            // render feedback
             html += `<div class="feedback">${message}</div>`
-            html += '<div class="toolbar">';
             // render prittfy button
-            html += '<input class="button primary" type="button" id="prittfy" value="Prittfy" '
+            html += '<input class="button button-small primary" type="button" id="prittfy" value="Prittfy" '
                 + `onclick="TextEditorHandler.onClick(event, '${a1nRange}')" />`;
             // render minify button
-            html += '<input class="button primary" type="button" id="minify" value="Minify" '
+            html += '<input class="button button-small primary" type="button" id="minify" value="Minify" '
                 + `onclick="TextEditorHandler.onClick(event, '${a1nRange}')" />`;
             //render highlight button
-            html += '<input class="button info" type="button" id="highlight" value="Highlight" '
+            html += '<input class="button button-small info" type="button" id="highlight" value="Highlight" '
                 + `onclick="TextEditorHandler.onClick(event, '${a1nRange}')" />`;
+            html += '</div>';
+            html += '<div>';
             // render cancel button
             html += '<input class="button accent" type="button" id="cancel" value="Cancel" '
                 + `onclick="TextEditorHandler.onClick(event, '${a1nRange}')" />`;
             // render save button
             html += '<input class="button accent" type="button" id="save" value="Save" '
                 + `onclick="TextEditorHandler.onClick(event, '${a1nRange}')" />`;
+            html += '</div>';
             html += '</div>';
             container.innerHTML = html;
         };
@@ -209,6 +227,25 @@
             console.log('😀 renderLoading', element);
             element.innerHTML = '<div class="loading" id="loading">Loading... please wait</div>';
         };
+
+        this.disableAllButtons = () => {
+            const buttons = document.querySelectorAll('input[type="button"]');
+            console.log('😀 disableAllButtons', buttons);
+            buttons.forEach((button) => {
+                button.disabled = true;
+                button.classList.add('disabled');
+            });
+        };
+
+        this.enableAllButtons = () => {
+            console.log('😀 enableAllButtons');
+            const buttons = document.querySelectorAll('input[type="button"]');
+            buttons.forEach((button) => {
+                button.disabled = false;
+                button.classList.remove('disabled');
+            });
+        };
+
     };
     // event handler
     const AppHandler = {
@@ -217,90 +254,106 @@
             const viewModel = new AddOns.ViewModel();
             viewModel.renderSidebar({ container: document.getElementById("app") });
         },
+        onClick: (e) => {
+            console.log('😀 onClick', e);
+            const viewModel = new AddOns.ViewModel();
+            viewModel.renderSidebar({ container: document.getElementById("app") });
+            viewModel.disableAllButtons();
+            let formatPattern = undefined;
+            if (e.target.id === 'minifyAll') {
+                formatPattern = 'minify';
+            }
+            else if (e.target.id === 'prittfyAll') {
+                formatPattern = 'pretty';
+            }
+            // call the server
+            google.script.run
+                .withSuccessHandler(AppHandler.onServerSuccess)
+                .withFailureHandler(AppHandler.onServerFailure)
+                .doValidationReport({
+                    pageSize: 3,
+                    offset: 0,
+                    formatPattern
+                });
+        },
         handleValidateEvent: (e) => {
             console.log('😀 handleValidateEvent', e);
             let viewModel = new AddOns.ViewModel();
             viewModel.renderSidebar({ container: document.getElementById("app") });
-            const onServerSuccess = (response) => {
-                console.log('😀 onServerSuccess', response);
-                // render the page with the response
-                viewModel.renderValidationResponse({
-                    container: document.getElementById("response"),
-                    response
-                });
-            };
-
-            const onServerFailure = (response) => {
-                console.log('😀 onServerFailure', response);
-                // render the page with the response
-                viewModel.renderValidationResponse({
-                    container: document.getElementById("response"),
-                    response
-                });
-            };
-
+            viewModel.disableAllButtons();
             // call the server
             google.script.run
-                .withSuccessHandler(onServerSuccess)
-                .withFailureHandler(onServerFailure)
-                .doValidationReport();
+                .withSuccessHandler(AppHandler.onServerSuccess)
+                .withFailureHandler(AppHandler.onServerFailure)
+                .doValidationReport({
+                    pageSize: 3,
+                    offset: 0
+                });
+        },
+        handleNextPageEvent: (e, offset, a1n) => {
+            console.log('😀 handleNextPageEvent', { e, offset, a1n });
+            let viewModel = new AddOns.ViewModel();
+            viewModel.renderSidebar({ container: document.getElementById("app") });
+            viewModel.disableAllButtons();
+            // call the server
+            google.script.run
+                .withSuccessHandler(AppHandler.onServerSuccess)
+                .withFailureHandler(AppHandler.onServerFailure)
+                .doValidationReport({
+                    maxRows: 3,
+                    offset: offset,
+                    a1NotationRange: a1n
+                });
         },
         handleMinifyAllEvent: (e) => {
             console.log('😀 handleMinifyAllEvent', e);
             let viewModel = new AddOns.ViewModel();
             viewModel.renderSidebar({ container: document.getElementById("app") });
-            const onServerSuccess = (response) => {
-                console.log('😀 onServerSuccess', response);
-                // render the page with the response
-                viewModel.renderValidationResponse({
-                    container: document.getElementById("response"),
-                    response
-                });
-            };
-
-            const onServerFailure = (response) => {
-                console.log('😀 onServerFailure', response);
-                // render the page with the response
-                viewModel.renderValidationResponse({
-                    container: document.getElementById("response"),
-                    response
-                });
-            };
-
+            viewModel.disableAllButtons();
             // call the server
             google.script.run
-                .withSuccessHandler(onServerSuccess)
-                .withFailureHandler(onServerFailure)
-                .minifyAllJsonOnServer();
+                .withSuccessHandler(AppHandler.onServerSuccess)
+                .withFailureHandler(AppHandler.onServerFailure)
+                .doValidationReport({
+                    pageSize: 3,
+                    offset: 0,
+                    formatPattern: 'minify'
+                });
         },
-
         handlePrettyPrintAllEvent: (e) => {
             console.log('😀 handlePrettyPrintAllEvent', e);
             let viewModel = new AddOns.ViewModel();
             viewModel.renderSidebar({ container: document.getElementById("app") });
-            const onServerSuccess = (response) => {
-                console.log('😀 onServerSuccess', response);
-                // render the page with the response
-                viewModel.renderValidationResponse({
-                    container: document.getElementById("response"),
-                    response
-                });
-            };
-
-            const onServerFailure = (response) => {
-                console.log('😀 onServerFailure', response);
-                // render the page with the response
-                viewModel.renderValidationResponse({
-                    container: document.getElementById("response"),
-                    response
-                });
-            };
-
+            viewModel.disableAllButtons();
             // call the server
             google.script.run
-                .withSuccessHandler(onServerSuccess)
-                .withFailureHandler(onServerFailure)
-                .prettyPrintAllJsonOnServer();
+                .withSuccessHandler(AppHandler.onServerSuccess)
+                .withFailureHandler(AppHandler.onServerFailure)
+                .doValidationReport({
+                    pageSize: 3,
+                    offset: 0,
+                    formatPattern: 'pretty'
+                });
+        },
+        onServerSuccess: (response) => {
+            console.log('😀 onServerSuccess', response);
+            const viewModel = new AddOns.ViewModel();
+            // render the page with the response
+            viewModel.renderValidationResponse({
+                container: document.getElementById("response"),
+                response
+            });
+            viewModel.enableAllButtons();
+        },
+        onServerFailure: (response) => {
+            console.log('😀 onServerFailure', response);
+            const viewModel = new AddOns.ViewModel();
+            // render the page with the response
+            viewModel.renderValidationResponse({
+                container: document.getElementById("response"),
+                response
+            });
+            viewModel.enableAllButtons();
         }
     };
 
@@ -315,30 +368,31 @@
                 input: cell.input,
                 message: cell.message
             });
+            TextEditorHandler.onKeyUp({ target: document.getElementById('textArea') });
         },
         onKeyUp: (e) => {
             console.log('😀 TextEditorHandler.onKeyUp', e);
             // validate the input
             const text = e.target.value;
             let isValid = true;
+            const editorAreaDiv = document.getElementById("text-editor");
+            const feedbackDiv = editorAreaDiv.querySelector('.feedback');
             try {
                 JSON.parse(text);
-                e.target.nextElementSibling.innerHTML = '';
+                // clear the error message
+                feedbackDiv.innerHTML = '';
+                feedbackDiv.classList.remove('error');
             } catch (error) {
                 isValid = false;
                 // show the error message
-                e.target.nextElementSibling.innerHTML = error.message;
+                feedbackDiv.innerHTML = error.message;
+                feedbackDiv.classList.add('error');
             }
-            if (isValid) {
-                e.target.classList.remove('error');
-            } else {
-                e.target.classList.add('error');
-            }
-
         },
         onClick: (e, a1n) => {
             console.log('😀 TextEditorHandler.onClick', { e, a1n });
             const viewModel = new AddOns.ViewModel();
+            viewModel.disableAllButtons();
             const target = e.target;
             if (target.id === 'prittfy') {
                 console.log('😀 prittfy', a1n);
@@ -352,12 +406,15 @@
                             input: response.input,
                             message: response.message
                         });
+                        viewModel.enableAllButtons();
                     })
                     .withFailureHandler((response) => {
                         console.log('😀 prettyPrintCell', response);
+                        viewModel.enableAllButtons();
                     })
                     .prettyPrintCell(a1n, text);
-            } else if (target.id === 'minify') {
+            }
+            else if (target.id === 'minify') {
                 console.log('😀 minify', a1n);
                 const text = document.getElementById('textArea').value;
                 google.script.run
@@ -366,31 +423,46 @@
                         viewModel.renderTextEditor({
                             container: document.getElementById("text-editor"),
                             a1nRange: a1n,
-                            input: text,
+                            input: response.input,
                             message: response.message
                         });
+                        viewModel.enableAllButtons();
                     })
                     .withFailureHandler((response) => {
                         console.log('😀 minifyCell', response);
+                        viewModel.enableAllButtons();
                     })
                     .minifyCell(a1n, text);
-            } else if (target.id === 'highlight') {
+            }
+            else if (target.id === 'highlight') {
                 console.log('😀 highlight', a1n);
                 google.script.run.highlightCell(a1n);
-            } else if (target.id === 'cancel') {
-                console.log('😀 cancel');
-
-            } else if (target.id === 'save') {
+                viewModel.enableAllButtons();
+            }
+            else if (target.id === 'save') {
                 console.log('😀 save');
                 const text = document.getElementById('textArea').value;
                 google.script.run
                     .withSuccessHandler((response) => {
                         console.log('😀 saveCell', response);
+                        viewModel.enableAllButtons();
                     })
                     .withFailureHandler((response) => {
                         console.log('😀 saveCell', response);
+                        viewModel.enableAllButtons();
                     })
                     .saveCell(a1n, text);
+            }
+            else if (target.id === 'cancel') {
+                console.log('😀 cancel');
+                viewModel.renderTextEditor({
+                    container: document.getElementById("text-editor")
+                });
+                viewModel.enableAllButtons();
+            }
+            else {
+                console.log('😀 unknown', a1n);
+                viewModel.enableAllButtons();
             }
         }
     }

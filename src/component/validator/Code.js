@@ -42,39 +42,88 @@ function validateJsonOnServer() {
 }
 
 // This function is called when the user clicks on the "Validate JSON" button in the sidebar
-function doValidationReport() {
+
+function doValidationReport({ pageSize = 3, offset = 0, a1NotationRange, formatPattern }) {
   try {
+    // get selected range
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const range = sheet.getActiveRange();
-    // check if the selected any cell is selected
+    // get the selected range by a1NotationRange or the active range
+    const range = a1NotationRange ? sheet.getRange(a1NotationRange) : sheet.getActiveRange();
+    // check if the selected range is 1 cell or more
     if (range.getNumRows() < 1 || range.getNumColumns() < 1) {
       SpreadsheetApp.getActiveSpreadsheet().toast('Please select a range', 'JSON Editor ‼️', 3);
       return;
     }
 
+    const customeRange = range.offset(Math.min(offset, range.getNumRows() - 1), 0, pageSize);
+    const customeA1NRange = customeRange.getA1Notation();
+    const startRow = customeRange.getRow();
+    const rows = [];
+    for (let i = 0; i < customeRange.getNumRows(); i++) {
+      rows.push(startRow + i);
+    }
+
+    // first column letter of the selected range
+    const firstCol = customeRange.getA1Notation().split(':')[0].replace(/\d/g, '');
+    // array of columns, input range as "C8:E12" will return ["C", "D", "E"]
+    const columns = [];
+    for (let i = 0; i < customeRange.getNumColumns(); i++) {
+      columns.push(String.fromCharCode(firstCol.charCodeAt(0) + i));
+    }
+
+    // get the values of the selected range
+    const values = customeRange.getValues();
+    // check if there are more rows to display
+    const hasMoreRows = range.getNumRows() > (pageSize + offset);
     const response = {
       range: {
         a1n: range.getA1Notation(),
         numRows: range.getNumRows(),
-        numColumns: range.getNumColumns()
+        numColumns: range.getNumColumns(),
+        columns: columns,
+        rows: rows,
       },
-      report: new Array(range.getNumRows()).fill(null).map(() => new Array(range.getNumColumns()).fill(null))
+      page: {
+        columns: columns,
+        rows: rows,
+        maxRows: pageSize,
+        offset: offset,
+        a1n: customeA1NRange
+      },
+      nextRowOffset: hasMoreRows ? offset + pageSize : null,
+      // allocate a 2D array to store the validation report
+      report: new Array(values.length).fill(null).map(() => new Array(values[0].length).fill(null))
     };
 
-    // for each cell in the selected range validate the JSON
-    const values = range.getValues();
+    // for each row and column in the custome range, validate the JSON
     for (let i = 0; i < values.length; i++) {
       for (let j = 0; j < values[i].length; j++) {
         try {
           JSON.parse(values[i][j]);
+          if (formatPattern === 'pretty') {
+            // try to pretty print the JSON
+            const value = JSON.stringify(JSON.parse(values[i][j]), null, 2);
+            range.getCell(i + 1, j + 1).setValue(value);
+          } else if (formatPattern === 'minify') {
+            // try to minify the JSON
+            const value = JSON.stringify(JSON.parse(values[i][j]));
+            range.getCell(i + 1, j + 1).setValue(value);
+          }
+
           response.report[i][j] = {
             'valid': true,
-            'icon': '✅', 'range': range.getCell(i + 1, j + 1).getA1Notation(), 'message': 'Valid JSON', 'input': values[i][j]
+            'icon': '✅',
+            'range': range.getCell(i + 1, j + 1).getA1Notation(),
+            'input': values[i][j],
+            'message': 'Valid JSON'
           };
         } catch (error) {
           response.report[i][j] = {
             'valid': false,
-            'icon': '❌', 'range': range.getCell(i + 1, j + 1).getA1Notation(), 'message': error.toString(), 'input': values[i][j]
+            'icon': '❌',
+            'range': range.getCell(i + 1, j + 1).getA1Notation(),
+            'message': error.toString(),
+            'input': values[i][j]
           };
         }
       }
@@ -107,50 +156,6 @@ function highlightCell(a1n) {
   range.setBackground(null);
 }
 
-function prettyPrintAllJsonOnServer() {
-  // Get the active sheet
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  // Get the active range
-  const range = sheet.getActiveRange();
-
-  // check if the selected any cell is selected
-  if (range.getNumRows() < 1 || range.getNumColumns() < 1) {
-    SpreadsheetApp.getActiveSpreadsheet().toast('Please select a range', 'JSON Editor ‼️', 3);
-    return;
-  }
-
-  const response = {
-    range: {
-      a1n: range.getA1Notation(),
-      numRows: range.getNumRows(),
-      numColumns: range.getNumColumns()
-    },
-    report: new Array(range.getNumRows()).fill(null).map(() => new Array(range.getNumColumns()).fill(null))
-  };
-
-  // for each cell in the selected range pretty print the JSON
-  const values = range.getValues();
-  for (let i = 0; i < values.length; i++) {
-    for (let j = 0; j < values[i].length; j++) {
-      try {
-        // try to pretty print the JSON
-        const value = JSON.stringify(JSON.parse(values[i][j]), null, 2);
-        range.getCell(i + 1, j + 1).setValue(value);
-        response.report[i][j] = {
-          'valid': true,
-          'icon': '✅', 'range': range.getCell(i + 1, j + 1).getA1Notation(), 'message': 'JSON pretty printed successfully', 'input': value
-        };
-      } catch (error) {
-        response.report[i][j] = {
-          'valid': false,
-          'icon': '❌', 'range': range.getCell(i + 1, j + 1).getA1Notation(), 'message': error.toString(), 'input': values[i][j]
-        };
-      }
-    }
-  }
-
-  return response;
-}
 function prettyPrintCell(a1n, text) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = sheet.getRange(a1n);
@@ -178,51 +183,6 @@ function prettyPrintCell(a1n, text) {
 
     return response;
   }
-}
-
-function minifyAllJsonOnServer() {
-  // Get the active sheet
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  // Get the active range
-  const range = sheet.getActiveRange();
-
-  // check if the selected any cell is selected
-  if (range.getNumRows() < 1 || range.getNumColumns() < 1) {
-    SpreadsheetApp.getActiveSpreadsheet().toast('Please select a range', 'JSON Editor ‼️', 3);
-    return;
-  }
-
-  const response = {
-    range: {
-      a1n: range.getA1Notation(),
-      numRows: range.getNumRows(),
-      numColumns: range.getNumColumns()
-    },
-    report: new Array(range.getNumRows()).fill(null).map(() => new Array(range.getNumColumns()).fill(null))
-  };
-
-  // for each cell in the selected range minify the JSON
-  const values = range.getValues();
-  for (let i = 0; i < values.length; i++) {
-    for (let j = 0; j < values[i].length; j++) {
-      try {
-        // try to minify the JSON
-        const value = JSON.stringify(JSON.parse(values[i][j]));
-        range.getCell(i + 1, j + 1).setValue(value);
-        response.report[i][j] = {
-          'valid': true,
-          'icon': '✅', 'range': range.getCell(i + 1, j + 1).getA1Notation(), 'message': 'JSON minified successfully', 'input': value
-        };
-      } catch (error) {
-        response.report[i][j] = {
-          'valid': false,
-          'icon': '❌', 'range': range.getCell(i + 1, j + 1).getA1Notation(), 'message': error.toString(), 'input': values[i][j]
-        };
-      }
-    }
-  }
-
-  return response;
 }
 
 function minifyCell(a1n, text) {
