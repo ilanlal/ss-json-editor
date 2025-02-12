@@ -1,18 +1,18 @@
-// Test_Addons.gs is a test class for the functioalities of the add-ons.
-class Test_Addons {
+// Test_Hendler.gs
+class Test_Hendler {
     constructor() {
-        QUnit.module("Addons");
+        QUnit.module("Handlers");
         this.runTests();
     }
     runTests() {
         const tests = [
-            "test_AB"
+            "test_onClick"
         ];
         tests.forEach(test => this[test]());
     }
 
-    test_AB() {
-        QUnit.test("AB Test", function (assert) {
+    test_onClick() {
+        QUnit.test("onClick", function (assert) {
             assert.ok(false, "Not implemented");
         });
     }

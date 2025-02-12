@@ -1,7 +1,7 @@
-// test_Helpers.gs is a test class for the functions in the Helpers.gs file.
-class test_Helpers {
+// Test_Helpers.gs
+class Test_Helpers {
     constructor() {
-        QUnit.module("AspSpreadsheet");
+        QUnit.module("Helpers");
         this.runTests();
     }
     runTests() {

@@ -6,11 +6,12 @@ function doGet(e) {
             + ` v${Global_Resources.version}`
     });
     QUnit.load(doGetMainTest);
-    // see https://developers.google.com/apps-script/guides/services/tests#testing_doget_and_dopost
     return QUnit.getHtml();
 }
 
 function doGetMainTest() {
-    new test_Helpers();
-    new test_Addons();
+    new Test_Helpers();
+    new Test_ViewModel();
+    new Test_Hendler();
+    new Test_Addons();
 }
