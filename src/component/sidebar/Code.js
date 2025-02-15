@@ -1,68 +1,28 @@
-// Author: Ilan Laloum
-// Description: This file contains the code for the validator component server side.
-// This Server side code is written in Google Apps Script and is executed on Google servers.
-
-// This function is called when the user clicks on the "Open Sidebar" button in the add-on menu
-function openSidebar(e) {
-  // Only show the sidebar if the user is an add-on
-  if (e && e.authMode !== ScriptApp.AuthMode.NONE) {
-    SpreadsheetApp.getUi().alert('Opening the sidebar');
-  }
-
-  const htmlOutput = HtmlService
-    .createTemplateFromFile('component/validator/Page')
-    .evaluate();
-  SpreadsheetApp.getUi().showSidebar(htmlOutput);
-}
-
-// This function is called when the user clicks on the "Validate JSON" button in the sidebar
-function validateJsonOnServer() {
-  try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const range = sheet.getActiveRange();
-    // check if the selected range is 1 cell
-    if (range.getNumRows() > 1 || range.getNumColumns() > 1) {
-      SpreadsheetApp.getActiveSpreadsheet().toast('Please select only one cell', 'JSON Editor ‼️', 3);
-      return;
-    }
-
-    // Get the value of the selected range
-    const value = range.getValue() + '';
-    JSON.parse(value);
-    return value;
-  } catch (error) {
-    SpreadsheetApp.getActiveSpreadsheet().toast('Invalid JSON ☠️☠️', error.toString(), 15);
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-
-    // set the background color to yellow
-    const range = sheet.getActiveRange();
-    range.setBackground('#FFFF00');
-    throw error;
-  }
-}
-
-// This function is called when the user clicks on the "Validate JSON" button in the sidebar
-
-function doValidationReport({ pageSize = 3, offset = 0, a1NotationRange, formatPattern }) {
+function doValidationReport({ pageSize = 3, offset = 0, a1n, formatPattern }) {
   try {
     // get selected range
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     // get the selected range by a1NotationRange or the active range
-    const range = a1NotationRange ? sheet.getRange(a1NotationRange) : sheet.getActiveRange();
+    const range = a1n ? sheet.getRange(a1n) : sheet.getActiveRange();
     // check if the selected range is 1 cell or more
     if (range.getNumRows() < 1 || range.getNumColumns() < 1) {
       SpreadsheetApp.getActiveSpreadsheet().toast('Please select a range', 'JSON Editor ‼️', 3);
       return;
     }
-
-    const customeRange = range.offset(Math.min(offset, range.getNumRows() - 1), 0, pageSize);
-    const customeA1NRange = customeRange.getA1Notation();
-    const startRow = customeRange.getRow();
+    const startRow = range.getRow();
     const rows = [];
-    for (let i = 0; i < customeRange.getNumRows(); i++) {
+    for (let i = 0; i < range.getNumRows() && i < 25; i++) {
       rows.push(startRow + i);
     }
 
+    pageSize = Math.min(range.getNumRows() - offset, pageSize);
+    const customeRange = range.offset(Math.min(offset, range.getNumRows() - 1), 0, pageSize);
+    const customeA1NRange = customeRange.getA1Notation();
+    const startCustomeRow = customeRange.getRow();
+    const customeRows = [];
+    for (let i = 0; i < customeRange.getNumRows(); i++) {
+      customeRows.push(startCustomeRow + i);
+    }
     // first column letter of the selected range
     const firstCol = customeRange.getA1Notation().split(':')[0].replace(/\d/g, '');
     // array of columns, input range as "C8:E12" will return ["C", "D", "E"]
@@ -85,12 +45,15 @@ function doValidationReport({ pageSize = 3, offset = 0, a1NotationRange, formatP
       },
       page: {
         columns: columns,
-        rows: rows,
-        maxRows: pageSize,
+        rows: customeRows,
+        pageSize: pageSize,
         offset: offset,
-        a1n: customeA1NRange
+        a1n: customeA1NRange,
+        pageNumber: Math.floor(offset / pageSize) + 1,
+        numPages: Math.ceil(range.getNumRows() / pageSize),
+        hasMoreRows: hasMoreRows
       },
-      nextRowOffset: hasMoreRows ? offset + pageSize : null,
+      nextOffset: hasMoreRows ? offset + pageSize : null,
       // allocate a 2D array to store the validation report
       report: new Array(values.length).fill(null).map(() => new Array(values[0].length).fill(null))
     };
@@ -137,6 +100,27 @@ function doValidationReport({ pageSize = 3, offset = 0, a1NotationRange, formatP
   }
 }
 
+function fetchSelectedRange() {
+  const range = SpreadsheetApp.getActiveRange();
+  const a1n = range.getA1Notation();
+  const numRows = range.getNumRows();
+  
+  const numColumns = range.getNumColumns();
+  const columns = [];
+  for (let i = 0; i < numColumns; i++) {
+      columns.push(String.fromCharCode(a1n.split(':')[0].replace(/\d/g, '').charCodeAt(0) + i));
+  }
+
+  return {
+      range: {
+          a1n: range.getA1Notation(),
+          numRows: range.getNumRows(),
+          numColumns: range.getNumColumns(),
+          columns: columns
+      }
+  };
+}
+
 function focusCell(a1n) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = sheet.getRange(a1n);
@@ -156,7 +140,7 @@ function highlightCell(a1n) {
   range.setBackground(null);
 }
 
-function prettyPrintCell(a1n, text) {
+function prettyPrintCell({ a1n, text }) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = sheet.getRange(a1n);
   const value = text || range.getValue();

@@ -1,10 +1,10 @@
-// Test_ViewModel.gs
+// test_ViewModel.gs
 class Test_ViewModel {
     constructor() {
         QUnit.module("ViewModel");
         this.runTests();
     }
-    
+
     runTests() {
         const tests = [
             "test_AB",
@@ -13,25 +13,30 @@ class Test_ViewModel {
         tests.forEach(test => this[test]());
     }
 
+    // This is example of "content" from JavaScript.html file:
+    // <script>
+    //      var AddOns = AddOns || {}; 
+    //      AddOns.ViewModel = AddOns.ViewModel || {};</script>"
+    // </script>
     test_AB() {
         QUnit.test("AB Test", function (assert) {
             // load JavaScript.html file content 
-            // this is the content of the JavaScript.html file
-            // <script>
-            //      var AddOns = AddOns || {}; 
-            //      AddOns.ViewModel = AddOns.ViewModel || {};</script>"
-            // </script>
-            const htmlScript = HtmlService.createHtmlOutputFromFile('JavaScript').getContent();
-            assert.ok(htmlScript, "JavaScript file");
-            // evaluate the content of the JavaScript.html file
-            // this will create the AddOns object
-            // and the ViewModel object
-            const htmlOutput = HtmlService.createHtmlOutput(htmlScript).evaluate();
-            assert.ok(htmlOutput, "JavaScript output");
+            const content = HtmlService.createHtmlOutputFromFile('component/validator/JavaScript').getContent();
+            assert.ok(content, "JavaScript content loaded");
 
-            // get the content of the htmlOutput
-            const content = htmlOutput.getContent();
-            assert.ok(content, "JavaScript content");
+            // bind script content to new object
+            const javaScript = new Function(content.replaceAll('<script>', '').replaceAll('</script>', ''));
+            assert.ok(javaScript, "Script content binded to new object");
+            // execute 'new AddOns.ViewModel()' and bind it to 'viewModel'
+
+            const jsObject = new javaScript();
+            assert.ok(jsObject, "Script executed");
+
+            // check if 'jsObject' is an object
+            assert.ok(jsObject instanceof Object, "viewModel is an object");
+
+            // check if 'jsObject' has 'AddOns' namespace
+            assert.ok(jsObject.AddOns, "viewModel has AddOns namespace");
         });
     }
 

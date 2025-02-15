@@ -1,4 +1,4 @@
-// Test_Addons.gs is a test class for the functioalities of the add-ons.
+// test_Addons.gs
 class Test_Addons {
     constructor() {
         QUnit.module("Addons");

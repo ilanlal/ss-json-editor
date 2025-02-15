@@ -12,6 +12,7 @@ function doGet(e) {
 function doGetMainTest() {
     new Test_Helpers();
     new Test_ViewModel();
-    new Test_Hendler();
+    new Test_AppHendler();
+    new Test_TextEditorHandler();
     new Test_Addons();
 }

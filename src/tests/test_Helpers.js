@@ -1,4 +1,4 @@
-// Test_Helpers.gs
+// test_Helpers.gs
 class Test_Helpers {
     constructor() {
         QUnit.module("Helpers");
