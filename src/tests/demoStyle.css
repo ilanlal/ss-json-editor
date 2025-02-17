@@ -37,6 +37,8 @@ body {
 
 .card .title .led {
     float: right;
+    font-size: 12px;
+    border-radius: 50%;
 }
 
 .card .title .subtitle1, .card .title .subtitle2 {
@@ -72,52 +74,7 @@ body {
     padding: 10px;
 }
 
-table {
-    /* limit the height of the table */
-    
-    overflow-y: hidden;
-    
-    /* set the width of the table */
-    width: 100%;
-    border-collapse: collapse;
-    color: #333;
-    font-size: 11px;
-}
 
-th,
-td {
-    /* set the width of the columns */
-    width: auto;
-    /* set the border of the table lik google sheet */
-    border: 1px solid #CCC;
-    padding: 2px;
-    text-align: center;
-    font-weight: lighter;
-}
-
-th {
-    background-color: #EEE;
-}
-
-td {
-    background-color: #FFF;
-} 
-
-td.active {
-    background-color: #FF0;
-    cursor: crosshair;
-}
-/* set the width of the first column as google sheet style */
-td:first-child {
-    max-width: 60px;
-    background-color: #EEE;
-    border: 1px ridge #AAA;
-}
-
-.report {
-    width: 100%;
-    border-collapse: collapse;
-}
 
 .caption {
     width: 100%;
@@ -175,12 +132,13 @@ td:first-child {
     font-size: 12px;
 }
 
+
 .button:hover {
-    background-color: #3e8e41;
+    color: #333;
 }
 
 .button:active {
-    background-color: #3e8e41;
+    background-color: #AFAF00;
 }
 
 .button.disabled {
@@ -237,4 +195,9 @@ td:first-child {
 
 .left {
     text-align: left;
+}
+
+.center {
+    display: block;
+    margin: auto;
 }

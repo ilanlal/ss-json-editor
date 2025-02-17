@@ -20,104 +20,9 @@
         margin: 0 0 8px 0;
     }
 
-    table {
-        /* freeze the first column */
-        table-layout: fixed;
-        /* allow the rows to be scrolled */
-        overflow-y: scroll;
-        /* set the height of the table */
-        max-height: 250px;
-        /* set the width of the table */
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th,
-    td {
-        /* set the width of the columns */
-        width: auto;
-        /* set the border of the table lik google sheet */
-        border: 1px solid #ccc;
-    }
-
-    th {
-        background-color: #AAA;
-        font-size: 14px;
-        font-weight: bold;
-        text-align: center;
-    }
-
-    td {
-        font-size: 14px;
-        text-align: center;
-    }
-
-    /* set the width of the first column */
-    th:first-child,
-    td:first-child {
-        width: 48px;
-        background-color: #AAA;
-        font-size: 14px;
-        font-weight: bold;
-        text-align: center;
-    }
-
     .feedback {
         font-size: 14px;
         text-align: left;
-    }
-
-    .button {
-        border: none;
-        color: white;
-        padding: 4px 12px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 14px;
-        margin: 4px 2px;
-        cursor: pointer;
-    }
-
-    .button-small {
-        padding: 2px 8px;
-        font-size: 12px;
-        margin: 0 1px;
-    }
-
-    .button:hover {
-        background-color: #3e8e41;
-    }
-
-    .button:active {
-        background-color: #3e8e41;
-    }
-
-    .button.disabled {
-        background-color: #ccc;
-    }
-
-    .button-primary {
-        background-color: #2196F3;
-        /* Blue */
-    }
-
-    .report {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .caption {
-        width: 100%;
-        font-size: 14px;
-        font-weight: bold;
-        background-color: #AAA;
-        text-align: center;
-    }
-
-    .report-cell {
-        text-align: center;
-        cursor: pointer;
     }
 
     .success {
@@ -159,33 +64,7 @@
         background-color: #607d8b;
         /* Blue */
     }
-
-    .dark {
-        background-color: #333;
-        /* Blue */
-    }
-
-    .light {
-        background-color: #f1f1f1;
-        /* Blue */
-    }
-
-    .subtitle {
-        padding: 0;
-        font-size: 14px;
-    }
-
-    .body1 {
-        padding: 2px 8px;
-        font-size: 16px;
-    }
-
-    .body2 {
-        padding: 2px 8px;
-        font-size: 14px;
-        font-style: italic;
-    }
-
+    
     .container {
         display: flex;
         flex-wrap: wrap;
@@ -207,51 +86,6 @@
 
     .center {
         justify-content: center;
-    }
-
-    .card {
-        background-color: #BBB;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin: 10px;
-        padding: 16px;
-    }
-
-    .card .title {
-        color: #333;
-        font-size: 24px;
-        margin: 0 0 10px 0;
-    }
-
-    .card .subtitle {
-        color: #666;
-        font-size: 15px;
-        margin: 0 0 10px 0;
-    }
-
-    .card .body1 {
-        color: #666;
-        font-size: 16px;
-        margin: 0 0 10px 0;
-    }
-
-    .card .body2 {
-        color: #666;
-        font-size: 14px;
-        margin: 0;
-    }
-
-    .card .action {
-        margin-top: 20px;
-        text-align: right;
-    }
-
-    .label {
-        font-size: 9px;
-        font-weight: bold;
-        padding: 2px;
-        margin-right: 2px;
-        cursor: default;
     }
 
     .hidden {

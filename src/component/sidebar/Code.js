@@ -76,7 +76,7 @@ function doValidationReport({ pageSize = 3, offset = 0, a1n, formatPattern }) {
           response.report[i][j] = {
             'valid': true,
             'icon': '✅',
-            'range': range.getCell(i + 1, j + 1).getA1Notation(),
+            'range': range.getCell(i + 1 + offset, j + 1).getA1Notation(),
             'input': values[i][j],
             'message': 'Valid JSON'
           };
@@ -84,7 +84,7 @@ function doValidationReport({ pageSize = 3, offset = 0, a1n, formatPattern }) {
           response.report[i][j] = {
             'valid': false,
             'icon': '❌',
-            'range': range.getCell(i + 1, j + 1).getA1Notation(),
+            'range': range.getCell(i + 1 + offset, j + 1).getA1Notation(),
             'message': error.toString(),
             'input': values[i][j]
           };
@@ -104,20 +104,20 @@ function fetchSelectedRange() {
   const range = SpreadsheetApp.getActiveRange();
   const a1n = range.getA1Notation();
   const numRows = range.getNumRows();
-  
+
   const numColumns = range.getNumColumns();
   const columns = [];
   for (let i = 0; i < numColumns; i++) {
-      columns.push(String.fromCharCode(a1n.split(':')[0].replace(/\d/g, '').charCodeAt(0) + i));
+    columns.push(String.fromCharCode(a1n.split(':')[0].replace(/\d/g, '').charCodeAt(0) + i));
   }
 
   return {
-      range: {
-          a1n: range.getA1Notation(),
-          numRows: range.getNumRows(),
-          numColumns: range.getNumColumns(),
-          columns: columns
-      }
+    range: {
+      a1n: range.getA1Notation(),
+      numRows: range.getNumRows(),
+      numColumns: range.getNumColumns(),
+      columns: columns
+    }
   };
 }
 
@@ -130,14 +130,18 @@ function focusCell(a1n) {
 function highlightCell(a1n) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = sheet.getRange(a1n);
-  // set the background color blink to yellow for 1 second
-  range.setBackground('#FFFF00');
-  // flush the changes
-  SpreadsheetApp.flush();
-
-  // sleep for 2 seconds
-  Utilities.sleep(2000);
-  range.setBackground(null);
+  const orgColor = range.getBackground();
+  for (let i = 0; i < 3; i++) {
+    // set the background color blink to yellow for 1 second
+    range.setBackground('#FFFF00');
+    // flush the changes
+    SpreadsheetApp.flush();
+    // sleep for 1 seconds
+    Utilities.sleep(500);
+    range.setBackground(orgColor);
+    SpreadsheetApp.flush();
+    Utilities.sleep(250);
+  }
 }
 
 function prettyPrintCell({ a1n, text }) {
@@ -202,6 +206,11 @@ function saveCell(a1n, value) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const range = sheet.getRange(a1n);
     range.setValue(value);
+    return {
+      a1n: a1n,
+      input: value,
+      message: 'Cell value saved successfully'
+    };
   }
   catch (error) {
     SpreadsheetApp.getActiveSpreadsheet().toast('Error while saving the cell value', error.toString(), 15);

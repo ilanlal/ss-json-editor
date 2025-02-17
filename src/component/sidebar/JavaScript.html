@@ -1,6 +1,5 @@
 <!-- JavaScript -->
 <script>
-
     (function () {
         const PAGE_SIZE = 3;
         //resource = 
@@ -10,7 +9,7 @@
             version: '0.0.1',
             en: {
                 "appTitle": "JSON Studio",
-                "loading": "Loading... please wait",
+                "loading": "Loading...",
                 "refresh": "Refresh",
                 "minifyAll": "Minify All",
                 "prittfyAll": "Prittfy All",
@@ -35,11 +34,12 @@
                 "numRows": "Number of rows",
                 "pageSize": "Page size",
                 "offset": "Offset",
-                "nextOffset": "Next offset"
+                "nextOffset": "Next offset",
+                "page": "Page"
             },
             fr: {
                 "appTitle": "JSON Studio",
-                "loading": "Chargement... veuillez patienter",
+                "loading": "Chargement...",
                 "refresh": "Actualiser",
                 "minifyAll": "Minifier tout",
                 "prittfyAll": "Prittfy tout",
@@ -64,20 +64,12 @@
                 "numRows": "Nombre de lignes",
                 "pageSize": "Taille de la page",
                 "offset": "Décalage",
-                "nextOffset": "Décalage suivant"
+                "nextOffset": "Décalage suivant",
+                "page": "Page"
             }
         };
         const locale = 'en';
         const resources = Global_Resources[locale];
-
-        var myRunner = google.script.run
-            .withSuccessHandler(function () {
-                // set the loading message
-                document.getElementById("loading").innerHTML = 'Done';
-            })
-            .withFailureHandler(function (error) {
-                document.getElementById("loading").innerHTML = 'Error: ' + error.message;
-            });
 
         // Sidebar
         this.Sidebar = {
@@ -88,9 +80,13 @@
                     console.log('😀 start', e);
                     const viewModel = addon.Sidebar.ViewModel;
                     viewModel.renderSidebar({ container: document.getElementById("app") });
-                    viewModel.renderLoading({ message: resources.loading });
-                    viewModel.disableAllButtons();
+                    viewModel.renderSubtitle({
+                        cardKey: 'state',
+                        message: resources.loading
+                    });
                     viewModel.renderLed({ led: '🟡' });
+                    viewModel.disableAllButtons();
+
                     // call the server
                     google.script.run
                         .withSuccessHandler(addon.Sidebar.AppHandler.onServerSuccess)
@@ -102,7 +98,10 @@
                     console.log('😀 onClick', e);
                     const viewModel = addon.Sidebar.ViewModel;
                     if (e.target.id === 'refresh') {
-                        viewModel.renderLoading({ message: resources.loading });
+                        viewModel.renderSubtitle({
+                            cardKey: 'state',
+                            message: resources.loading
+                        });
                         viewModel.disableAllButtons();
                         viewModel.renderLed({ led: '🟡' });
                         google.script.run
@@ -115,6 +114,13 @@
                 onServerSuccess: (response) => {
                     console.log('😀 onServerSuccess', response);
                     const viewModel = addon.Sidebar.ViewModel;
+
+                    viewModel.renderSubtitle({
+                        cardKey: 'state',
+                        message: resources.done
+                    });
+                    viewModel.renderLed({ led: '🔘' });
+                    viewModel.enableAllButtons();
                     // render the page with the response
                     viewModel.renderSelectedRange({
                         container: document.getElementById("selectedRange"),
@@ -129,6 +135,10 @@
                 onServerFailure: (response) => {
                     console.log('😀 onServerFailure', response);
                     const viewModel = addon.Sidebar.ViewModel;
+                    viewModel.renderSubtitle({
+                        cardKey: 'state',
+                        message: resources.error
+                    });
                     // alert the error message
                     alert(response.message);
                     viewModel.renderLed({ led: '🔴' });
@@ -146,7 +156,10 @@
                     });
                     viewModel.disableAllButtons();
                     viewModel.renderLed({ led: '🟡' });
-                    viewModel.renderLoading({ message: resources.loading });
+                    viewModel.renderSubtitle({
+                        cardKey: 'response',
+                        message: resources.loading + ' ' + resources.page + ' 1'
+                    });
                     // show the response card
                     container.classList.remove('hidden');
                     // call the server
@@ -207,12 +220,29 @@
                         container: document.getElementById("response"),
                         response
                     });
-                    viewModel.renderPagination({
-                        container: document.getElementById("pagination"),
-                        response
-                    });
-                    viewModel.renderLed({ led: '🟢' });
-                    viewModel.enableAllButtons();
+                    if (response.nextOffset) {
+                        viewModel.renderSubtitle({
+                            cardKey: 'response',
+                            message: resources.loading + ' ' + resources.page + ' ' + (response.nextOffset / PAGE_SIZE)
+                        });
+                        // fetch the next page
+                        google.script.run
+                            .withSuccessHandler(addon.Sidebar.ReportHandler.onServerSuccess)
+                            .withFailureHandler(addon.Sidebar.ReportHandler.onServerFailure)
+                            .doValidationReport({
+                                pageSize: PAGE_SIZE,
+                                offset: response.nextOffset,
+                                a1n: response.range.a1n
+                            });
+                    }
+                    else {
+                        viewModel.renderSubtitle({
+                            cardKey: 'response',
+                            message: resources.done
+                        });
+                        viewModel.renderLed({ led: '🔘' });
+                        viewModel.enableAllButtons();
+                    }
                 },
                 onServerFailure: (response) => {
                     console.log('😀 ReportHandler.onServerFailure', response);
@@ -221,6 +251,10 @@
                     viewModel.renderValidateResponse({
                         container: document.getElementById("response"),
                         response
+                    });
+                    viewModel.renderSubtitle({
+                        cardKey: 'response',
+                        message: resources.error
                     });
                     viewModel.renderLed({ led: '🔴' });
                     viewModel.enableAllButtons();
@@ -272,78 +306,75 @@
                         console.log('😀 prittfy', a1n);
                         const text = document.getElementById('textArea').value;
                         google.script.run
-                            .withSuccessHandler((response) => {
-                                console.log('😀 prettyPrintCell', response);
-                                viewModel.renderTextEditor({
-                                    container: document.getElementById("text-editor"),
-                                    a1nRange: a1n,
-                                    input: response.input,
-                                    message: response.message
-                                });
-                                viewModel.renderLed({ led: '🟢' });
-                                viewModel.enableAllButtons();
-                            })
-                            .withFailureHandler((response) => {
-                                console.log('😀 prettyPrintCell', response);
-                                viewModel.renderLed({ led: '🟢' })
-                                viewModel.enableAllButtons();
-                            })
+                            .withSuccessHandler(addon.Sidebar.TextEditorHandler.onServerSuccess)
+                            .withFailureHandler(addon.Sidebar.TextEditorHandler.onServerFailure)
                             .prettyPrintCell({ a1n, text });
                     }
                     else if (target.id === 'minify') {
                         console.log('😀 minify', a1n);
                         const text = document.getElementById('textArea').value;
                         google.script.run
-                            .withSuccessHandler((response) => {
-                                console.log('😀 minifyCell', response);
-                                viewModel.renderTextEditor({
-                                    container: document.getElementById("text-editor"),
-                                    a1nRange: a1n,
-                                    input: response.input,
-                                    message: response.message
-                                });
-                                viewModel.renderLed({ led: '🟢' })
-                                viewModel.enableAllButtons();
-                            })
-                            .withFailureHandler((response) => {
-                                console.log('😀 minifyCell', response);
-                                viewModel.renderLed({ led: '🟢' })
-                                viewModel.enableAllButtons();
-                            })
+                            .withSuccessHandler(addon.Sidebar.TextEditorHandler.onServerSuccess)
+                            .withFailureHandler(addon.Sidebar.TextEditorHandler.onServerFailure)
                             .minifyCell(a1n, text);
                     }
                     else if (target.id === 'highlight') {
                         console.log('😀 highlight', a1n);
-                        google.script.run.highlightCell(a1n);
-                        viewModel.enableAllButtons();
+                        google.script.run
+                            .withSuccessHandler(addon.Sidebar.TextEditorHandler.onServerSuccess)
+                            .withFailureHandler(addon.Sidebar.TextEditorHandler.onServerFailure)
+                            .highlightCell(a1n);
                     }
                     else if (target.id === 'save') {
                         console.log('😀 save');
                         const text = document.getElementById('textArea').value;
                         google.script.run
-                            .withSuccessHandler((response) => {
-                                console.log('😀 saveCell', response);
-                                viewModel.enableAllButtons();
-                            })
-                            .withFailureHandler((response) => {
-                                console.log('😀 saveCell', response);
-                                viewModel.enableAllButtons();
-                            })
+                            .withSuccessHandler(addon.Sidebar.TextEditorHandler.onServerSuccess)
+                            .withFailureHandler(addon.Sidebar.TextEditorHandler.onServerFailure)
                             .saveCell(a1n, text);
                     }
                     else if (target.id === 'cancel') {
                         console.log('😀 cancel');
                         // hide the text editor card
                         document.getElementById("text-editor").classList.add('hidden');
-                        viewModel.renderLed({ led: '🟢' })
-                        viewModel.enableAllButtons();
                     }
                     else {
-                        console.log('😀 unknown', a1n);
+                        console.log('🟢 else', a1n);
+                        viewModel.renderSubtitle({
+                            cardKey: 'text-editor',
+                            message: resources.done
+                        })
                         viewModel.renderLed({ led: '🔘' });
-
                         viewModel.enableAllButtons();
                     }
+                },
+                onServerSuccess: (response) => {
+                    console.log('😀 onServerSuccess', response);
+                    const viewModel = addon.Sidebar.ViewModel;
+                    if (response) {
+                        viewModel.renderTextEditor({
+                            container: document.getElementById("text-editor"),
+                            a1nRange: response.a1n,
+                            input: response.input,
+                            message: response.message
+                        });
+                    }
+                    viewModel.renderSubtitle({
+                        cardKey: 'text-editor',
+                        message: resources.done
+                    });
+                    viewModel.renderLed({ led: '🔘' });
+                    viewModel.enableAllButtons();
+                },
+                onServerFailure: (response) => {
+                    console.log('😀 onServerFailure', response);
+                    const viewModel = addon.Sidebar.ViewModel;
+                    viewModel.renderSubtitle({
+                        cardKey: 'text-editor',
+                        message: resources.error
+                    });
+                    viewModel.renderLed({ led: '🔴' });
+                    viewModel.enableAllButtons();
                 }
             },
             // View class
@@ -358,7 +389,7 @@
                     if (!container) {
                         return;
                     }
-                    let html = '';
+
                     // Add container
                     container.innerHTML = '<div class="container" id="container"></div>';
                     addon.Sidebar.ViewModel.appendStateCard({ container: container.querySelector('#container') });
@@ -372,26 +403,13 @@
                         return;
                     }
 
-                    let html = '';
-                    // Card
-                    html += '<div class="card">';
-                    // Add card title
-                    html += `  <div class="title"><span class="led"></span> ${resources.status}</div>`;
-                    html += `  <div class="content subtitle"><span id="loading"></span></div>`;
-                    // Add card content
-                    html += '  <div class="content body2">';
-                    html += '    <div id="selectedRange" class="range"></div>';
-                    html += '  </div>';
-                    // Add card actions
-                    html += '  <div id="action" class="action">';
-                    // Add Refresh button
-                    html += `    <input class="button primary" type="button" id="refresh" value="${resources.refresh}" `
-                        + 'onclick="Sidebar.AppHandler.start(event)" />';
-                    html += '  </div>';
-                    // end of card
-                    html += '</div>';
-
-                    container.innerHTML += html;
+                    addon.Sidebar.CardView.appendCard({
+                        container: container,
+                        key: 'state',
+                        title: resources.status,
+                        subtitle: resources.loading,
+                        content: '<span id="selectedRange" class="range">A1:N</span>'
+                    });
                 },
                 // append Report card
                 appendReportCard: ({ container }) => {
@@ -400,24 +418,16 @@
                         return;
                     }
 
-                    let html = '';
-                    html += '<div id="response" class="card hidden">';
-                    // Add card title
-                    html += `  <div class="title">${resources.report}</div>`;
-                    // Add card content
-                    html += '  <div class="content body1">';
-                    html += '    <div id="report" class="report"></div>';
-                    html += '    <div class="subtitle" id="summary"></div>';
-                    html += '  </div>';
-                    // Add Action bar
-                    html += '  <div class="action">';
-                    html += '    <div id="pagination" class="pagination"></div>'
-                    // end of action bar
-                    html += '  </div>';
-                    // end of response card
-                    html += '</div>';
-
-                    container.innerHTML += html;
+                    addon.Sidebar.CardView.appendCard({
+                        container: container,
+                        key: 'response',
+                        title: resources.report,
+                        subtitle: resources.loading,
+                        content: '<div id="report" class="report"></div><div class="subtitle" id="summary"></div>',
+                        actions: [
+                            { label: resources.refresh, handler: 'Sidebar.AppHandler.onClick(event)' }
+                        ]
+                    });
                 },
                 // append text editor card
                 appendTextEditorCard: ({ container }) => {
@@ -478,18 +488,6 @@
                             container: document.getElementById("report"),
                             response
                         });
-                    }
-                },
-                // renderPagination method
-                renderPagination: ({ container, response }) => {
-                    console.log('😀 renderPagination', { container, response });
-                    if (!container) {
-                        return;
-                    }
-                    container.innerHTML = '';
-                    if (response.nextOffset) {
-                        container.innerHTML += `<input class="button primary" type="button" id="nextPage" value="${resources.nextPage}" `
-                            + `onclick="Sidebar.ReportHandler.onClick(event, ${response.nextOffset}, '${response.range.a1n}')" />`;
                     }
                 },
                 // renderSummary method
@@ -637,23 +635,31 @@
                     html += '</div>';
                     container.querySelector('.content').innerHTML = html;
                 },
-                // renderLoading method
-                renderLoading: ({ message }) => {
-                    console.log('😀 renderLoading', message);
-                    const container = document.getElementById("loading");
+                // renderSubtitle method
+                renderSubtitle: ({ cardKey, message }) => {
+                    console.log('😀 renderSubtitle', message);
+                    const container = document.getElementById(cardKey);
                     if (!container) {
                         return;
                     }
-                    container.innerHTML = message;
+
+                    const subtitle = container.querySelector('.subtitle');
+                    if (!subtitle) {
+                        return;
+                    }
+                    subtitle.innerHTML = message;
                 },
                 // render led
                 renderLed: ({ led }) => {
                     console.log('😀 renderLed', led);
-                    const container = document.getElementsByClassName("led")?.[0];
-                    if (!container) {
-                        container.innerHTML = '🔘';
+                    const leds = document.getElementsByClassName("led");
+                    if (!leds) {
+                        leds.innerHTML = '🔘';
                     }
-                    container.innerHTML = led;
+
+                    for (let i = 0; i < leds.length; i++) {
+                        leds[i].innerHTML = led;
+                    }
                 },
                 // disableAllButtons method
                 disableAllButtons: () => {
@@ -674,7 +680,40 @@
                     });
                 }
             },
-
+            // CardView class
+            CardView: {
+                appendCard: ({ container, key, title, subtitle, content, actions }) => {
+                    console.log('😀 renderCard', { container, key, title, subtitle, content, actions });
+                    if (!container) {
+                        return;
+                    }
+                    let html = '';
+                    // Card
+                    html += `<div class="card" id="${key}">`;
+                    // Add card titlex
+                    html += `  <div class="title">${title}`;
+                    html += '    <div class="right led"></div>';
+                    if (subtitle) {
+                        html += `    <div class="subtitle">${subtitle}</div>`;
+                    }
+                    html += '  </div>';
+                    // Add card content
+                    html += '  <div class="content body1">';
+                    html += content;
+                    html += '  </div>';
+                    // Add card actions
+                    if (actions) {
+                        html += '  <div class="action">';
+                        actions.forEach((action) => {
+                            html += `    <input class="button primary" type="button" value="${action.label}" `
+                                + `onclick="${action.handler}" />`;
+                        });
+                    }
+                    // end of card
+                    html += '</div>';
+                    container.innerHTML += html;
+                }
+            }
         };
 
         console.log('😀 Script load', this);

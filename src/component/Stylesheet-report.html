@@ -1,0 +1,90 @@
+<style>
+    table {
+        /* limit the height of the table */
+
+        overflow-y: hidden;
+
+        /* set the width of the table */
+        width: 100%;
+        border-collapse: collapse;
+        color: #333;
+        font-size: 11px;
+    }
+
+    th,
+    td {
+        /* set the width of the columns */
+        width: auto;
+        /* set the border of the table lik google sheet */
+        border: 1px solid #CCC;
+        padding: 2px;
+        text-align: center;
+        font-weight: lighter;
+    }
+
+    th {
+        background-color: #EEE;
+    }
+
+    td {
+        background-color: #FFF;
+    }
+
+    td.active {
+        background-color: #FF0;
+        cursor: crosshair;
+    }
+
+    /* set the width of the first column as google sheet style */
+    td:first-child {
+        max-width: 60px;
+        background-color: #EEE;
+        border: 1px ridge #AAA;
+    }
+
+    .report {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .report-cell {
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .text-editor .toolbar {
+        display: block;
+        margin-top: 10px;
+
+    }
+
+    .textarea {
+        width: 100%;
+        height: 100%;
+        padding: 1px;
+        margin: 0;
+        border: 0;
+        resize: none;
+        overflow-y: scroll;
+        font-family: Arial, sans-serif;
+        word-break: break-all;
+        word-spacing: normal;
+    }
+
+    .label {
+        font-size: 9px;
+        font-weight: bold;
+        padding: 2px;
+        margin-right: 2px;
+        cursor: default;
+    }
+
+    .caption {
+        width: 100%;
+        font-size: 12px;
+        background-color: #BBB;
+        color: #333;
+        text-align: center;
+        border: 1px solid #ccc;
+    }
+</style>
