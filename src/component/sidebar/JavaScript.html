@@ -7,18 +7,78 @@
         const addon = this;
         // Global_Resources
         const Global_Resources = {
-            version: '1.0.0',
+            version: '0.0.1',
             en: {
                 "appTitle": "JSON Studio",
-                "loading": "Loading... please wait"
+                "loading": "Loading... please wait",
+                "refresh": "Refresh",
+                "minifyAll": "Minify All",
+                "prittfyAll": "Prittfy All",
+                "nextPage": "Next Page",
+                "cancel": "Cancel",
+                "save": "Save",
+                "highlight": "Highlight",
+                "prittfy": "Prittfy",
+                "minify": "Minify",
+                "done": "Done",
+                "notImplemented": "Not implemented",
+                "error": "Error: ",
+                "noValues": "No values in the selected range",
+                "status": "Status",
+                "report": "Report",
+                "textEditor": "Text Editor",
+                "totalCells": "Total cells",
+                "totalSuccess": "Total success",
+                "totalFail": "Total fails",
+                "a1nNotation": "A1 Notation range",
+                "numColumns": "Number of columns",
+                "numRows": "Number of rows",
+                "pageSize": "Page size",
+                "offset": "Offset",
+                "nextOffset": "Next offset"
             },
             fr: {
                 "appTitle": "JSON Studio",
-                "loading": "Chargement... veuillez patienter"
+                "loading": "Chargement... veuillez patienter",
+                "refresh": "Actualiser",
+                "minifyAll": "Minifier tout",
+                "prittfyAll": "Prittfy tout",
+                "nextPage": "Page suivante",
+                "cancel": "Annuler",
+                "save": "Enregistrer",
+                "highlight": "Surligner",
+                "prittfy": "Prittfy",
+                "minify": "Minifier",
+                "done": "Terminé",
+                "notImplemented": "Non implémenté",
+                "error": "Erreur: ",
+                "noValues": "Pas de valeurs dans la plage sélectionnée",
+                "status": "Statut",
+                "report": "Rapport",
+                "textEditor": "Éditeur de texte",
+                "totalCells": "Cellules totales",
+                "totalSuccess": "Succès total",
+                "totalFail": "Échecs totaux",
+                "a1nNotation": "Plage de notation A1",
+                "numColumns": "Nombre de colonnes",
+                "numRows": "Nombre de lignes",
+                "pageSize": "Taille de la page",
+                "offset": "Décalage",
+                "nextOffset": "Décalage suivant"
             }
         };
         const locale = 'en';
         const resources = Global_Resources[locale];
+
+        var myRunner = google.script.run
+            .withSuccessHandler(function () {
+                // set the loading message
+                document.getElementById("loading").innerHTML = 'Done';
+            })
+            .withFailureHandler(function (error) {
+                document.getElementById("loading").innerHTML = 'Error: ' + error.message;
+            });
+
         // Sidebar
         this.Sidebar = {
             // Model class
@@ -28,7 +88,7 @@
                     console.log('😀 start', e);
                     const viewModel = addon.Sidebar.ViewModel;
                     viewModel.renderSidebar({ container: document.getElementById("app") });
-                    viewModel.renderLoading({ container: document.getElementById("selectedRange") });
+                    viewModel.renderLoading({ message: resources.loading });
                     viewModel.disableAllButtons();
                     viewModel.renderLed({ led: '🟡' });
                     // call the server
@@ -41,11 +101,14 @@
                 onClick: (e) => {
                     console.log('😀 onClick', e);
                     const viewModel = addon.Sidebar.ViewModel;
-                    if (e.target.id === 'minifyAll') {
-                        throw new Error('Not implemented');
-                    }
-                    else if (e.target.id === 'prittfyAll') {
-                        throw new Error('Not implemented');
+                    if (e.target.id === 'refresh') {
+                        viewModel.renderLoading({ message: resources.loading });
+                        viewModel.disableAllButtons();
+                        viewModel.renderLed({ led: '🟡' });
+                        google.script.run
+                            .withSuccessHandler(addon.Sidebar.AppHandler.onServerSuccess)
+                            .withFailureHandler(addon.Sidebar.AppHandler.onServerFailure)
+                            .fetchSelectedRange();
                     }
                 },
                 // onServerSuccess method
@@ -83,6 +146,7 @@
                     });
                     viewModel.disableAllButtons();
                     viewModel.renderLed({ led: '🟡' });
+                    viewModel.renderLoading({ message: resources.loading });
                     // show the response card
                     container.classList.remove('hidden');
                     // call the server
@@ -312,17 +376,17 @@
                     // Card
                     html += '<div class="card">';
                     // Add card title
-                    html += `  <div class="title"><span class="led"></span> Staus</div>`;
+                    html += `  <div class="title"><span class="led"></span> ${resources.status}</div>`;
+                    html += `  <div class="content subtitle"><span id="loading"></span></div>`;
                     // Add card content
-                    html += '  <div class="content">';
+                    html += '  <div class="content body2">';
                     html += '    <div id="selectedRange" class="range"></div>';
                     html += '  </div>';
                     // Add card actions
-                    html += '  <div id="action" class="container flex">';
-                    // Add Minify All button
-                    html += '  <input class="button primary" type="button" id="minifyAll" value="Minify All" onclick="Sidebar.ReportHandler.onClick(event)" />';
-                    // Add Prittfy All button
-                    html += '  <input class="button primary" type="button" id="prittfyAll" value="Prittfy All" onclick="Sidebar.ReportHandler.onClick(event)" />';
+                    html += '  <div id="action" class="action">';
+                    // Add Refresh button
+                    html += `    <input class="button primary" type="button" id="refresh" value="${resources.refresh}" `
+                        + 'onclick="Sidebar.AppHandler.start(event)" />';
                     html += '  </div>';
                     // end of card
                     html += '</div>';
@@ -339,11 +403,11 @@
                     let html = '';
                     html += '<div id="response" class="card hidden">';
                     // Add card title
-                    html += '  <div class="title">Report</div>';
-                    html += '  <div class="subtitle" id="summary"></div>';
+                    html += `  <div class="title">${resources.report}</div>`;
                     // Add card content
-                    html += '  <div class="content">';
+                    html += '  <div class="content body1">';
                     html += '    <div id="report" class="report"></div>';
+                    html += '    <div class="subtitle" id="summary"></div>';
                     html += '  </div>';
                     // Add Action bar
                     html += '  <div class="action">';
@@ -365,9 +429,9 @@
                     let html = '';
                     html += '<div class="card hidden" id="text-editor">';
                     // Add card title
-                    html += '  <div class="title">Text Editor</div>';
+                    html += `  <div class="title">${resources.textEditor}</div>`;
                     // Add card content
-                    html += '  <div class="content"></div>';
+                    html += '  <div class="content body1"></div>';
                     // Add card actions
                     html += '  <div class="action"></div>';
                     // end of text editor card
@@ -382,7 +446,7 @@
                     }
                     container.innerHTML = '';
                     if (!range) {
-                        container.innerHTML = 'No values in the selected range';
+                        container.innerHTML = resources.noValues;
                         return;
                     }
                     container.innerHTML = range.a1n;
@@ -424,7 +488,7 @@
                     }
                     container.innerHTML = '';
                     if (response.nextOffset) {
-                        container.innerHTML += `<input class="button primary" type="button" id="nextPage" value="Next ${response.page.pageNumber + 1} of ${response.page.numPages}" `
+                        container.innerHTML += `<input class="button primary" type="button" id="nextPage" value="${resources.nextPage}" `
                             + `onclick="Sidebar.ReportHandler.onClick(event, ${response.nextOffset}, '${response.range.a1n}')" />`;
                     }
                 },
@@ -436,7 +500,7 @@
                     }
                     container.innerHTML = '';
                     if (!response?.range) {
-                        container.innerHTML = 'No values in the selected range';
+                        container.innerHTML = resources.noValues;
                         return;
                     }
 
@@ -453,17 +517,17 @@
                     const totalFail = totalCells - totalSuccess;
                     let div = '';
                     div += '<div class="container center">';
-                    div += `  <span class="label info" title="Total cells">T:${totalCells}</span>`;
-                    div += `  <span class="label success" title="Total success">S:${totalSuccess}</span>`;
-                    div += `  <span class="label error" title="Total fails">F:${totalFail}</span>`;
-                    div += `  <span class="label info" title="A1 Notation range">${range.a1n}</span>`;
-                    div += `  <span class="label info" title="Number of columns">C:${range.numColumns}</span>`;
-                    div += `  <span class="label info" title="range.numRows">R:${range.numRows}</span>`;
+                    div += `  <span class="label info" title="${resources.totalCells}">T:${totalCells}</span>`;
+                    div += `  <span class="label success" title="${resources.totalSuccess}">S:${totalSuccess}</span>`;
+                    div += `  <span class="label error" title="${resources.totalFail}">F:${totalFail}</span>`;
+                    div += `  <span class="label info" title="${resources.a1nNotation}">${range.a1n}</span>`;
+                    div += `  <span class="label info" title="${resources.numColumns}">C:${range.numColumns}</span>`;
+                    div += `  <span class="label info" title="${resources.numRows}">R:${range.numRows}</span>`;
                     div += '</div>';
                     div += '<div class="container center">';
-                    div += `  <span class="label info" title="page.pageSize">P:${page.pageSize}</span>`;
-                    div += `  <span class="label info" title="page.offset">O:${page.offset}</span>`;
-                    div += `  <span class="label info" title="response.nextOffset">N:${response.nextOffset || ''}</span>`;
+                    div += `  <span class="label info" title="${resources.pageSize}">P:${page.pageSize}</span>`;
+                    div += `  <span class="label info" title="${resources.offset}">O:${page.offset}</span>`;
+                    div += `  <span class="label info" title="${resources.nextOffset}">N:${response.nextOffset || ''}</span>`;
                     div += '</div>';
 
                     container.innerHTML = div;
@@ -476,7 +540,7 @@
                     }
                     container.innerHTML = '';
                     if (!range) {
-                        container.innerHTML = 'No values in the selected range';
+                        container.innerHTML = resources.noValues;
                         return;
                     }
 
@@ -485,7 +549,7 @@
                     rangeDiv.appendChild(document.createTextNode(range.a1n));
                     container.appendChild(rangeDiv);
                     const columns = range.columns || [];
-                    
+
                     const table = document.createElement('table');
                     const thead = document.createElement('thead');
                     const trh = document.createElement('tr');
@@ -508,7 +572,7 @@
                         return;
                     }
                     if (!response?.report) {
-                        container.innerHTML = 'No values in the selected range';
+                        container.innerHTML = resources.noValues;
                         return;
                     }
                     const rows = response?.page?.rows || [];
@@ -552,31 +616,35 @@
                     let html = '';
                     html += `<div class="caption">${a1nRange}</div>`;
                     html += '<div>';
-                    html += `<textarea class="textarea" id="textArea" name="textArea" rows="20" cols="30" `
+                    html += `<textarea class="textarea" id="textArea" name="textArea" rows="15" cols="25" `
                         + `onkeyup="Sidebar.TextEditorHandler.onKeyUp(event)" `
                         + `>${input || ''}</textarea>`;
                     html += '<div>';
                     html += `<div class="feedback">${message}</div>`
-                    html += '<input class="button button-small primary" type="button" id="prittfy" value="Prittfy" '
+                    html += `<input class="button button-small primary" type="button" id="prittfy" value="${resources.prittfy}" `
                         + `onclick="Sidebar.TextEditorHandler.onClick(event, '${a1nRange}')" />`;
-                    html += '<input class="button button-small primary" type="button" id="minify" value="Minify" '
+                    html += `<input class="button button-small primary" type="button" id="minify" value="${resources.minify}" `
                         + `onclick="Sidebar.TextEditorHandler.onClick(event, '${a1nRange}')" />`;
-                    html += '<input class="button button-small info" type="button" id="highlight" value="Highlight" '
+                    html += `<input class="button button-small info" type="button" id="highlight" value="${resources.highlight}" `
                         + `onclick="Sidebar.TextEditorHandler.onClick(event, '${a1nRange}')" />`;
                     html += '</div>';
                     html += '<div>';
-                    html += '<input class="button accent" type="button" id="cancel" value="Cancel" '
+                    html += `<input class="button accent" type="button" id="cancel" value="${resources.cancel}" `
                         + `onclick="Sidebar.TextEditorHandler.onClick(event, '${a1nRange}')" />`;
-                    html += '<input class="button accent" type="button" id="save" value="Save" '
+                    html += `<input class="button accent" type="button" id="save" value="${resources.save}" `
                         + `onclick="Sidebar.TextEditorHandler.onClick(event, '${a1nRange}')" />`;
                     html += '</div>';
                     html += '</div>';
                     container.querySelector('.content').innerHTML = html;
                 },
                 // renderLoading method
-                renderLoading: ({ container }) => {
-                    console.log('😀 renderLoading', container);
-                    container.innerHTML = '<div class="loading" id="loading">Loading... please wait</div>';
+                renderLoading: ({ message }) => {
+                    console.log('😀 renderLoading', message);
+                    const container = document.getElementById("loading");
+                    if (!container) {
+                        return;
+                    }
+                    container.innerHTML = message;
                 },
                 // render led
                 renderLed: ({ led }) => {
