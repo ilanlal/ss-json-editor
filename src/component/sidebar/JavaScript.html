@@ -1,7 +1,7 @@
 <!-- JavaScript -->
 <script>
     (function () {
-        const PAGE_SIZE = 3;
+        const PAGE_SIZE = 25;
         //resource = 
         const addon = this;
         // Global_Resources
@@ -81,7 +81,7 @@
                     const viewModel = addon.Sidebar.ViewModel;
                     viewModel.renderSidebar({ container: document.getElementById("app") });
                     viewModel.renderSubtitle({
-                        cardKey: 'state',
+                        cardKey: viewModel.STATE_CARD_ID,
                         message: resources.loading
                     });
                     viewModel.renderLed({ led: '🟡' });
@@ -98,16 +98,7 @@
                     console.log('😀 onClick', e);
                     const viewModel = addon.Sidebar.ViewModel;
                     if (e.target.id === 'refresh') {
-                        viewModel.renderSubtitle({
-                            cardKey: 'state',
-                            message: resources.loading
-                        });
-                        viewModel.disableAllButtons();
-                        viewModel.renderLed({ led: '🟡' });
-                        google.script.run
-                            .withSuccessHandler(addon.Sidebar.AppHandler.onServerSuccess)
-                            .withFailureHandler(addon.Sidebar.AppHandler.onServerFailure)
-                            .fetchSelectedRange();
+                        // refresh the page
                     }
                 },
                 // onServerSuccess method
@@ -116,18 +107,18 @@
                     const viewModel = addon.Sidebar.ViewModel;
 
                     viewModel.renderSubtitle({
-                        cardKey: 'state',
+                        cardKey: viewModel.STATE_CARD_ID,
                         message: resources.done
                     });
                     viewModel.renderLed({ led: '🔘' });
                     viewModel.enableAllButtons();
                     // render the page with the response
                     viewModel.renderSelectedRange({
-                        container: document.getElementById("selectedRange"),
+                        container: document.getElementById(viewModel.RANGE_ID),
                         range: response.range
                     });
                     addon.Sidebar.ReportHandler.start({
-                        container: document.getElementById("response"),
+                        container: document.getElementById(viewModel.REPORT_CARD_ID),
                         range: response.range
                     });
                 },
@@ -136,7 +127,7 @@
                     console.log('😀 onServerFailure', response);
                     const viewModel = addon.Sidebar.ViewModel;
                     viewModel.renderSubtitle({
-                        cardKey: 'state',
+                        cardKey: viewModel.STATE_CARD_ID,
                         message: resources.error
                     });
                     // alert the error message
@@ -150,6 +141,7 @@
                 start: ({ container, range }) => {
                     console.log('😀 ReportHandler.start', { container, range });
                     const viewModel = addon.Sidebar.ViewModel;
+                    // todo: render the card
                     viewModel.renderTabelReport({
                         container: document.getElementById("report"),
                         range: range
@@ -157,7 +149,7 @@
                     viewModel.disableAllButtons();
                     viewModel.renderLed({ led: '🟡' });
                     viewModel.renderSubtitle({
-                        cardKey: 'response',
+                        cardKey: viewModel.REPORT_CARD_ID,
                         message: resources.loading + ' ' + resources.page + ' 1'
                     });
                     // show the response card
@@ -173,32 +165,29 @@
                         });
                 },
                 onClick: (e, offset, a1n) => {
-                    console.log('😀 onClick', e);
+                    console.log('😀 onClick', { e, offset, a1n });
                     const viewModel = addon.Sidebar.ViewModel;
-                    viewModel.renderLed({ led: '🟡' });
-                    viewModel.disableAllButtons();
-                    if (e.target.id === "minifyAll") {
-                        google.script.run
-                            .withSuccessHandler(addon.Sidebar.ReportHandler.onServerSuccess)
-                            .withFailureHandler(addon.Sidebar.ReportHandler.onServerFailure)
-                            .doValidationReport({
-                                pageSize: PAGE_SIZE,
-                                offset: 0,
-                                a1n: a1n,
-                                formatPattern: 'minify'
-                            });
-                    }
-                    else if (e.target.id === 'prittfyAll') {
+
+                    if (e.target.id === 'refresh') {
+                        const currentA1n = document.getElementById(viewModel.RANGE_ID).innerText;
+                        viewModel.renderSubtitle({
+                            cardKey: viewModel.REPORT_CARD_ID,
+                            message: resources.refresh + ' ' + currentA1n
+                        });
                         viewModel.disableAllButtons();
                         viewModel.renderLed({ led: '🟡' });
+                        // close text editor card
+                        document.getElementById(viewModel.TEXT_CARD_ID).classList.add('hidden');
+                        // clear the report table rows
+                        document.getElementById("report").querySelector('tbody').innerHTML = '';
+                        // call the server
                         google.script.run
                             .withSuccessHandler(addon.Sidebar.ReportHandler.onServerSuccess)
                             .withFailureHandler(addon.Sidebar.ReportHandler.onServerFailure)
                             .doValidationReport({
                                 pageSize: PAGE_SIZE,
                                 offset: 0,
-                                a1n: a1n,
-                                formatPattern: 'prittfy'
+                                a1n: currentA1n
                             });
                     }
                     else if (e.target.id === 'nextPage' && offset) {
@@ -217,12 +206,12 @@
                     const viewModel = addon.Sidebar.ViewModel;
                     // render the page with the response
                     viewModel.renderValidateResponse({
-                        container: document.getElementById("response"),
+                        container: document.getElementById(viewModel.REPORT_CARD_ID),
                         response
                     });
                     if (response.nextOffset) {
                         viewModel.renderSubtitle({
-                            cardKey: 'response',
+                            cardKey: viewModel.REPORT_CARD_ID,
                             message: resources.loading + ' ' + resources.page + ' ' + (response.nextOffset / PAGE_SIZE)
                         });
                         // fetch the next page
@@ -237,7 +226,7 @@
                     }
                     else {
                         viewModel.renderSubtitle({
-                            cardKey: 'response',
+                            cardKey: viewModel.REPORT_CARD_ID,
                             message: resources.done
                         });
                         viewModel.renderLed({ led: '🔘' });
@@ -249,11 +238,11 @@
                     const viewModel = addon.Sidebar.ViewModel;
                     // render the page with the response
                     viewModel.renderValidateResponse({
-                        container: document.getElementById("response"),
+                        container: document.getElementById(viewModel.REPORT_CARD_ID),
                         response
                     });
                     viewModel.renderSubtitle({
-                        cardKey: 'response',
+                        cardKey: viewModel.REPORT_CARD_ID,
                         message: resources.error
                     });
                     viewModel.renderLed({ led: '🔴' });
@@ -267,13 +256,16 @@
                     console.log('😀 TextEditorHandler.start', { container, cell });
                     // render the text editor using viewModel
                     const viewModel = addon.Sidebar.ViewModel;
+                    document.getElementById(viewModel.TEXT_CARD_ID).classList.remove('hidden')
                     viewModel.renderTextEditor({
                         container: container,
                         a1nRange: cell.range,
                         input: cell.input,
                         message: cell.message
                     });
-                    addon.Sidebar.TextEditorHandler.onKeyUp({ target: container.querySelector('#textArea') });
+                    addon.Sidebar.TextEditorHandler.onKeyUp({
+                        target: container.querySelector(`#${addon.Sidebar.ViewModel.TEXT_AREA_ID}`)
+                    });
                 },
                 // onKeyUp method
                 onKeyUp: (e) => {
@@ -281,30 +273,39 @@
                     // validate the input
                     const text = e.target.value;
                     let isValid = true;
-                    const editorAreaDiv = document.getElementById("text-editor");
-                    const feedbackDiv = editorAreaDiv.querySelector('.feedback');
+                    const viewModel = addon.Sidebar.ViewModel;
                     try {
                         JSON.parse(text);
                         // clear the error message
-                        feedbackDiv.innerHTML = '';
-                        feedbackDiv.classList.remove('error');
+
+                        viewModel.renderSubtitle({
+                            cardKey: viewModel.TEXT_CARD_ID,
+                            message: '💫'
+                        });
+                        //feedbackDiv.classList.remove('error');
                     } catch (error) {
                         isValid = false;
                         // show the error message
-                        feedbackDiv.innerHTML = error.message;
-                        feedbackDiv.classList.add('error');
+                        //feedbackDiv.innerHTML = error.message;
+                        viewModel.renderSubtitle({
+                            cardKey: viewModel.TEXT_CARD_ID,
+                            message: `❗ ${error.message}`
+                        });
+                        //feedbackDiv.classList.add('error');
                     }
                 },
                 // onClick method
-                onClick: (e, a1n) => {
-                    console.log('😀 TextEditorHandler.onClick', { e, a1n });
+                onClick: (e) => {
+                    console.log('😀 TextEditorHandler.onClick', { e });
                     const viewModel = addon.Sidebar.ViewModel;
                     viewModel.renderLed({ led: '🟡' });
                     viewModel.disableAllButtons();
+                    const a1n = document.getElementById(viewModel.TEXT_CARD_ID).querySelector('.caption').innerText;
                     const target = e.target;
+                    const editorCard = document.getElementById(viewModel.TEXT_CARD_ID);
                     if (target.id === 'prittfy') {
                         console.log('😀 prittfy', a1n);
-                        const text = document.getElementById('textArea').value;
+                        const text = editorCard.querySelector(`#${viewModel.TEXT_AREA_ID}`).value;
                         google.script.run
                             .withSuccessHandler(addon.Sidebar.TextEditorHandler.onServerSuccess)
                             .withFailureHandler(addon.Sidebar.TextEditorHandler.onServerFailure)
@@ -312,7 +313,7 @@
                     }
                     else if (target.id === 'minify') {
                         console.log('😀 minify', a1n);
-                        const text = document.getElementById('textArea').value;
+                        const text = editorCard.querySelector(`#${viewModel.TEXT_AREA_ID}`).value;
                         google.script.run
                             .withSuccessHandler(addon.Sidebar.TextEditorHandler.onServerSuccess)
                             .withFailureHandler(addon.Sidebar.TextEditorHandler.onServerFailure)
@@ -327,7 +328,7 @@
                     }
                     else if (target.id === 'save') {
                         console.log('😀 save');
-                        const text = document.getElementById('textArea').value;
+                        const text = editorCard.querySelector(`#${viewModel.TEXT_AREA_ID}`).value;
                         google.script.run
                             .withSuccessHandler(addon.Sidebar.TextEditorHandler.onServerSuccess)
                             .withFailureHandler(addon.Sidebar.TextEditorHandler.onServerFailure)
@@ -336,12 +337,12 @@
                     else if (target.id === 'cancel') {
                         console.log('😀 cancel');
                         // hide the text editor card
-                        document.getElementById("text-editor").classList.add('hidden');
+                        document.getElementById(viewModel.TEXT_CARD_ID).classList.add('hidden');
                     }
                     else {
                         console.log('🟢 else', a1n);
                         viewModel.renderSubtitle({
-                            cardKey: 'text-editor',
+                            cardKey: viewModel.TEXT_CARD_ID,
                             message: resources.done
                         })
                         viewModel.renderLed({ led: '🔘' });
@@ -353,14 +354,14 @@
                     const viewModel = addon.Sidebar.ViewModel;
                     if (response) {
                         viewModel.renderTextEditor({
-                            container: document.getElementById("text-editor"),
+                            container: document.getElementById(viewModel.TEXT_CARD_ID),
                             a1nRange: response.a1n,
                             input: response.input,
                             message: response.message
                         });
                     }
                     viewModel.renderSubtitle({
-                        cardKey: 'text-editor',
+                        cardKey: viewModel.TEXT_CARD_ID,
                         message: resources.done
                     });
                     viewModel.renderLed({ led: '🔘' });
@@ -370,7 +371,7 @@
                     console.log('😀 onServerFailure', response);
                     const viewModel = addon.Sidebar.ViewModel;
                     viewModel.renderSubtitle({
-                        cardKey: 'text-editor',
+                        cardKey: viewModel.TEXT_CARD_ID,
                         message: resources.error
                     });
                     viewModel.renderLed({ led: '🔴' });
@@ -379,6 +380,13 @@
             },
             // View class
             ViewModel: {
+                STATE_CARD_ID: 'state-card',
+                REPORT_CARD_ID: 'report-card',
+                TEXT_CARD_ID: 'text-card',
+                TEXT_AREA_ID: 'text-editor',
+                SUMMARY_ID: 'summary',
+                RANGE_ID: 'selectedRange',
+                // start method
                 start: () => {
                     console.log('😀 ViewModel.start');
                     addon.Sidebar.ViewModel.renderSidebar({ container: document.getElementById("app") });
@@ -391,10 +399,10 @@
                     }
 
                     // Add container
-                    container.innerHTML = '<div class="container" id="container"></div>';
-                    addon.Sidebar.ViewModel.appendStateCard({ container: container.querySelector('#container') });
-                    addon.Sidebar.ViewModel.appendReportCard({ container: container.querySelector('#container') });
-                    addon.Sidebar.ViewModel.appendTextEditorCard({ container: container.querySelector('#container') });
+                    container.innerHTML = '<div class="container" id="appContainer"></div>';
+                    addon.Sidebar.ViewModel.appendStateCard({ container: container.querySelector('#appContainer') });
+                    addon.Sidebar.ViewModel.appendReportCard({ container: container.querySelector('#appContainer') });
+                    addon.Sidebar.ViewModel.appendTextEditorCard({ container: container.querySelector('#appContainer') });
                 },
                 // append State card
                 appendStateCard: ({ container }) => {
@@ -405,10 +413,10 @@
 
                     addon.Sidebar.CardView.appendCard({
                         container: container,
-                        key: 'state',
+                        key: addon.Sidebar.ViewModel.STATE_CARD_ID,
                         title: resources.status,
                         subtitle: resources.loading,
-                        content: '<span id="selectedRange" class="range">A1:N</span>'
+                        content: '<span id="selectedRange" class="range"></span>'
                     });
                 },
                 // append Report card
@@ -420,12 +428,13 @@
 
                     addon.Sidebar.CardView.appendCard({
                         container: container,
-                        key: 'response',
+                        key: addon.Sidebar.ViewModel.REPORT_CARD_ID,
                         title: resources.report,
                         subtitle: resources.loading,
-                        content: '<div id="report" class="report"></div><div class="subtitle" id="summary"></div>',
+                        hidden: true,
+                        content: '<div id="report" class="report"></div><div class="subtitle1" id="summary"></div>',
                         actions: [
-                            { label: resources.refresh, handler: 'Sidebar.AppHandler.onClick(event)' }
+                            { id: resources.refresh.toLowerCase(), label: resources.refresh, handler: 'Sidebar.ReportHandler.onClick(event)' }
                         ]
                     });
                 },
@@ -436,17 +445,45 @@
                         return;
                     }
 
+                    const actions = [
+                        { id: 'highlight', label: resources.highlight, handler: 'Sidebar.TextEditorHandler.onClick(event)' },
+                        { id: 'prittfy', label: resources.prittfy, handler: 'Sidebar.TextEditorHandler.onClick(event)' },
+                        { id: 'minify', label: resources.minify, handler: 'Sidebar.TextEditorHandler.onClick(event)' },
+                        { id: 'save', label: resources.save, handler: 'Sidebar.TextEditorHandler.onClick(event)' },
+                        { id: 'cancel', label: resources.cancel, handler: 'Sidebar.TextEditorHandler.onClick(event)' }
+                    ];
+
+                    const contet = ``;
+
+                    addon.Sidebar.CardView.appendCard({
+                        container: container,
+                        key: addon.Sidebar.ViewModel.TEXT_CARD_ID,
+                        title: resources.textEditor,
+                        subtitle: '💫',
+                        content: contet,
+                        actions: actions,
+                        hidden: true
+                    });
+                },
+                // render textarea
+                renderTextEditor: ({ container, a1nRange, input, message }) => {
+                    console.log("renderTextEditor", { container, a1nRange, input, message });
+                    const e = container.querySelector('.content');
+                    if (!e) {
+                        console.warn('🤔😶‍🌫️ e is null!!! ');
+                        return;
+                    }
+
                     let html = '';
-                    html += '<div class="card hidden" id="text-editor">';
-                    // Add card title
-                    html += `  <div class="title">${resources.textEditor}</div>`;
-                    // Add card content
-                    html += '  <div class="content body1"></div>';
-                    // Add card actions
-                    html += '  <div class="action"></div>';
-                    // end of text editor card
+                    html += `<div class="caption">${a1nRange}</div>`;
+                    html += '<div>';
+                    html += `<textarea class="textarea" id="${addon.Sidebar.ViewModel.TEXT_AREA_ID}" name="text-editor" rows="10" cols="25" `
+                        + `spellcheck="false" placeholder="Enter your text here..." onkeyup="Sidebar.TextEditorHandler.onKeyUp(event)">`;
+                    html += input || '';
+                    html += '</textarea>';
+                    
                     html += '</div>';
-                    container.innerHTML += html;
+                    e.innerHTML = html;
                 },
                 // renderSelectedRange method
                 renderSelectedRange: ({ container, range }) => {
@@ -585,10 +622,11 @@
                             td2.appendChild(document.createTextNode(col.icon));
                             td2.classList.add('report-cell');
                             td2.title = col.message;
+                            td2.id = col.a1n;
                             td2.addEventListener('click', (e) => {
                                 console.log('😀 report-cell click', e);
                                 addon.Sidebar.TextEditorHandler.start({
-                                    container: document.getElementById("text-editor"),
+                                    container: document.getElementById(addon.Sidebar.ViewModel.TEXT_CARD_ID),
                                     cell: col
                                 });
                             });
@@ -596,44 +634,6 @@
                         }
                         tbody.appendChild(tr);
                     }
-                },
-                // renderTextEditor method
-                renderTextEditor: ({ container, a1nRange, input, message }) => {
-                    console.log('😀 renderTextEditor', { container, a1nRange, input });
-                    if (!container) {
-                        return;
-                    }
-                    if (!a1nRange) {
-                        container.innerHTML = '';
-                        return;
-                    }
-
-                    // show the text editor card
-                    container.classList.remove('hidden');
-
-                    let html = '';
-                    html += `<div class="caption">${a1nRange}</div>`;
-                    html += '<div>';
-                    html += `<textarea class="textarea" id="textArea" name="textArea" rows="15" cols="25" `
-                        + `onkeyup="Sidebar.TextEditorHandler.onKeyUp(event)" `
-                        + `>${input || ''}</textarea>`;
-                    html += '<div>';
-                    html += `<div class="feedback">${message}</div>`
-                    html += `<input class="button button-small primary" type="button" id="prittfy" value="${resources.prittfy}" `
-                        + `onclick="Sidebar.TextEditorHandler.onClick(event, '${a1nRange}')" />`;
-                    html += `<input class="button button-small primary" type="button" id="minify" value="${resources.minify}" `
-                        + `onclick="Sidebar.TextEditorHandler.onClick(event, '${a1nRange}')" />`;
-                    html += `<input class="button button-small info" type="button" id="highlight" value="${resources.highlight}" `
-                        + `onclick="Sidebar.TextEditorHandler.onClick(event, '${a1nRange}')" />`;
-                    html += '</div>';
-                    html += '<div>';
-                    html += `<input class="button accent" type="button" id="cancel" value="${resources.cancel}" `
-                        + `onclick="Sidebar.TextEditorHandler.onClick(event, '${a1nRange}')" />`;
-                    html += `<input class="button accent" type="button" id="save" value="${resources.save}" `
-                        + `onclick="Sidebar.TextEditorHandler.onClick(event, '${a1nRange}')" />`;
-                    html += '</div>';
-                    html += '</div>';
-                    container.querySelector('.content').innerHTML = html;
                 },
                 // renderSubtitle method
                 renderSubtitle: ({ cardKey, message }) => {
@@ -643,11 +643,17 @@
                         return;
                     }
 
-                    const subtitle = container.querySelector('.subtitle');
-                    if (!subtitle) {
+                    const subtitle1 = container.querySelector('.subtitle1');
+                    const subtitle2 = container.querySelector('.subtitle2');
+                    if (!subtitle1 && !subtitle2) {
                         return;
                     }
-                    subtitle.innerHTML = message;
+                    if (subtitle2) {
+                        subtitle2.innerHTML = message;
+                    }
+                    else {
+                        subtitle1.innerHTML = message;
+                    }
                 },
                 // render led
                 renderLed: ({ led }) => {
@@ -682,33 +688,42 @@
             },
             // CardView class
             CardView: {
-                appendCard: ({ container, key, title, subtitle, content, actions }) => {
+                appendCard: ({ container, key, title, subtitle, content, actions, hidden }) => {
                     console.log('😀 renderCard', { container, key, title, subtitle, content, actions });
                     if (!container) {
                         return;
                     }
+
+                    // check if the card already exists
+                    const card = document.getElementById(key);
+                    if (card) {
+                        card.innerHTML = '';
+                    }
+
                     let html = '';
                     // Card
-                    html += `<div class="card" id="${key}">`;
+                    html += `<div class="card ${hidden ? 'hidden' : ''}" id="${key}">`;
                     // Add card titlex
                     html += `  <div class="title">${title}`;
                     html += '    <div class="right led"></div>';
                     if (subtitle) {
-                        html += `    <div class="subtitle">${subtitle}</div>`;
+                        html += `    <div class="subtitle1">${subtitle}</div>`;
                     }
                     html += '  </div>';
                     // Add card content
                     html += '  <div class="content body1">';
-                    html += content;
+                    html += content || '';
                     html += '  </div>';
                     // Add card actions
+                    html += '  <div class="action">';
                     if (actions) {
-                        html += '  <div class="action">';
                         actions.forEach((action) => {
-                            html += `    <input class="button primary" type="button" value="${action.label}" `
-                                + `onclick="${action.handler}" />`;
+                            html += `    <input class="button primary" type="button" value="${action.label}"`
+                                + ` id="${action.id}" `
+                                + ` onclick="${action.handler}" />`;
                         });
                     }
+                    html += '  </div>';
                     // end of card
                     html += '</div>';
                     container.innerHTML += html;
