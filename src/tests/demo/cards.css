@@ -1,0 +1,113 @@
+.card {
+    background-color: #999;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0 0 16px 0;
+    width: 100%;
+}
+
+.card .title {
+    background-color: #555;
+    font-size: 16px;
+    margin: 0;
+    padding: 10px;
+}
+
+.card .title .led {
+    float: right;
+    font-size: 12px;
+    border-radius: 50%;
+}
+
+.card .title .subtitle1,
+.card .title .subtitle2 {
+    color: #FFF;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 0 5px 5px 5px;
+    margin-top: 8px;
+    min-height: 18px;
+}
+
+.card .title .subtitle2 {
+    font-style: italic;
+}
+
+.card .content {
+    padding: 10px;
+    display: block;
+    max-height: 180px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.card .body1,
+.card .body2 {
+    font-size: 14px;
+    color: #333;
+}
+
+.card .body2 {
+    font-style: italic;
+}
+
+.card .action {
+    background-color: #555;
+    margin-top: 20px;
+    padding: 10px;
+}
+
+
+.card .action .button {
+    border: none;
+    color: white;
+    padding: 8px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    min-width: 80px;
+    max-width: 160px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.card .action .button {
+    border: none;
+    color: white;
+    padding: 8px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    min-width: 80px;
+    max-width: 160px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.card .action .button.small {
+    min-width: 60px;
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+
+.card .action .button:hover {
+    color: #333;
+}
+
+.card .action .button:active {
+    background-color: #AFAF00;
+}
+
+.card .action .button.disabled {
+    background-color: #999;
+    color: #333;
+}

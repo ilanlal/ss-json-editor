@@ -10,13 +10,19 @@
             en: {
                 "appTitle": "JSON Studio",
                 "loading": "Loading...",
+                "welcome": "Welcome",
+                "bindSelectRange": "Bind selected range",
+                "bindSelectRangeDesc": "Bind the selected range to the app",
                 "refresh": "Refresh",
                 "minifyAll": "Minify All",
                 "prittfyAll": "Prittfy All",
                 "nextPage": "Next Page",
                 "cancel": "Cancel",
+                "close": "Close",
                 "save": "Save",
-                "highlight": "Highlight",
+                "saveAndClose": "Save & Close",
+                "openInDialog": "⇱ Open",
+                "highlight": "Highlight 🔦",
                 "prittfy": "Prittfy",
                 "minify": "Minify",
                 "done": "Done",
@@ -35,18 +41,26 @@
                 "pageSize": "Page size",
                 "offset": "Offset",
                 "nextOffset": "Next offset",
-                "page": "Page"
+                "page": "Page",
+                "jsonValid": "JSON is valid",
+                "jsonInvalid": "JSON is invalid"
             },
             fr: {
                 "appTitle": "JSON Studio",
                 "loading": "Chargement...",
+                "welcome": "Bienvenue",
+                "bindSelectRange": "Lier la plage sélectionnée",
+                "bindSelectRangeDesc": "Lier la plage sélectionnée à l'application",
                 "refresh": "Actualiser",
                 "minifyAll": "Minifier tout",
                 "prittfyAll": "Prittfy tout",
                 "nextPage": "Page suivante",
                 "cancel": "Annuler",
+                "close": "Fermer",
                 "save": "Enregistrer",
-                "highlight": "Surligner",
+                "saveAndClose": "Enregistrer et fermer",
+                "openInDialog": "⇱ Ouvrir",
+                "highlight": "Surligner 🔦",
                 "prittfy": "Prittfy",
                 "minify": "Minifier",
                 "done": "Terminé",
@@ -65,7 +79,9 @@
                 "pageSize": "Taille de la page",
                 "offset": "Décalage",
                 "nextOffset": "Décalage suivant",
-                "page": "Page"
+                "page": "Page",
+                "jsonValid": "JSON est valide",
+                "jsonInvalid": "JSON est invalide"
             }
         };
         const locale = 'en';
@@ -80,12 +96,10 @@
                     console.log('😀 start', e);
                     const viewModel = addon.Sidebar.ViewModel;
                     viewModel.renderSidebar({ container: document.getElementById("app") });
-                    viewModel.renderSubtitle({
+                    viewModel.renderWorkInProgress({
                         cardKey: viewModel.STATE_CARD_ID,
-                        message: resources.loading
+                        message: resources.bindSelectRangeDesc
                     });
-                    viewModel.renderLed({ led: '🟡' });
-                    viewModel.disableAllButtons();
 
                     // call the server
                     google.script.run
@@ -105,13 +119,11 @@
                 onServerSuccess: (response) => {
                     console.log('😀 onServerSuccess', response);
                     const viewModel = addon.Sidebar.ViewModel;
-
-                    viewModel.renderSubtitle({
+                    viewModel.renderIdleState({
                         cardKey: viewModel.STATE_CARD_ID,
                         message: resources.done
                     });
-                    viewModel.renderLed({ led: '🔘' });
-                    viewModel.enableAllButtons();
+
                     // render the page with the response
                     viewModel.renderSelectedRange({
                         container: document.getElementById(viewModel.RANGE_ID),
@@ -134,6 +146,7 @@
                     alert(response.message);
                     viewModel.renderLed({ led: '🔴' });
                     viewModel.enableAllButtons();
+
                 }
             },
             // ReportHandler class
@@ -146,11 +159,10 @@
                         container: document.getElementById("report"),
                         range: range
                     });
-                    viewModel.disableAllButtons();
-                    viewModel.renderLed({ led: '🟡' });
-                    viewModel.renderSubtitle({
+
+                    viewModel.renderWorkInProgress({
                         cardKey: viewModel.REPORT_CARD_ID,
-                        message: resources.loading + ' ' + resources.page + ' 1'
+                        message: resources.loading + ' ' + resources.page + ' 1' + ' ' + range.a1n
                     });
                     // show the response card
                     container.classList.remove('hidden');
@@ -170,12 +182,12 @@
 
                     if (e.target.id === 'refresh') {
                         const currentA1n = document.getElementById(viewModel.RANGE_ID).innerText;
-                        viewModel.renderSubtitle({
+
+                        viewModel.renderWorkInProgress({
                             cardKey: viewModel.REPORT_CARD_ID,
                             message: resources.refresh + ' ' + currentA1n
                         });
-                        viewModel.disableAllButtons();
-                        viewModel.renderLed({ led: '🟡' });
+
                         // close text editor card
                         document.getElementById(viewModel.TEXT_CARD_ID).classList.add('hidden');
                         // clear the report table rows
@@ -280,30 +292,31 @@
 
                         viewModel.renderSubtitle({
                             cardKey: viewModel.TEXT_CARD_ID,
-                            message: '💫'
+                            message: `✓ ${resources.jsonValid}`,
+                            className: 'success'
                         });
-                        //feedbackDiv.classList.remove('error');
                     } catch (error) {
                         isValid = false;
                         // show the error message
-                        //feedbackDiv.innerHTML = error.message;
                         viewModel.renderSubtitle({
                             cardKey: viewModel.TEXT_CARD_ID,
-                            message: `❗ ${error.message}`
+                            message: `⨂ ${error.message}`,
+                            className: 'accent'
                         });
-                        //feedbackDiv.classList.add('error');
                     }
                 },
                 // onClick method
                 onClick: (e) => {
                     console.log('😀 TextEditorHandler.onClick', { e });
                     const viewModel = addon.Sidebar.ViewModel;
-                    viewModel.renderLed({ led: '🟡' });
-                    viewModel.disableAllButtons();
                     const a1n = document.getElementById(viewModel.TEXT_CARD_ID).querySelector('.caption').innerText;
                     const target = e.target;
                     const editorCard = document.getElementById(viewModel.TEXT_CARD_ID);
                     if (target.id === 'prittfy') {
+                        viewModel.renderWorkInProgress({
+                            cardKey: viewModel.TEXT_CARD_ID,
+                            message: resources.prittfy
+                        });
                         console.log('😀 prittfy', a1n);
                         const text = editorCard.querySelector(`#${viewModel.TEXT_AREA_ID}`).value;
                         google.script.run
@@ -313,6 +326,10 @@
                     }
                     else if (target.id === 'minify') {
                         console.log('😀 minify', a1n);
+                        viewModel.renderWorkInProgress({
+                            cardKey: viewModel.TEXT_CARD_ID,
+                            message: resources.minify
+                        });
                         const text = editorCard.querySelector(`#${viewModel.TEXT_AREA_ID}`).value;
                         google.script.run
                             .withSuccessHandler(addon.Sidebar.TextEditorHandler.onServerSuccess)
@@ -321,6 +338,10 @@
                     }
                     else if (target.id === 'highlight') {
                         console.log('😀 highlight', a1n);
+                        viewModel.renderWorkInProgress({
+                            cardKey: viewModel.TEXT_CARD_ID,
+                            message: resources.highlight
+                        });
                         google.script.run
                             .withSuccessHandler(addon.Sidebar.TextEditorHandler.onServerSuccess)
                             .withFailureHandler(addon.Sidebar.TextEditorHandler.onServerFailure)
@@ -328,26 +349,30 @@
                     }
                     else if (target.id === 'save') {
                         console.log('😀 save');
+                        viewModel.renderWorkInProgress({
+                            cardKey: viewModel.TEXT_CARD_ID,
+                            message: resources.save
+                        });
                         const text = editorCard.querySelector(`#${viewModel.TEXT_AREA_ID}`).value;
                         google.script.run
                             .withSuccessHandler(addon.Sidebar.TextEditorHandler.onServerSuccess)
                             .withFailureHandler(addon.Sidebar.TextEditorHandler.onServerFailure)
                             .saveCell(a1n, text);
                     }
-                    else if (target.id === 'cancel') {
-                        console.log('😀 cancel');
+                    else if (target.id === 'close') {
+                        console.log('😀 close');
                         // hide the text editor card
                         document.getElementById(viewModel.TEXT_CARD_ID).classList.add('hidden');
                     }
-                    else {
-                        console.log('🟢 else', a1n);
-                        viewModel.renderSubtitle({
-                            cardKey: viewModel.TEXT_CARD_ID,
-                            message: resources.done
-                        })
-                        viewModel.renderLed({ led: '🔘' });
-                        viewModel.enableAllButtons();
+                    else if (target.id === 'openInDialog') {
+                        console.log('😀 openInDialog', a1n);
+                        // open the dialog
+                        google.script.run
+                            .withSuccessHandler(addon.Sidebar.TextEditorHandler.onServerSuccess)
+                            .withFailureHandler(addon.Sidebar.TextEditorHandler.onServerFailure)
+                            .openEditor(a1n);
                     }
+
                 },
                 onServerSuccess: (response) => {
                     console.log('😀 onServerSuccess', response);
@@ -414,8 +439,8 @@
                     addon.Sidebar.CardView.appendCard({
                         container: container,
                         key: addon.Sidebar.ViewModel.STATE_CARD_ID,
-                        title: resources.status,
-                        subtitle: resources.loading,
+                        title: resources.welcome,
+                        subtitle: resources.bindSelectRangeDesc,
                         content: '<span id="selectedRange" class="range"></span>'
                     });
                 },
@@ -430,11 +455,16 @@
                         container: container,
                         key: addon.Sidebar.ViewModel.REPORT_CARD_ID,
                         title: resources.report,
-                        subtitle: resources.loading,
+                        subtitle: resources.bindSelectRange,
                         hidden: true,
                         content: '<div id="report" class="report"></div><div class="subtitle1" id="summary"></div>',
                         actions: [
-                            { id: resources.refresh.toLowerCase(), label: resources.refresh, handler: 'Sidebar.ReportHandler.onClick(event)' }
+                            {
+                                id: resources.refresh.toLowerCase(),
+                                className: 'primary small',
+                                label: resources.refresh,
+                                handler: 'Sidebar.ReportHandler.onClick(event)'
+                            }
                         ]
                     });
                 },
@@ -446,11 +476,38 @@
                     }
 
                     const actions = [
-                        { id: 'highlight', label: resources.highlight, handler: 'Sidebar.TextEditorHandler.onClick(event)' },
-                        { id: 'prittfy', label: resources.prittfy, handler: 'Sidebar.TextEditorHandler.onClick(event)' },
-                        { id: 'minify', label: resources.minify, handler: 'Sidebar.TextEditorHandler.onClick(event)' },
-                        { id: 'save', label: resources.save, handler: 'Sidebar.TextEditorHandler.onClick(event)' },
-                        { id: 'cancel', label: resources.cancel, handler: 'Sidebar.TextEditorHandler.onClick(event)' }
+                        {
+                            id: 'highlight', className: 'small primary-dark',
+                            label: resources.highlight,
+                            handler: 'Sidebar.TextEditorHandler.onClick(event)'
+                        },
+                        {
+                            id: 'prittfy', className: 'small primary',
+                            label: resources.prittfy,
+                            handler: 'Sidebar.TextEditorHandler.onClick(event)'
+                        },
+                        {
+                            id: 'minify',
+                            className: 'small primary',
+                            label: resources.minify,
+                            handler: 'Sidebar.TextEditorHandler.onClick(event)'
+                        },
+                        {
+                            id: 'openInDialog',
+                            className: 'small secondary',
+                            label: resources.openInDialog,
+                            handler: 'Sidebar.TextEditorHandler.onClick(event)'
+                        },
+                        {
+                            id: 'close',
+                            className: 'small secondary',
+                            label: resources.close, handler: 'Sidebar.TextEditorHandler.onClick(event)'
+                        },
+                        {
+                            id: 'save', className: 'accent right',
+                            label: resources.save,
+                            handler: 'Sidebar.TextEditorHandler.onClick(event)'
+                        }
                     ];
 
                     const contet = ``;
@@ -481,7 +538,7 @@
                         + `spellcheck="false" placeholder="Enter your text here..." onkeyup="Sidebar.TextEditorHandler.onKeyUp(event)">`;
                     html += input || '';
                     html += '</textarea>';
-                    
+
                     html += '</div>';
                     e.innerHTML = html;
                 },
@@ -623,6 +680,7 @@
                             td2.classList.add('report-cell');
                             td2.title = col.message;
                             td2.id = col.a1n;
+                            td2.classList.add(col.isValid ? 'valid' : 'invalid');
                             td2.addEventListener('click', (e) => {
                                 console.log('😀 report-cell click', e);
                                 addon.Sidebar.TextEditorHandler.start({
@@ -634,6 +692,28 @@
                         }
                         tbody.appendChild(tr);
                     }
+                },
+                // renderWorkInProgress method
+                renderWorkInProgress: ({ cardKey, message }) => {
+                    console.log('😀 renderWorkInProgress');
+                    const viewModel = addon.Sidebar.ViewModel;
+                    viewModel.renderSubtitle({
+                        cardKey: cardKey,
+                        message: message
+                    });
+                    viewModel.renderLed({ led: '🟡' });
+                    viewModel.disableAllButtons();
+                },
+                // render idle state
+                renderIdleState: ({ cardKey, message }) => {
+                    console.log('😀 renderIdleState');
+                    const viewModel = addon.Sidebar.ViewModel;
+                    viewModel.renderSubtitle({
+                        cardKey: cardKey,
+                        message: message
+                    });
+                    viewModel.renderLed({ led: '' });
+                    viewModel.enableAllButtons();
                 },
                 // renderSubtitle method
                 renderSubtitle: ({ cardKey, message }) => {
@@ -675,6 +755,11 @@
                         button.disabled = true;
                         button.classList.add('disabled');
                     });
+
+                    const textAreas = document.querySelectorAll('textarea');
+                    textAreas.forEach((textArea) => {
+                        textArea.disabled = true;
+                    });
                 },
                 // enableAllButtons method
                 enableAllButtons: () => {
@@ -683,6 +768,11 @@
                     buttons.forEach((button) => {
                         button.disabled = false;
                         button.classList.remove('disabled');
+                    });
+
+                    const textAreas = document.querySelectorAll('textarea');
+                    textAreas.forEach((textArea) => {
+                        textArea.disabled = false;
                     });
                 }
             },
@@ -714,16 +804,17 @@
                     html += '  <div class="content body1">';
                     html += content || '';
                     html += '  </div>';
-                    // Add card actions
-                    html += '  <div class="action">';
+
                     if (actions) {
+                        // Add card actions
+                        html += '  <div class="action">';
                         actions.forEach((action) => {
-                            html += `    <input class="button primary" type="button" value="${action.label}"`
+                            html += `    <input class="button ${action.className || 'primary'}" type="button" value="${action.label}"`
                                 + ` id="${action.id}" `
                                 + ` onclick="${action.handler}" />`;
                         });
+                        html += '  </div>';
                     }
-                    html += '  </div>';
                     // end of card
                     html += '</div>';
                     container.innerHTML += html;

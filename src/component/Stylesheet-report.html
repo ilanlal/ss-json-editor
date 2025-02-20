@@ -31,13 +31,17 @@
     }
 
     td.active {
-        background-color: #FF0;
+        background-color: #FF9;
         cursor: crosshair;
     }
 
+    td:hover {
+        background-color: #FFC;
+    }
+
     /* set the width of the first column as google sheet style */
-    td:first-child {
-        max-width: 60px;
+   th:first-child, td:first-child {
+        width: 40px;
         background-color: #EEE;
         border: 1px ridge #AAA;
     }
@@ -48,14 +52,9 @@
     }
 
     .report-cell {
+        font-weight: bold;
         text-align: center;
         cursor: pointer;
-    }
-
-    .text-editor .toolbar {
-        display: block;
-        margin-top: 10px;
-
     }
 
     .textarea {
@@ -85,5 +84,15 @@
         color: #333;
         text-align: center;
         border: 1px solid #ccc;
+    }
+
+    .valid {
+        color: #4CAF50;
+        /* Green */
+    }
+
+    .invalid {
+        color: #f44336;
+        /* Red */
     }
 </style>

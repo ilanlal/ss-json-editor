@@ -6,65 +6,16 @@ function onOpen(e) {
     // The label for a menu item should be in sentence case (only the first word capitalized).
     // see https://developers.google.com/apps-script/reference/base/menu#detailed-documentation
     ui.createMenu('JSON Studio')
-        .addItem('Vallidate selected range', 'openSidebarIndex_')
-        .addSubMenu(SpreadsheetApp.getUi().createMenu('Format selected range')
-            .addItem('Minify selected range', 'openSidebarIndex_')
-            .addItem('Pretty print selected range', 'openSidebarIndex_'))
-        .addItem('Open dialog', 'openDialogHelp_')
+        .addItem("⇱ Edit", 'openEditorDialog')
+        .addItem('▦ Range', 'openSidebarView')
+        .addSubMenu(SpreadsheetApp.getUi().createMenu('↹ Format')
+            .addItem('Minify', 'minifyRange')
+            .addItem('Prettify', 'prettifyRange'))
         .addSeparator()
-        .addItem('Setting', 'openSidebarSetting_')
+        .addItem('⨏ Setting', 'openSettingDialog')
         .addSeparator()
-        .addItem('Help', 'openSidebarHelp_')
-        .addItem('About', 'openSidebarAbout_')
+        .addItem('⁈ Help', 'openHelpDialog')
         .addToUi();
-}
-
-
-function getRecords(a1n) {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const range = a1n ? sheet.getRange(a1n) : sheet.getDataRange();
-
-    // first column letter of the selected range
-    const firstCol = customeRange.getA1Notation().split(':')[0].replace(/\d/g, '');
-    // array of columns, input range as "C8:E12" will return ["C", "D", "E"]
-    const columns = [];
-    for (let i = 0; i < customeRange.getNumColumns(); i++) {
-        columns.push(String.fromCharCode(firstCol.charCodeAt(0) + i));
-    }
-
-    const startRow = range.getRow();
-    // array of rows, input range as "C8:E12" will return [8, 9, 10, 11, 12]
-    const rows = [];
-    for (let i = 0; i < range.getNumRows(); i++) {
-        rows.push(startRow + i);
-    }
-
-    // get the values ([[]]) of the selected range
-    const rangeValues = range.getValues();
-    var records = [];
-    // for each record in the selected range create a record object
-    for (let i = 0; i < rangeValues.length; i++) {
-        const rowValues = rangeValues[i];
-        // create a new record object
-        var record = {
-            // line number of the record
-            line: startRow + i,
-
-        };
-
-        // for each column in the record
-        for (let j = 0; j < values[i].length; j++) {
-            // a1 notation of the cell
-            const currentRange = columns[j] + rows[i];
-            // add a new property to the record object
-            record[columns[j]] = values[i][j];
-        }
-        records.push(record);
-    }
-}
-
-function onSelectionChange(e) {
-
 }
 
 function onInstall(e) {
@@ -73,46 +24,43 @@ function onInstall(e) {
     userProperties.setProperty('sidebarOpen', 'false');
     onOpen(e);
 }
-function openSidebarIndex_(e) {
-    openSidebar_(e, 'component/sidebar/Index');
-}
-function openSidebarSetting_(e) {
-    openSidebar_(e, 'component/pages/setting/Index');
-}
 
-function openSidebarHelp_(e) {
-    openSidebar_(e, 'component/pages/Help');
-}
-
-function openSidebarAbout_(e) {
-    openSidebar_(e, 'component/pages/About');
-}
-// This function is called when the user clicks on the "Open Sidebar" button in the add-on menu
-function openSidebar_(e, file) {
+function minifyRange(e) {
     // Only show the sidebar if the user is an add-on
     if (e && e.authMode !== ScriptApp.AuthMode.NONE) {
-        SpreadsheetApp.getUi().alert('Opening the sidebar (add-on)');
+        SpreadsheetApp.getUi().alert('Minifying the range (add-on)');
     }
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const range = sheet.getActiveRange();
+    const values = range.getValues();
+    const newValues = values.map(row => row.map(cell => {
+        try {
+            return JSON.stringify(JSON.parse(cell));
+        } catch (error) {
+            return cell;
+        }
+    }));
 
-    const htmlOutput = HtmlService
-        .createTemplateFromFile(file)
-        .evaluate()
-        .setTitle('JSON Studio');
-    SpreadsheetApp.getUi().showSidebar(htmlOutput);
+    range.setValues(newValues);
 }
 
-function openDialogHelp_(e) {
-    openDialog_(e, 'component/pages/Help');
-}
-function openDialog_(e, file) {
+function prettifyRange(e) {
     // Only show the sidebar if the user is an add-on
     if (e && e.authMode !== ScriptApp.AuthMode.NONE) {
-        SpreadsheetApp.getUi().alert('Opening the dialog (add-on)');
+        SpreadsheetApp.getUi().alert('Prettifying the range (add-on)');
     }
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const range = sheet.getActiveRange();
+    const values = range.getValues();
+    const newValues = values.map(row => row.map(cell => {
+        try {
+            return JSON.stringify(JSON.parse(cell), null, 2);
+        } catch (error) {
+            return cell;
+        }
+    }));
 
-    const htmlOutput = HtmlService
-        .createTemplateFromFile(file)
-        .evaluate();
-    SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'JSON Studio');
+    range.setValues(newValues);
 }
+
 
