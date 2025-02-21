@@ -33,6 +33,24 @@
     font-style: italic;
 }
 
+.card .title span {
+    color: #FFF;
+    font-weight: lighter;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 0 5px 5px 5px;
+    display: inline-block;
+}
+.card .title .tip {
+    color: #DDD;
+    background-color: #3c3e1f;
+    padding: 4px 10px;
+    border-radius: 0 5px 5px 5px;
+    margin-top: 8px;
+    font-weight: lighter;
+    font-size: 12px;
+}
+
 .card .content {
     padding: 10px;
     display: block;

@@ -34,6 +34,25 @@
         font-style: italic;
     }
 
+    .card .title span {
+        color: #FFF;
+        font-weight: lighter;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 0 5px 5px 5px;
+        display: inline-block;
+    }
+
+    .card .title .tip {
+        color: #DDD;
+        background-color: #3c3e1f;
+        padding: 4px 10px;
+        border-radius: 0 5px 5px 5px;
+        margin-top: 8px;
+        font-weight: lighter;
+        font-size: 12px;
+    }
+
     .card .content {
         padding: 10px;
         display: block;
@@ -56,24 +75,6 @@
         background-color: #555;
         margin-top: 20px;
         padding: 10px;
-    }
-
-
-    .card .action .button {
-        border: none;
-        color: white;
-        padding: 8px 20px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        border-radius: 4px;
-        min-width: 80px;
-        max-width: 160px;
-        white-space: nowrap;
-        text-overflow: ellipsis;
     }
 
     .card .action .button {
@@ -101,7 +102,7 @@
 
 
     .card .action .button:hover {
-        color: #333;
+        color: #555 !important;
     }
 
     .card .action .button:active {
@@ -109,7 +110,7 @@
     }
 
     .card .action .button.disabled {
-        background-color: #999;
-        color: #333;
+        background-color: #999 !important;
+        color: #555 !important;
     }
 </style>

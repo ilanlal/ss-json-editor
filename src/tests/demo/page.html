@@ -17,7 +17,15 @@
                 <div class="title">
                     Status
                     <div class="right led">🟡</div>
-                    <div class="subtitle1 warn">Loading...</div>
+                    <div class="subtitle1">🟢 The add-on is live</div>
+                    <p class="tip">
+                        Welcome to JSON Studio.
+
+                        💡 This add-on helps you to validate JSON data in Google Sheets.
+                        To get started, select a range of cells and click on the 'Bind selected range' button.
+                        The add-on will validate the JSON data in the selected range and display the results in a
+                        report.
+                    </p>
                 </div>
                 <div class="content">
                     <div class="body1">A1:C12</div>
@@ -28,6 +36,7 @@
                     Report
                     <div class="led"></div>
                     <div class="subtitle1">Done.</div>
+
                 </div>
                 <div class="content">
                     <div class="caption">A10:B25</div>
@@ -133,7 +142,11 @@
                 <div class="title">
                     Text Editor
                     <div class="right led">🟡</div>
-                    <div class="subtitle1 accent">⨂ Unexpected token 'a', "action" is not valid JSON</div>
+                    <div class="subtitle1">
+                        <span class="error">
+                            ⨂ Unexpected token 'a', "action" is not valid JSON
+                        </span>
+                    </div>
                 </div>
                 <div class="content body1">
                     <div class="caption">B12</div>
@@ -148,7 +161,6 @@
 }
                         </textarea>
                     </div>
-                    <div class="feedback"></div>
                 </div>
                 <div class="action">
                     <input type="button" value="Minify" class="button primary small" />

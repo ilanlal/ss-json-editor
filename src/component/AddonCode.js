@@ -1,9 +1,24 @@
 function doValidationReport({ pageSize = 3, offset = 0, a1n, formatPattern }) {
   try {
-    // get selected range
+    // get active sheet
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+    const lastRow = sheet.getLastRow();
+    if (offset > lastRow) {
+      SpreadsheetApp.getActiveSpreadsheet().toast('Offset is greater than the last row', 'JSON Editor ‼️', 3);
+      return;
+    }
+
+    // get the last column of the sheet
+    const lastColumn = sheet.getLastColumn();
+    if (lastColumn > 26) {
+      SpreadsheetApp.getActiveSpreadsheet().toast('The sheet has more than 26 columns', 'JSON Editor ‼️', 3);
+      return;
+    }
+
     // get the selected range by a1NotationRange or the active range
-    const range = a1n ? sheet.getRange(a1n) : sheet.getActiveRange();
+    const range = a1n ? sheet.getRange(a1n) : sheet.getDataRange();
+
     // check if the selected range is 1 cell or more
     if (range.getNumRows() < 1 || range.getNumColumns() < 1) {
       SpreadsheetApp.getActiveSpreadsheet().toast('Please select a range', 'JSON Editor ‼️', 3);
@@ -53,7 +68,7 @@ function doValidationReport({ pageSize = 3, offset = 0, a1n, formatPattern }) {
         numPages: Math.ceil(range.getNumRows() / pageSize),
         hasMoreRows: hasMoreRows
       },
-      nextOffset: hasMoreRows ? offset + pageSize : null,
+      nextOffset: hasMoreRows ? Math.min(offset + pageSize, lastRow) : null,
       // allocate a 2D array to store the validation report
       report: new Array(values.length).fill(null).map(() => new Array(values[0].length).fill(null))
     };
@@ -83,7 +98,7 @@ function doValidationReport({ pageSize = 3, offset = 0, a1n, formatPattern }) {
         } catch (error) {
           response.report[i][j] = {
             'isValid': false,
-            'icon': '⨂',
+            'icon': '⊗',
             'range': range.getCell(i + 1 + offset, j + 1).getA1Notation(),
             'message': error.toString(),
             'input': values[i][j]
@@ -100,13 +115,40 @@ function doValidationReport({ pageSize = 3, offset = 0, a1n, formatPattern }) {
   }
 }
 
+function fetchSelectedRange() {
+  // get active sheet
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  // get the selected range by a1NotationRange or the active range
+  const range = sheet.getActiveRange();
+  const lastRow = sheet.getLastRow();
+  const lastColumn = range.getLastColumn();
+  // shrink the range to the last row and last column
+  range.offset(0, 0, Math.min(range.getNumRows(), lastRow), Math.min(range.getNumColumns(), lastColumn));
+
+  const newA1n = range.getA1Notation();
+  const numColumns = range.getNumColumns();
+  const columns = [];
+  for (let i = 0; i < numColumns; i++) {
+    columns.push(String.fromCharCode(newA1n.split(':')[0].replace(/\d/g, '').charCodeAt(0) + i));
+  }
+
+  return {
+    range: {
+      a1n: range.getA1Notation(),
+      numRows: range.getNumRows(),
+      numColumns: range.getNumColumns(),
+      columns: columns
+    }
+  };
+}
+
 function focusCell(a1n) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = sheet.getRange(a1n);
   range.activateAsCurrentCell();
 }
 
-function highlightCell(a1n) {
+function highlightRange(a1n) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = sheet.getRange(a1n);
   range.activateAsCurrentCell();
@@ -199,28 +241,13 @@ function saveCell(a1n, value) {
   }
 }
 
-function fetchSelectedRange() {
-  const range = SpreadsheetApp.getActiveRange();
-  const a1n = range.getA1Notation();
+function getCurrentCell(e) {
+  // get the current cell
+  const range = SpreadsheetApp
+    .getActiveSpreadsheet()
+    .getActiveSheet()
+    .getCurrentCell();
 
-  const numColumns = range.getNumColumns();
-  const columns = [];
-  for (let i = 0; i < numColumns; i++) {
-    columns.push(String.fromCharCode(a1n.split(':')[0].replace(/\d/g, '').charCodeAt(0) + i));
-  }
-
-  return {
-    range: {
-      a1n: range.getA1Notation(),
-      numRows: range.getNumRows(),
-      numColumns: range.getNumColumns(),
-      columns: columns
-    }
-  };
-}
-
-function getCurrentCell() {
-  const range = SpreadsheetApp.getCurrentCell();
   return {
     cell: {
       a1n: range.getA1Notation(),
@@ -252,4 +279,21 @@ function openSettingDialog(e) {
 
 function openEditorDialog(e) {
   openDialog(e, 'component/dialog/Index');
+}
+
+function showNotification({ title, message, type = 'info', timeout = 5 }) {
+  switch (type) {
+    case 'info':
+      SpreadsheetApp.getActiveSpreadsheet().toast(message, title, timeout);
+      break;
+    case 'error':
+      SpreadsheetApp.getActiveSpreadsheet().toast(message, title, timeout);
+      break;
+    case 'warning':
+      SpreadsheetApp.getActiveSpreadsheet().toast(message, title, timeout);
+      break;
+    default:
+      SpreadsheetApp.getActiveSpreadsheet().toast(message, title, timeout);
+      break;
+  }
 }

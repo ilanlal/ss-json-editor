@@ -30,10 +30,24 @@ function minifyRange(e) {
     if (e && e.authMode !== ScriptApp.AuthMode.NONE) {
         SpreadsheetApp.getUi().alert('Minifying the range (add-on)');
     }
+
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+    const lastRow = sheet.getLastRow();
+    // get the last column of the sheet
+    const lastColumn = sheet.getLastColumn();
+    if (lastColumn > 26) {
+        SpreadsheetApp.getActiveSpreadsheet().toast('The sheet has more than 26 columns', 'JSON Editor ‼️', 3);
+        return;
+    }
+
     const range = sheet.getActiveRange();
     const values = range.getValues();
-    const newValues = values.map(row => row.map(cell => {
+    const newValues = values.map((row, i) => row.map((cell, j) => {
+        // if range is out of last row, remove the cell from newValus 
+        if (i > lastRow) {
+            return;
+        }
         try {
             return JSON.stringify(JSON.parse(cell));
         } catch (error) {
@@ -50,9 +64,20 @@ function prettifyRange(e) {
         SpreadsheetApp.getUi().alert('Prettifying the range (add-on)');
     }
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const lastRow = sheet.getLastRow();
+    // get the last column of the sheet
+    const lastColumn = sheet.getLastColumn();
+    if (lastColumn > 26) {
+        SpreadsheetApp.getActiveSpreadsheet().toast('The sheet has more than 26 columns', 'JSON Editor ‼️', 3);
+        return;
+    }
     const range = sheet.getActiveRange();
     const values = range.getValues();
-    const newValues = values.map(row => row.map(cell => {
+    const newValues = values.map((row, i) => row.map((cell, j) => {
+        // if range is out of last row, remove the cell from newValus 
+        if (i > lastRow) {
+            return;
+        }
         try {
             return JSON.stringify(JSON.parse(cell), null, 2);
         } catch (error) {
@@ -63,4 +88,23 @@ function prettifyRange(e) {
     range.setValues(newValues);
 }
 
+function highlightActiveRange(e) {
+    // Only show the sidebar if the user is an add-on
+    if (e && e.authMode !== ScriptApp.AuthMode.NONE) {
+        SpreadsheetApp.getUi().alert('Prettifying the range (add-on)');
+    }
+    
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const range = sheet.getDataRange();
+    
+    const orgColor = range.getBackgrounds();
+    const newColor = orgColor.map(row => row.map(cell => cell === '#ffff00' ? '#ffffff' : '#ffff00'));
+    range.setBackgrounds(newColor);
+    
+    // Sleep for 2 second
+    Utilities.sleep(2000);
+
+    // Reset the background color
+    range.setBackgrounds(orgColor);
+}
 
