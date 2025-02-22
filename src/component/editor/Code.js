@@ -8,7 +8,7 @@ function openDialog(e, file) {
         .createTemplateFromFile(file)
         .evaluate()
         .setHeight(600)
-        .setWidth(480);
+        .setWidth(640);
 
     SpreadsheetApp.getUi()
         .showModalDialog(htmlOutput, 'JSON Studio');

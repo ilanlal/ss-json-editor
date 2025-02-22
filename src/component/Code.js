@@ -5,16 +5,17 @@ function onOpen(e) {
 
     // The label for a menu item should be in sentence case (only the first word capitalized).
     // see https://developers.google.com/apps-script/reference/base/menu#detailed-documentation
-    ui.createMenu('JSON Studio')
-        .addItem("⇱ Edit", 'openEditorDialog')
-        .addItem('▦ Range', 'openSidebarView')
+    ui.createMenu('Json')
+        .addItem("⇱ Edit", 'openDialogEditor')
+        .addItem('▦ Range', 'openSidebarRangeReport')
+        .addSeparator()
         .addSubMenu(SpreadsheetApp.getUi().createMenu('↹ Format')
             .addItem('Minify', 'minifyRange')
             .addItem('Prettify', 'prettifyRange'))
         .addSeparator()
-        .addItem('⨏ Setting', 'openSettingDialog')
+        .addItem('⚙️ Setting', 'openDialogSetting')
         .addSeparator()
-        .addItem('⁈ Help', 'openHelpDialog')
+        .addItem('❔ Help', 'openDialogHelp')
         .addToUi();
 }
 
@@ -93,7 +94,7 @@ function highlightActiveRange(e) {
     if (e && e.authMode !== ScriptApp.AuthMode.NONE) {
         SpreadsheetApp.getUi().alert('Prettifying the range (add-on)');
     }
-    
+
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const range = sheet.getDataRange();
     

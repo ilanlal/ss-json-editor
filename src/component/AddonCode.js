@@ -2,22 +2,14 @@ function doValidationReport({ pageSize = 3, offset = 0, a1n, formatPattern }) {
   try {
     // get active sheet
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-
-    const lastRow = sheet.getLastRow();
-    if (offset > lastRow) {
-      SpreadsheetApp.getActiveSpreadsheet().toast('Offset is greater than the last row', 'JSON Editor ‼️', 3);
-      return;
-    }
-
-    // get the last column of the sheet
-    const lastColumn = sheet.getLastColumn();
-    if (lastColumn > 26) {
-      SpreadsheetApp.getActiveSpreadsheet().toast('The sheet has more than 26 columns', 'JSON Editor ‼️', 3);
-      return;
-    }
+    const dataRange = sheet.getDataRange();
+    const lastRow = dataRange.getLastRow();
+    const lastColumn = dataRange.getLastColumn();
 
     // get the selected range by a1NotationRange or the active range
-    const range = a1n ? sheet.getRange(a1n) : sheet.getDataRange();
+    const range = a1n ? sheet.getRange(a1n) : sheet.getActiveRange();
+    // shrink the range to the last row and last column if the range is out of the last row
+    range.offset(0, 0, Math.min(range.getNumRows(), lastRow), Math.min(range.getNumColumns(), lastColumn));
 
     // check if the selected range is 1 cell or more
     if (range.getNumRows() < 1 || range.getNumColumns() < 1) {
@@ -118,25 +110,28 @@ function doValidationReport({ pageSize = 3, offset = 0, a1n, formatPattern }) {
 function fetchSelectedRange() {
   // get active sheet
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  // get the selected range by a1NotationRange or the active range
   const range = sheet.getActiveRange();
-  const lastRow = sheet.getLastRow();
-  const lastColumn = range.getLastColumn();
-  // shrink the range to the last row and last column
-  range.offset(0, 0, Math.min(range.getNumRows(), lastRow), Math.min(range.getNumColumns(), lastColumn));
+  const dataRange = sheet.getDataRange();
+  const lastRow = dataRange.getLastRow();
+  const lastColumn = dataRange.getLastColumn();
+  const numColumns = Math.min(range.getNumColumns(), lastColumn);
+  const numRows = Math.min(range.getNumRows(), lastRow);
 
-  const newA1n = range.getA1Notation();
-  const numColumns = range.getNumColumns();
+  // shrink the range to the last row and last column
+  const newRange = range.offset(0, 0, numRows, numColumns);
+
+  const a1n = newRange.getA1Notation();
+
   const columns = [];
   for (let i = 0; i < numColumns; i++) {
-    columns.push(String.fromCharCode(newA1n.split(':')[0].replace(/\d/g, '').charCodeAt(0) + i));
+    columns.push(String.fromCharCode(a1n.split(':')[0].replace(/\d/g, '').charCodeAt(0) + i));
   }
 
   return {
     range: {
-      a1n: range.getA1Notation(),
-      numRows: range.getNumRows(),
-      numColumns: range.getNumColumns(),
+      a1n: a1n,
+      numRows: numRows,
+      numColumns: numColumns,
       columns: columns
     }
   };
@@ -148,11 +143,16 @@ function focusCell(a1n) {
   range.activateAsCurrentCell();
 }
 
-function highlightRange(a1n) {
+function focusRange(a1n) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const range = sheet.getRange(a1n);
+  range.activate();
+}
+
+function highlightCell(a1n) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = sheet.getRange(a1n);
   range.activateAsCurrentCell();
-  SpreadsheetApp.flush();
   const orgColor = range.getBackground();
   for (let i = 0; i < 3; i++) {
     // set the background color blink to yellow for 1 second
@@ -262,23 +262,23 @@ function openEditor(a1n) {
   //sheet.getRange(a1n).activate();
   const range = sheet.getRange(a1n);
   range.activateAsCurrentCell();
-  return openEditorDialog();
+  return openDialogEditor();
 }
 
-function openSidebarView(e) {
-  openSidebar(e, 'component/sidebar/Index');
+function openSidebarRangeReport(e) {
+  openSidebar(e, 'component/rangeReport/Index');
 }
 
-function openHelpDialog(e) {
-  openDialog(e, 'component/pages/Help');
+function openDialogHelp(e) {
+  openDialog(e, 'component/help/Index');
 }
 
-function openSettingDialog(e) {
-  openDialog(e, 'component/pages/setting/Index');
+function openDialogSetting(e) {
+  openDialog(e, 'component/setting/Index');
 }
 
-function openEditorDialog(e) {
-  openDialog(e, 'component/dialog/Index');
+function openDialogEditor(e) {
+  openDialog(e, 'component/editor/Index');
 }
 
 function showNotification({ title, message, type = 'info', timeout = 5 }) {

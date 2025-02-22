@@ -6,9 +6,9 @@
         const addon = this;
         // Global_Resources
         const Global_Resources = {
-            version: '0.0.1',
-            en: {
-                "appTitle": "JSON Studio",
+            "version": '0.0.1',
+            "en": {
+                "appTitle": "Json",
                 "loading": "Loading...",
                 "pleaseWait": "Please wait...",
                 "welcome": "Welcome",
@@ -35,6 +35,7 @@
                 "status": "Status",
                 "report": "Report",
                 "textEditor": "Text Editor",
+                "textEditorPlaceholder": "Enter your text here...",
                 "totalCells": "Total cells",
                 "totalSuccess": "Total success",
                 "totalFail": "Total fails",
@@ -47,13 +48,13 @@
                 "page": "Page",
                 "jsonValid": "JSON is valid",
                 "jsonInvalid": "JSON is invalid",
-                "welcomeTips": "Welcome to JSON Studio. This add-on helps you to validate JSON data in Google Sheets. To get started, select a range of cells and click on the 'Bind selected range' button. The add-on will validate the JSON data in the selected range and display the results in a report.",
-                "reportTips": "The report shows the validation status of each cell in the selected range. The report is paginated and you can navigate through the pages using the 'Next Page' button. You can also refresh the report by clicking on the 'Refresh' button.",
+                "welcomeTips": "💡 The add-on will validate the JSON data in the selected range and display the results in a report.",
+                "reportTips": "💡 The report shows the validation status of each cell in the selected range.",
                 "textEditorTips": "The text editor allows you to edit the JSON data in a cell. You can highlight, minify, or prettify the JSON data. You can also save the changes back to the cell or open the cell in a dialog editor.",
                 "dialogEditorTips": "The dialog editor allows you to edit the JSON data in a cell in a dialog box. You can highlight, minify, or prettify the JSON data. You can also save the changes back to the cell or close the dialog editor."
             },
-            fr: {
-                "appTitle": "JSON Studio",
+            "fr": {
+                "appTitle": "Json",
                 "loading": "Chargement...",
                 "pleaseWait": "Veuillez patienter...",
                 "welcome": "Bienvenue",
@@ -80,6 +81,7 @@
                 "status": "Statut",
                 "report": "Rapport",
                 "textEditor": "Éditeur de texte",
+                "textEditorPlaceholder": "Entrez votre texte ici...",
                 "totalCells": "Cellules totales",
                 "totalSuccess": "Succès total",
                 "totalFail": "Échecs totaux",
@@ -92,8 +94,8 @@
                 "page": "Page",
                 "jsonValid": "JSON est valide",
                 "jsonInvalid": "JSON est invalide",
-                "welcomeTips": "Bienvenue dans JSON Studio. Cette extension vous aide à valider les données JSON dans Google Sheets. Pour commencer, sélectionnez une plage de cellules et cliquez sur le bouton 'Lier la plage sélectionnée'. L'extension validera les données JSON de la plage sélectionnée et affichera les résultats dans un rapport.",
-                "reportTips": "Le rapport montre l'état de validation de chaque cellule de la plage sélectionnée. Le rapport est paginé et vous pouvez naviguer à travers les pages en utilisant le bouton 'Page suivante'. Vous pouvez également actualiser le rapport en cliquant sur le bouton 'Actualiser'.",
+                "welcomeTips": "💡 L'extension validera les données JSON dans la plage sélectionnée et affichera les résultats dans un rapport.",
+                "reportTips": "💡 Le rapport montre l'état de validation de chaque cellule de la plage sélectionnée.",
                 "textEditorTips": "L'éditeur de texte vous permet de modifier les données JSON dans une cellule. Vous pouvez surligner, minifier ou embellir les données JSON. Vous pouvez également enregistrer les modifications dans la cellule ou ouvrir la cellule dans un éditeur de dialogue.",
                 "dialogEditorTips": "L'éditeur de dialogue vous permet de modifier les données JSON dans une cellule dans une boîte de dialogue. Vous pouvez surligner, minifier ou embellir les données JSON. Vous pouvez également enregistrer les modifications dans la cellule ou fermer l'éditeur de dialogue."
             }
@@ -219,6 +221,9 @@
                         document.getElementById(viewModel.TEXT_CARD_ID).classList.add('hidden');
                         // clear the report table rows
                         document.getElementById("report").querySelector('tbody').innerHTML = '';
+
+                        google.script.run.focusRange(currentA1n);
+
                         // call the server
                         google.script.run
                             .withSuccessHandler(_sidebar.ReportHandler.onServerSuccess)
@@ -310,7 +315,9 @@
                     console.log('😀 TextEditorHandler.start', { container, cell });
                     // render the text editor using viewModel
                     const viewModel = _sidebar.ViewModel;
-                    document.getElementById(viewModel.TEXT_CARD_ID).classList.remove('hidden')
+                    document.getElementById(viewModel.TEXT_CARD_ID).classList.remove('hidden');
+                    google.script.run
+                        .focusCell(cell.range);
                     viewModel.renderTextEditor({
                         container: container,
                         a1nRange: cell.range,
@@ -323,7 +330,6 @@
                 },
                 // onKeyUp method
                 onKeyUp: (e) => {
-                    console.log('😀 TextEditorHandler.onKeyUp', e);
                     // validate the input
                     const text = e.target.value;
                     let isValid = true;
@@ -337,6 +343,11 @@
                             message: `<span class="success">✓ ${resources.jsonValid}</span>`,
                         });
 
+                        // enable mini & pritty buttons
+                        document.getElementById('prittfy').disabled = false;
+                        document.getElementById('prittfy').classList.remove('disabled');
+                        document.getElementById('minify').disabled = false;
+                        document.getElementById('minify').classList.remove('disabled');
                     } catch (error) {
                         isValid = false;
                         // show the error message
@@ -344,6 +355,12 @@
                             cardKey: viewModel.TEXT_CARD_ID,
                             message: `<span class="error">⨂ ${error.message}</span>`
                         });
+
+                        // disabled mini & pritty buttons
+                        document.getElementById('prittfy').disabled = true;
+                        document.getElementById('prittfy').classList.add('disabled');
+                        document.getElementById('minify').disabled = true;
+                        document.getElementById('minify').classList.add('disabled');
                     }
 
                     if (e?.target?.defaultValue && e.target.defaultValue !== e.target.value) {
@@ -362,7 +379,7 @@
                 },
                 // onClick method
                 onClick: (e) => {
-                    console.log('😀 TextEditorHandler.onClick', { e });
+                    console.log('😀 onClick', { target: e.target });
                     const viewModel = _sidebar.ViewModel;
                     const a1n = document.getElementById(viewModel.TEXT_CARD_ID).querySelector('.caption').innerText;
                     const target = e.target;
@@ -372,7 +389,6 @@
                             cardKey: viewModel.TEXT_CARD_ID,
                             message: resources.prittfy
                         });
-                        console.log('😀 prittfy', a1n);
                         const text = editorCard.querySelector(`#${viewModel.TEXT_AREA_ID}`).value;
                         google.script.run
                             .withSuccessHandler(_sidebar.TextEditorHandler.onServerSuccess)
@@ -380,7 +396,6 @@
                             .prettyPrintCell({ a1n, text });
                     }
                     else if (target.id === 'minify') {
-                        console.log('😀 minify', a1n);
                         viewModel.renderWorkInProgress({
                             cardKey: viewModel.TEXT_CARD_ID,
                             message: resources.minify
@@ -392,7 +407,6 @@
                             .minifyCell(a1n, text);
                     }
                     else if (target.id === 'highlight') {
-                        console.log('😀 highlight', a1n);
                         viewModel.renderWorkInProgress({
                             cardKey: viewModel.TEXT_CARD_ID,
                             message: resources.highlight
@@ -400,10 +414,9 @@
                         google.script.run
                             .withSuccessHandler(_sidebar.TextEditorHandler.onServerSuccess)
                             .withFailureHandler(_sidebar.TextEditorHandler.onServerFailure)
-                            .highlightRange(a1n);
+                            .highlightCell(a1n);
                     }
                     else if (target.id === 'save') {
-                        console.log('😀 save');
                         viewModel.renderWorkInProgress({
                             cardKey: viewModel.TEXT_CARD_ID,
                             message: resources.save
@@ -415,12 +428,10 @@
                             .saveCell(a1n, text);
                     }
                     else if (target.id === 'close') {
-                        console.log('😀 close');
                         // hide the text editor card
                         document.getElementById(viewModel.TEXT_CARD_ID).classList.add('hidden');
                     }
                     else if (target.id === 'openInDialog') {
-                        console.log('😀 openInDialog', a1n);
                         // open the dialog
                         google.script.run
                             .withSuccessHandler(_sidebar.TextEditorHandler.onServerSuccess)
@@ -451,7 +462,7 @@
                     });
                 },
                 onServerFailure: (response) => {
-                    console.log('😀 onServerFailure', response);
+                    console.error('😀 onServerFailure', response);
                     const viewModel = _sidebar.ViewModel;
                     viewModel.renderSubtitle({
                         cardKey: viewModel.TEXT_CARD_ID,
@@ -476,7 +487,6 @@
                 },
                 // renderSidebar method
                 renderSidebar: ({ container = document.getElementById("app") }) => {
-                    console.log('😀 renderSidebar', { container });
                     if (!container) {
                         return;
                     }
@@ -489,7 +499,6 @@
                 },
                 // append State card
                 appendWelcomeCard: ({ container }) => {
-                    console.log('😀 appendWelcomeCard', { container });
                     if (!container) {
                         return;
                     }
@@ -513,7 +522,6 @@
                 },
                 // append Report card
                 appendReportCard: ({ container }) => {
-                    console.log('😀 appendReportCard', { container });
                     if (!container) {
                         return;
                     }
@@ -538,15 +546,14 @@
                 },
                 // append text editor card
                 appendTextEditorCard: ({ container }) => {
-                    console.log('😀 appendTextEditorCard', { container });
                     if (!container) {
                         return;
                     }
 
                     const actions = [
                         {
-                            id: 'highlight', className: 'small secondary',
-                            label: resources.highlight,
+                            id: 'save', className: 'small secondary',
+                            label: resources.save,
                             handler: 'Sidebar.TextEditorHandler.onClick(event)'
                         },
                         {
@@ -567,14 +574,15 @@
                             handler: 'Sidebar.TextEditorHandler.onClick(event)'
                         },
                         {
+                            id: 'highlight',
+                            className: 'small secondary',
+                            label: resources.highlight,
+                            handler: 'Sidebar.TextEditorHandler.onClick(event)'
+                        },
+                        {
                             id: 'close',
                             className: 'small secondary',
                             label: resources.close, handler: 'Sidebar.TextEditorHandler.onClick(event)'
-                        },
-                        {
-                            id: 'save', className: 'small secondary',
-                            label: resources.save,
-                            handler: 'Sidebar.TextEditorHandler.onClick(event)'
                         }
                     ];
 
@@ -592,7 +600,6 @@
                 },
                 // render textarea
                 renderTextEditor: ({ container, a1nRange, input, message }) => {
-                    console.log("renderTextEditor", { container, a1nRange, input, message });
                     const e = container.querySelector('.content');
                     if (!e) {
                         console.warn('🤔😶‍🌫️ e is null!!! ');
@@ -603,7 +610,7 @@
                     html += `<div class="caption">${a1nRange}</div>`;
                     html += '<div>';
                     html += `<textarea class="textarea" id="${_sidebar.ViewModel.TEXT_AREA_ID}" name="text-editor" rows="10" cols="25" `
-                        + `spellcheck="false" placeholder="Enter your text here..." onkeyup="Sidebar.TextEditorHandler.onKeyUp(event)">`;
+                        + `spellcheck="false" placeholder="${resources.textEditorPlaceholder}" onkeyup="Sidebar.TextEditorHandler.onKeyUp(event)">`;
                     html += input || '';
                     html += '</textarea>';
 
@@ -612,7 +619,6 @@
                 },
                 // renderSelectedRange method
                 renderSelectedRange: ({ container, range }) => {
-                    console.log('😀 renderSelectedRange', { container, range });
                     if (!container) {
                         return;
                     }
@@ -621,7 +627,7 @@
                         container.innerHTML = resources.noValues;
                         return;
                     }
-                    container.innerHTML = range.a1n;
+                    container.innerHTML = `<div>${range.a1n}</div>`;
 
                 },
                 // renderResponse method
@@ -654,7 +660,6 @@
                 },
                 // renderSummary method
                 renderSummary: ({ container, response }) => {
-                    console.log('😀 renderSummary', { container, response });
                     if (!container) {
                         return;
                     }
@@ -670,7 +675,7 @@
 
                     const totalSuccess = response.report.reduce((acc, row) => {
                         return acc + row.reduce((acc, col) => {
-                            return acc + (col.icon === '✅' ? 1 : 0);
+                            return acc + (col.isValid ? 1 : 0);
                         }, 0);
                     }, 0);
 
@@ -694,7 +699,6 @@
                 },
                 // renderTabelReport method
                 renderTabelReport: ({ container, range }) => {
-                    console.log('😀 renderTabelReport', { container, range });
                     if (!container) {
                         return;
                     }
@@ -750,7 +754,6 @@
                             td2.id = col.a1n;
                             td2.classList.add(col.isValid ? 'valid' : 'invalid');
                             td2.addEventListener('click', (e) => {
-                                console.log('😀 report-cell click', e);
                                 _sidebar.TextEditorHandler.start({
                                     container: document.getElementById(_sidebar.ViewModel.TEXT_CARD_ID),
                                     cell: col
@@ -763,7 +766,6 @@
                 },
                 // renderWorkInProgress method
                 renderWorkInProgress: ({ cardKey, message }) => {
-                    console.log('😀 renderWorkInProgress');
                     const viewModel = _sidebar.ViewModel;
                     viewModel.renderSubtitle({
                         cardKey: cardKey,
@@ -774,7 +776,6 @@
                 },
                 // render idle state
                 renderIdleState: ({ cardKey, message }) => {
-                    console.log('😀 renderIdleState');
                     const viewModel = _sidebar.ViewModel;
                     viewModel.renderSubtitle({
                         cardKey: cardKey,
@@ -785,7 +786,6 @@
                 },
                 // renderSubtitle method
                 renderSubtitle: ({ cardKey, message }) => {
-                    console.log('😀 renderSubtitle', message);
                     const container = document.getElementById(cardKey);
                     if (!container) {
                         return;
@@ -805,7 +805,6 @@
                 },
                 // render led
                 renderLed: ({ led }) => {
-                    console.log('😀 renderLed', led);
                     const leds = document.getElementsByClassName("led");
                     if (!leds) {
                         leds.innerHTML = '🔘';
@@ -818,7 +817,7 @@
                 // disableAllButtons method
                 disableAllButtons: () => {
                     const buttons = document.querySelectorAll('input[type="button"]');
-                    console.log('😀 disableAllButtons', buttons);
+
                     buttons.forEach((button) => {
                         button.disabled = true;
                         button.classList.add('disabled');
@@ -831,7 +830,6 @@
                 },
                 // enableAllButtons method
                 enableAllButtons: () => {
-                    console.log('😀 enableAllButtons');
                     const buttons = document.querySelectorAll('input[type="button"]');
                     buttons.forEach((button) => {
                         button.disabled = false;
@@ -847,7 +845,6 @@
             // CardView class
             CardView: {
                 appendCard: ({ container, key, title, subtitle, content, tip, actions, hidden }) => {
-                    console.log('😀 renderCard', { container, key, title, subtitle, content, tip, actions, hidden });
                     if (!container) {
                         return;
                     }
@@ -972,7 +969,6 @@
                 },
                 // onKeyUp method
                 onKeyUp: (e) => {
-                    console.log('😀 TextEditorHandler.onKeyUp', e);
                     // validate the input
                     const text = e.target.value;
                     let isValid = true;
@@ -996,7 +992,6 @@
                 },
                 // onClick method
                 onClick: (e) => {
-                    console.log('😀 TextEditorHandler.onClick', { e });
                     const viewModel = _editor.ViewModel;
                     const a1n = document.getElementById(viewModel.TEXT_CARD_ID).querySelector('.caption').innerText;
                     const target = e.target;
@@ -1034,7 +1029,7 @@
                         google.script.run
                             .withSuccessHandler(_editor.TextEditorHandler.onServerSuccess)
                             .withFailureHandler(_editor.TextEditorHandler.onServerFailure)
-                            .highlightRange(a1n);
+                            .highlightCell(a1n);
                     }
                     else if (target.id === 'save') {
                         console.log('😀 save');
@@ -1082,7 +1077,7 @@
                     viewModel.enableAllButtons();
                 },
                 onServerFailure: (response) => {
-                    console.log('😀 onServerFailure', response);
+                    console.error('😀 onServerFailure', response);
                     const viewModel = _editor.ViewModel;
                     viewModel.renderSubtitle({
                         cardKey: viewModel.TEXT_CARD_ID,
@@ -1138,11 +1133,9 @@
                     }
 
                     const actions = [
-                        { id: 'highlight', label: resources.highlight, handler: 'Editor.TextEditorHandler.onClick(event)' },
                         { id: 'prittfy', label: resources.prittfy, handler: 'Editor.TextEditorHandler.onClick(event)' },
                         { id: 'minify', label: resources.minify, handler: 'Editor.TextEditorHandler.onClick(event)' },
-                        { id: 'save', label: resources.save, handler: 'Editor.TextEditorHandler.onClick(event)' },
-                        { id: 'cancel', label: resources.cancel, handler: 'Editor.TextEditorHandler.onClick(event)' }
+                        { id: 'save', label: resources.save, handler: 'Editor.TextEditorHandler.onClick(event)' }
                     ];
 
                     const contet = ``;
@@ -1170,7 +1163,7 @@
                     html += `<div class="caption">${a1nRange}</div>`;
                     html += '<div>';
                     html += `<textarea class="textarea" id="${_editor.ViewModel.TEXT_AREA_ID}" name="text-editor" rows="10" cols="25" `
-                        + `spellcheck="false" placeholder="Enter your text here..." onkeyup="Dialog.TextEditorHandler.onKeyUp(event)">`;
+                        + `spellcheck="false" placeholder="Enter your text here..." onkeyup="Editor.TextEditorHandler.onKeyUp(event)">`;
                     html += input || '';
                     html += '</textarea>';
 

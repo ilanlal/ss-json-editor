@@ -1,0 +1,178 @@
+<script>
+    (function () {
+        const Global_Resources = {
+            "version": "1.0.0",
+            "en": {
+                "welcome": "Welcome to the Help Page",
+                "help": "Help",
+                "about": "About",
+                "aboutContent": "This is a simple help page. It is designed to help you understand how to use this page. "
+                    + "This is a simple help page. It is designed to help you understand how to use this page.",
+                "support": "Support",
+                "supportContent": "This is a simple help page. It is designed to help you understand how to use this page. "
+                    + "This is a simple help page. It is designed to help you understand how to use this page.",
+                "faq": "FAQ",
+                "faqContent": "This is a simple help page. It is designed to help you understand how to use this page. "
+                    + "This is a simple help page. It is designed to help you understand how to use this page.",
+                "terms": "Terms",
+                "termsContent": "This is a simple help page. It is designed to help you understand how to use this page. "
+                    + "This is a simple help page. It is designed to help you understand how to use this page.",
+                "privacy": "Privacy",
+                "privacyContent": "This is a simple help page. It is designed to help you understand how to use this page. "
+                    + "This is a simple help page. It is designed to help you understand how to use this page.",
+                "contact": "Contact",
+                "contactContent": "This is a simple help page. It is designed to help you understand how to use this page. "
+                    + "This is a simple help page. It is designed to help you understand how to use this page.",
+            }
+        };
+
+        const locale = 'en';
+        const resources = Global_Resources[locale];
+
+        const _helpPage = this.HelpPage = {
+            // Model class
+            AppHandler: {
+                // start method
+                start: (e) => {
+                    console.log('😀 start', e);
+                    const viewModel = _helpPage.ViewModel;
+                    viewModel.renderPage({ container: document.getElementById("app") });
+                },
+                // onClick method
+                onClick: (e) => {
+                    console.log('😀 onClick', e);
+                    const viewModel = _helpPage.ViewModel;
+                    if (e.target.id === 'refresh') {
+                        // refresh the page
+                    }
+                },
+            },
+            // View class
+            ViewModel: {
+                WELCOME_CARD_ID: 'welcome-card',
+                HELP_CARD_ID: 'help-card',
+                FAQ_CARD_ID: 'faq-card',
+                ABOUT_CARD_ID: 'about-card',
+                SUPPORT_CARD_ID: 'support-card',
+                TERMS_CARD_ID: 'terms-card',
+                PRIVACY_CARD_ID: 'privacy-card',
+                CONTACT_CARD_ID: 'contact-card',
+                // start method
+                start: () => {
+                    console.log('😀 ViewModel.start');
+                    _helpPage.ViewModel.renderPage({ container: document.getElementById("app") });
+                },
+                // renderSidebar method
+                renderPage: ({ container = document.getElementById("app") }) => {
+                    console.log('😀 renderPage', { container });
+                    if (!container) {
+                        return;
+                    }
+
+                    // Add container
+                    container.innerHTML = '<div class="container" id="appContainer"></div>';
+
+                    _helpPage.CardView.appendCard({
+                        container: container.querySelector('#appContainer'),
+                        key: _helpPage.ViewModel.WELCOME_CARD_ID,
+                        title: resources.welcome
+                    });
+
+                    _helpPage.CardView.appendCard({
+                        container: container.querySelector('#appContainer'),
+                        key: _helpPage.ViewModel.HELP_CARD_ID,
+                        title: resources.help,
+                        content: resources.helpContent
+                    });
+
+                    _helpPage.CardView.appendCard({
+                        container: container.querySelector('#appContainer'),
+                        key: _helpPage.ViewModel.ABOUT_CARD_ID,
+                        title: resources.about,
+                        content: resources.aboutContent
+                    });
+
+                    _helpPage.CardView.appendCard({
+                        container: container.querySelector('#appContainer'),
+                        key: _helpPage.ViewModel.SUPPORT_CARD_ID,
+                        title: resources.support,
+                        content: resources.supportContent
+                    });
+
+                    _helpPage.CardView.appendCard({
+                        container: container.querySelector('#appContainer'),
+                        key: _helpPage.ViewModel.FAQ_CARD_ID,
+                        title: resources.faq,
+                        content: resources.faqContent
+                    });
+
+                    _helpPage.CardView.appendCard({
+                        container: container.querySelector('#appContainer'),
+                        key: _helpPage.ViewModel.TERMS_CARD_ID,
+                        title: resources.terms,
+                        content: resources.termsContent
+                    });
+
+                    _helpPage.CardView.appendCard({
+                        container: container.querySelector('#appContainer'),
+                        key: _helpPage.ViewModel.PRIVACY_CARD_ID,
+                        title: resources.privacy,
+                        content: resources.privacyContent
+                    });
+
+                    _helpPage.CardView.appendCard({
+                        container: container.querySelector('#appContainer'),
+                        key: _helpPage.ViewModel.CONTACT_CARD_ID,
+                        title: resources.contact,
+                        content: resources.contactContent
+                    });
+                }
+            },
+            // CardView class
+            CardView: {
+                appendCard: ({ container, key, title, subtitle, content, actions, hidden }) => {
+                    console.log('😀 renderCard', { container, key, title, subtitle, content, actions });
+                    if (!container) {
+                        return;
+                    }
+
+                    // check if the card already exists
+                    const card = document.getElementById(key);
+                    if (card) {
+                        card.innerHTML = '';
+                    }
+
+                    let html = '';
+                    // Card
+                    html += `<div class="card ${hidden ? 'hidden' : ''}" id="${key}">`;
+                    // Add card titlex
+                    html += `  <div class="title">${title}`;
+                    html += '    <div class="right led"></div>';
+                    if (subtitle) {
+                        html += `    <div class="subtitle1">${subtitle}</div>`;
+                    }
+                    html += '  </div>';
+                    // Add card content
+                    html += '  <div class="content body1">';
+                    html += content || '';
+                    html += '  </div>';
+                    if (actions) {
+                        // Add card actions
+                        html += '  <div class="action">';
+                        actions.forEach((action) => {
+                            html += `    <input class="button ${action.className || 'primary'}" type="button" value="${action.label}"`
+                                + ` id="${action.id}" `
+                                + ` onclick="${action.handler}" />`;
+                        });
+                        html += '  </div>';
+                    }
+
+                    // end of card
+                    html += '</div>';
+                    container.innerHTML += html;
+                }
+            }
+        };
+        this.HelpPage.AppHandler.start();
+    })();
+</script>
