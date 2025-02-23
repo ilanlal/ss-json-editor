@@ -69,14 +69,6 @@ td:first-child {
     word-spacing: normal;
 }
 
-.label {
-    font-size: 9px;
-    font-weight: bold;
-    padding: 2px;
-    margin-right: 2px;
-    cursor: default;
-}
-
 .caption {
     width: 100%;
     font-size: 12px;

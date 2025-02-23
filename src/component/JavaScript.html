@@ -509,7 +509,7 @@
                         title: resources.welcome,
                         subtitle: resources.bindSelectRangeDesc,
                         content: '<span id="selectedRange" class="range"></span>',
-                        tip: resources.welcomeTips,
+                        //tip: resources.welcomeTips,
                         actions: [
                             {
                                 id: 'rebind',
@@ -532,8 +532,8 @@
                         title: resources.report,
                         subtitle: resources.bindSelectRange,
                         hidden: true,
-                        content: '<div id="report" class="report"></div><div class="subtitle1" id="summary"></div>',
-                        tip: resources.reportTips,
+                        content: '<div id="report" class="report"></div><div id="summary"></div>',
+                        //tip: resources.reportTips,
                         actions: [
                             {
                                 id: 'refresh',
@@ -682,17 +682,9 @@
                     const totalFail = totalCells - totalSuccess;
                     let div = '';
                     div += '<div class="container center">';
-                    div += `  <span class="label info" title="${resources.totalCells}">T:${totalCells}</span>`;
                     div += `  <span class="label success" title="${resources.totalSuccess}">S:${totalSuccess}</span>`;
                     div += `  <span class="label error" title="${resources.totalFail}">F:${totalFail}</span>`;
-                    div += `  <span class="label info" title="${resources.a1nNotation}">${range.a1n}</span>`;
-                    div += `  <span class="label info" title="${resources.numColumns}">C:${range.numColumns}</span>`;
-                    div += `  <span class="label info" title="${resources.numRows}">R:${range.numRows}</span>`;
-                    div += '</div>';
-                    div += '<div class="container center">';
-                    div += `  <span class="label info" title="${resources.pageSize}">P:${page.pageSize}</span>`;
-                    div += `  <span class="label info" title="${resources.offset}">O:${page.offset}</span>`;
-                    div += `  <span class="label info" title="${resources.nextOffset}">N:${response.nextOffset || ''}</span>`;
+                    div += `  <span class="label info" title="${resources.totalCells}">T:${totalCells}</span>`;
                     div += '</div>';
 
                     container.innerHTML = div;
@@ -847,12 +839,6 @@
                 appendCard: ({ container, key, title, subtitle, content, tip, actions, hidden }) => {
                     if (!container) {
                         return;
-                    }
-
-                    // check if the card already exists
-                    const card = document.getElementById(key);
-                    if (card) {
-                        card.innerHTML = '';
                     }
 
                     let html = '';
@@ -1269,26 +1255,21 @@
             },
             // CardView class
             CardView: {
-                appendCard: ({ container, key, title, subtitle, content, actions, hidden }) => {
-                    console.log('😀 renderCard', { container, key, title, subtitle, content, actions });
+                appendCard: ({ container, key, title, subtitle, content, tip, actions, hidden }) => {
+                    console.log('😀 renderCard', { container, key, title, subtitle, content, tip, actions, hidden });
                     if (!container) {
                         return;
-                    }
-
-                    // check if the card already exists
-                    const card = document.getElementById(key);
-                    if (card) {
-                        card.innerHTML = '';
                     }
 
                     let html = '';
                     // Card
                     html += `<div class="card ${hidden ? 'hidden' : ''}" id="${key}">`;
                     // Add card titlex
-                    html += `  <div class="title">${title}`;
-                    html += '    <div class="right led"></div>';
-                    if (subtitle) {
-                        html += `    <div class="subtitle1">${subtitle}</div>`;
+                    html += `  <div class="title">${title || '*'}`;
+                    html += `    <div class="right led">*</div>`;
+                    html += `    <div class="subtitle1">${subtitle || '*'}</div>`;
+                    if (tip) {
+                        html += `    <p class="tip">${tip || ''}</p>`;
                     }
                     html += '  </div>';
                     // Add card content
