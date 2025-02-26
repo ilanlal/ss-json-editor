@@ -1,7 +1,7 @@
 // test_Addons.gs
-class Test_Addons {
+class test_ServerCode {
     constructor() {
-        QUnit.module("Addons");
+        QUnit.module("Code.gs (Server Code)");
         this.runTests();
     }
     runTests() {

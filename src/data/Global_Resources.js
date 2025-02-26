@@ -1,5 +1,7 @@
 // Global_Resources.gs
 const Global_Resources = {
+    appName: "JSON Studio for Google Sheets™️",
+    module: "core-server",
     version: "0.0.1",
     en: {
         title: "JSON Editor for Google Sheets™️",

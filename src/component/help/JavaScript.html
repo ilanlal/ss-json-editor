@@ -1,6 +1,7 @@
 <script>
     (function () {
-        const Global_Resources = {
+        this.Global_Resources = {
+            "module": "help",
             "version": "0.0.1",
             "en": {
                 "welcome": "Welcome to the Help Page",
@@ -11,14 +12,14 @@
         };
 
         const locale = 'en';
-        const resources = Global_Resources[locale];
+        const resources = this.Global_Resources[locale];
 
         const _helpPage = this.HelpPage = {
             // Model class
             AppHandler: {
                 // start method
-                start: (e) => {
-                    console.log('😀 start', e);
+                start: (appDOM) => {
+                    console.log('😀 start', appDOM);
                     const viewModel = _helpPage.ViewModel;
                     viewModel.renderPage({ container: document.getElementById("app") });
                 },
@@ -59,7 +60,7 @@
                     _helpPage.CardView.appendCard({
                         container: container.querySelector('#appContainer'),
                         key: _helpPage.ViewModel.WELCOME_CARD_ID,
-                        title: '<h1>ver: ' + Global_Resources.version + '</h1>'
+                        title: '<h1>ver: ' + resources.version + '</h1>'
                     });
 
                     _helpPage.CardView.appendCard({
@@ -110,6 +111,9 @@
                 }
             }
         };
-        this.HelpPage.AppHandler.start();
+
+        _helpPage.AppHandler.start();
     })();
+
+
 </script>

@@ -15,5 +15,9 @@
   "webapp": {
     "executeAs": "USER_ACCESSING",
     "access": "ANYONE"
-  }
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/script.container.ui",
+    "https://www.googleapis.com/auth/spreadsheets.currentonly"
+  ]
 }

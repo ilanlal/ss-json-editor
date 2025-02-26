@@ -6,14 +6,14 @@ function onOpen(e) {
     // The label for a menu item should be in sentence case (only the first word capitalized).
     // see https://developers.google.com/apps-script/reference/base/menu#detailed-documentation
     ui.createMenu('Json')
-        .addItem("⇱ Edit", 'openDialogEditor')
-        .addItem('▦ Range', 'openSidebarRangeReport')
+        .addItem("✏️ Edit", 'openDialogEditor')
+        .addItem('💫 Range', 'openSidebarRangeReport')
         .addSeparator()
-        .addSubMenu(SpreadsheetApp.getUi().createMenu('↹ Format')
+        .addSubMenu(SpreadsheetApp.getUi().createMenu('{👁️} Format')
             .addItem('Minify', 'minifyRange')
             .addItem('Prettify', 'prettifyRange'))
-        .addSeparator()
-        .addItem('⚙️ Setting', 'openDialogSetting')
+        //.addSeparator()
+        //.addItem('⚙️ Setting', 'openDialogSetting')
         .addSeparator()
         .addItem('❔ Help', 'openDialogHelp')
         .addToUi();

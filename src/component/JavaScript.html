@@ -5,8 +5,9 @@
         //resource = 
         const addon = this;
         // Global_Resources
-        const Global_Resources = {
-            "version": '0.0.1',
+        this.Global_Resources = {
+            "module": 'core-js',
+            "version": '0.0.2',
             "en": {
                 "appTitle": "Json",
                 "loading": "Loading...",
@@ -101,7 +102,7 @@
             }
         };
         const locale = 'en';
-        const resources = Global_Resources[locale];
+        const resources = this.Global_Resources[locale];
 
         // Sidebar
         const _sidebar = this.Sidebar = {
