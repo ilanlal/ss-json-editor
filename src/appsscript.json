@@ -24,7 +24,7 @@
   "addOns": {
     "common": {
       "name": "JSON Studio for Google Sheets™️",
-      "logoUrl": "https://github.com/ilanlal/ss-json-editor/assets/logo48.png",
+      "logoUrl": "https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo24.png",
       "layoutProperties": {
         "primaryColor": "#2196F3",
         "secondaryColor": "#607d8b"
