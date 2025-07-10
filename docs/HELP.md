@@ -1,6 +1,7 @@
 # Help and Support
 
-This is a simple markdown file that will be used to provide help and support to Google Sheets™️ users who are using this add-on.
+This is a simple markdown file that will be used to provide help and support,
+ to Google Sheets™️ users who are using this add-on.
 
 ## Quick start
 
@@ -10,7 +11,8 @@ This is a simple markdown file that will be used to provide help and support to 
 2. Click on the "Add-ons" menu
 3. Click on "Get add-ons"
 4. Search for "JSON Tools"
-5. Click on the "Install" button to install the add-on, and follow the instructions to grant the necessary permissions, if prompted.
+5. Click on the "Install" button to install the add-on,
+ and follow the instructions to grant the necessary permissions, if prompted.
 
 ### How to use this add-on
 

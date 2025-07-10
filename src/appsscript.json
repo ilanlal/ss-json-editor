@@ -18,6 +18,21 @@
   },
   "oauthScopes": [
     "https://www.googleapis.com/auth/script.container.ui",
-    "https://www.googleapis.com/auth/spreadsheets.currentonly"
-  ]
+    "https://www.googleapis.com/auth/spreadsheets.currentonly",
+    "https://www.googleapis.com/auth/script.locale"
+  ],
+  "addOns": {
+    "common": {
+      "name": "JSON Studio for Google Sheets™️",
+      "logoUrl": "https://github.com/ilanlal/ss-json-editor/assets/logo48.png",
+      "layoutProperties": {
+        "primaryColor": "#2196F3",
+        "secondaryColor": "#607d8b"
+      },
+      "homepageTrigger": {
+        "runFunction": "onHomepage"
+      }
+    },
+    "sheets": {}
+  }
 }

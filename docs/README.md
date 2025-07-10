@@ -1,4 +1,4 @@
-# JSON Tools
+# JSON Studio for Google Sheets™️
 
 This is a simple Google Sheets™️ add-on that allows users to edit and validate JSON data in a Google Sheets™️.
 

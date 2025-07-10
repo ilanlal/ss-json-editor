@@ -15,3 +15,15 @@
 ## Push & Deploy
 
 `clasp push -w` or `clasp push`
+
+## QUnit Tests
+
+This project uses [QUnit](https://qunitjs.com/) for unit testing. You can run the tests using the following command:
+
+```bash
+clasp run test
+```
+
+## How to install this add-on
+
+@see [docs/HELP.md](docs/HELP.md)
