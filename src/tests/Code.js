@@ -12,5 +12,5 @@ function doGet(e) {
 
 function doGetMainTest() {
     new test_Components();
-    new Test_Addons();
+    new test_ServerCode();
 }

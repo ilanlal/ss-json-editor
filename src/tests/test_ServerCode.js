@@ -1,4 +1,4 @@
-// test_Addons.gs
+// test_ServerCode.gs
 class test_ServerCode {
     constructor() {
         QUnit.module("Code.gs (Server Code)");

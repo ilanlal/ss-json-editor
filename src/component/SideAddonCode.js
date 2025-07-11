@@ -34,7 +34,7 @@ function createHomeCard(e) {
             .setImageAltText('JSON Studio for Google Sheets™️'));
 
     builder.addSection(CardService.newCardSection()
-        .setHeader('🛠️ Tools')
+        .setHeader('Formatting Options')
         .addWidget(CardService.newButtonSet()
             .addButton(CardService.newTextButton()
                 .setText('↹ Minify')
@@ -46,15 +46,6 @@ function createHomeCard(e) {
                 .setDisabled(false))));
 
     builder.addSection(CardService.newCardSection()
-        .setHeader('📊 Range')
-        .setCollapsible(false)
-        .addWidget(CardService.newButtonSet()
-            .addButton(CardService.newTextButton()
-                .setText('Range Report')
-                .setOnClickAction(CardService.newAction().setFunctionName('openSidebarRangeReport'))
-                .setDisabled(false))));
-
-    builder.addSection(CardService.newCardSection()
         .setHeader('✏️ Editor')
         .addWidget(CardService.newButtonSet()
             .addButton(CardService.newTextButton()
@@ -62,6 +53,15 @@ function createHomeCard(e) {
                 .setOnClickAction(CardService.newAction().setFunctionName('openDialogEditor'))
                 .setDisabled(false))));
 
+    builder.addSection(CardService.newCardSection()
+        .setHeader('📊 Range')
+        .setCollapsible(false)
+        .addWidget(CardService.newButtonSet()
+            .addButton(CardService.newTextButton()
+                .setText('Range Report')
+                .setOnClickAction(CardService.newAction().setFunctionName('openSidebarRangeReport'))
+                .setDisabled(false))));
+                
     const footer = CardService.newFixedFooter()
         .setSecondaryButton(
             CardService.newTextButton()
