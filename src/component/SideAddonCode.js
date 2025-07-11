@@ -5,71 +5,77 @@
  * @return {CardService.Card} The card to show the user.
  */
 function onHomepage(e) {
-    const DEFAULT_INPUT_TEXT = '';
-    const DEFAULT_OUTPUT_TEXT = '';
-    const DEFAULT_ORIGIN_LAN = ''; // Empty string means detect langauge
-    const DEFAULT_DESTINATION_LAN = 'en' // English
-
-    return createSelectionCard(e, DEFAULT_ORIGIN_LAN, DEFAULT_DESTINATION_LAN, DEFAULT_INPUT_TEXT, DEFAULT_OUTPUT_TEXT);
+    // If the user is not an add-on, show an alert
+    if (e && e.authMode === ScriptApp.AuthMode.NONE) {
+        SpreadsheetApp.getUi().alert('This add-on can only be used in Google Sheets™️.');
+        return;
+    }
+    else {
+        // Initialize the menu
+        onOpen(e);
+        return createHomeCard(e);
+    }
 }
 
-function createSelectionCard(e, originLanguage, destinationLanguage, inputText, outputText) {
+/**
+ * Callback for rendering the home card.
+ * @see {https://developers.google.com/workspace/add-ons/concepts/cards}
+ * @return {CardService.Card} The card to show the user.
+ */
+function createHomeCard(e) {
     var builder = CardService.newCardBuilder();
+    // Set the card header
+    builder.setHeader(
+        CardService.newCardHeader()
+            .setTitle('Welcome to JSON Studio')
+            .setSubtitle('Edit and validate JSON data in Google Sheets™️')
+            .setImageStyle(CardService.ImageStyle.SQUARE)
+            .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
+            .setImageAltText('JSON Studio for Google Sheets™️'));
 
-    // "From" language selection & text input section
-    var fromSection = CardService.newCardSection()
-        .addWidget(CardService.newTextInput()
-            .setFieldName('input')
-            .setValue(inputText)
-            .setTitle('Enter text...')
-            .setMultiline(true));
-
-    fromSection.addWidget(CardService.newButtonSet()
-        .addButton(CardService.newTextButton()
-            .setText('Get Selection')
-            .setOnClickAction(CardService.newAction().setFunctionName('getSheetsSelection'))
-            .setDisabled(false)));
-
-
-    builder.addSection(fromSection);
-
-    // "Translation" language selection & text input section
     builder.addSection(CardService.newCardSection()
-        .addWidget(CardService.newTextInput()
-            .setFieldName('output')
-            .setValue(outputText)
-            .setTitle('Translation...')
-            .setMultiline(true)));
-
-    //Buttons section
-    builder.addSection(CardService.newCardSection()
+        .setHeader('🛠️ Tools')
         .addWidget(CardService.newButtonSet()
             .addButton(CardService.newTextButton()
-                .setText('↹ Minify range')
+                .setText('↹ Minify')
                 .setOnClickAction(CardService.newAction().setFunctionName('minifyRange'))
                 .setDisabled(false))
             .addButton(CardService.newTextButton()
                 .setText('👁️ Prettify')
                 .setOnClickAction(CardService.newAction().setFunctionName('prettifyRange'))
-                .setDisabled(false))
-            .addButton(CardService.newTextButton()
-                .setText('🚥 Verify selected range')
-                .setOnClickAction(CardService.newAction().setFunctionName('openSidebarRangeReport'))
-                .setDisabled(false))
-            .addButton(CardService.newTextButton()
-                .setText('✏️ Open selected cell in editor')
-                .setOnClickAction(CardService.newAction().setFunctionName('openDialogEditor'))
-                .setDisabled(false))
-            .addButton(CardService.newTextButton()
-                .setText('❔ Help')
-                .setOnClickAction(CardService.newAction().setFunctionName('openDialogHelp'))
-                .setDisabled(false))
-            .addButton(CardService.newTextButton()
-                .setText('Clear')
-                .setOnClickAction(CardService.newAction().setFunctionName('clearText'))
-                .setDisabled(true))));
+                .setDisabled(false))));
 
-    //onOpen(e);
+    builder.addSection(CardService.newCardSection()
+        .setHeader('📊 Range')
+        .setCollapsible(false)
+        .addWidget(CardService.newButtonSet()
+            .addButton(CardService.newTextButton()
+                .setText('Range Report')
+                .setOnClickAction(CardService.newAction().setFunctionName('openSidebarRangeReport'))
+                .setDisabled(false))));
+
+    builder.addSection(CardService.newCardSection()
+        .setHeader('✏️ Editor')
+        .addWidget(CardService.newButtonSet()
+            .addButton(CardService.newTextButton()
+                .setText('Open Editor')
+                .setOnClickAction(CardService.newAction().setFunctionName('openDialogEditor'))
+                .setDisabled(false))));
+
+    const footer = CardService.newFixedFooter()
+        .setSecondaryButton(
+            CardService.newTextButton()
+                .setText('🌐 Website')
+                .setOpenLink(
+                    CardService.newOpenLink().setUrl('https://www.easyadm.com'))
+                .setDisabled(false))
+        .setPrimaryButton(
+            CardService.newTextButton()
+                .setText('⛑️ Help')
+                .setOnClickAction(CardService.newAction().setFunctionName('openDialogHelp'))
+                .setDisabled(false));
+    // Add the footer to the card
+    builder.setFixedFooter(footer);
     return builder.build();
 
 }
