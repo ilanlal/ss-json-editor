@@ -20,7 +20,7 @@ This add-on is built using [Google Apps Script](https://developers.google.com/ap
 
 ## Development roadmap
 
-This add-on is under active development. The roadmap for the JSON Studio add-on includes the following [phases](ROADMAP.md):
+This add-on is under active development. The roadmap for the JSON Studio add-on includes the following [phases](docs/ROADMAP.md):
 
 ## Unit Testing
 
