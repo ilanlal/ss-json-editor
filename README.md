@@ -14,33 +14,20 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 - **Integration with Google Sheets™️**: Seamlessly integrates with Google Sheets™️ for easy data manipulation.
 - **Cross-platform Compatibility**: Works on any device with Google Sheets™️ access.
 
+## Google Workspace™️ Add-ons
+
+This add-on is built using [Google Apps Script](https://developers.google.com/apps-script) and is designed to enhance the functionality of Google Sheets™️ by providing tools for working with JSON data.
+
+## Development roadmap
+
+This add-on is under active development. The roadmap for the JSON Studio add-on includes the following [phases](ROADMAP.md):
+
 ## Unit Testing
 
 This add-on uses [qUnit.js](https://qunitjs.com/) for unit testing. The tests are located in the `tests` directory and can be run using the qUnit.js framework.
 
-- [Test](https://script.google.com/macros/s/AKfycbz7FKpr7krvVbgdsGh8XerHG18C1r1hbzPUPInNXaGG/dev)
-- [Live](https://script.google.com/macros/s/AKfycbz7FKpr7krvVbgdsGh8XerHG18C1r1hbzPUPInNXaGG/exec)
-
-## Roadmap for the Add-on
-
-### The roadmap to publish the add-on to the Google Workspace Marketplace.
-
-1. **Development Phase**:
-   - Complete the core functionality of the add-on, including JSON formatting (prettify and minify).
-   - Implement user interface components using Google Apps Script and CardService.
-2. **Testing Phase**:
-   - Conduct thorough testing of the add-on to ensure it works as expected.
-   - Use qUnit.js for unit testing and ensure all features are functioning correctly.
-3. **Documentation Phase**:
-   - Create comprehensive documentation for the add-on, including installation instructions, usage guides, and troubleshooting tips.
-   - Write a detailed README.md file to provide an overview of the add-on and its features.
-4. **Publishing Phase**:
-   - Prepare the add-on for submission to the Google Workspace Marketplace.
-   - Follow the [Google Workspace Add-ons publishing guidelines](https://developers.google.com/workspace/marketplace/publish) to ensure compliance with all requirements.
-5. **Marketing Phase**:
-   - Promote the add-on through various channels, including social media, blogs, and developer communities.
-6. **Maintenance Phase**:
-   - Monitor user feedback and address any issues or feature requests.
+- See: [test](https://script.google.com/macros/s/AKfycbz7FKpr7krvVbgdsGh8XerHG18C1r1hbzPUPInNXaGG/dev) environment for testing the add-on.
+- See: [live](https://script.google.com/macros/s/AKfycbz7FKpr7krvVbgdsGh8XerHG18C1r1hbzPUPInNXaGG/exec) environment for testing the add-on.
 
 ## Installation
 
