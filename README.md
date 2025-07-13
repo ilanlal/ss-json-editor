@@ -14,6 +14,13 @@ If you are looking for a **simple way to prettify, minify, and edit JSON data** 
 - **Integration with Google Sheets™️**: Seamlessly integrates with Google Sheets™️ for easy data manipulation.
 - **Cross-platform Compatibility**: Works on any device with Google Sheets™️ access.
 
+## Unit Testing
+
+This add-on uses [qUnit.js](https://qunitjs.com/) for unit testing. The tests are located in the `tests` directory and can be run using the qUnit.js framework.
+
+- [Test](https://script.google.com/macros/s/AKfycbz7FKpr7krvVbgdsGh8XerHG18C1r1hbzPUPInNXaGG/dev)
+- [Live](https://script.google.com/macros/s/AKfycbz7FKpr7krvVbgdsGh8XerHG18C1r1hbzPUPInNXaGG/exec)
+
 ## Roadmap for the Add-on
 
 ### The roadmap to publish the add-on to the Google Workspace Marketplace.
@@ -44,7 +51,7 @@ Note: This add-on is currently in development and not yet available in the Googl
 - [Google Apps Script](https://developers.google.com/apps-script)
 - [Google Sheets™️](https://www.google.com/sheets/about/)
 - [JSON](https://www.json.org/json-en.html)
-- [qUnit.js](https://qunitjs.com/) for unit testing. [Live Demo](https://script.google.com/macros/s/AKfycbz7FKpr7krvVbgdsGh8XerHG18C1r1hbzPUPInNXaGG/exec)
+- [qUnit.js](https://qunitjs.com/) for unit testing.
 - [Easy ADM](https://www.easyadm.com/)
 
 ## License
