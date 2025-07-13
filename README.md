@@ -1,10 +1,10 @@
-# ![Logo](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/logo32.png) JSON Studio for Google Sheets™️
+# ![Logo](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/logo24.png) JSON Studio for Google Sheets™️
 
 This Google Sheets™️ add-on that allows users to format JSON data directly within their spreadsheets. It provides a user-friendly interface for working with JSON data, making it easier to manage and manipulate structured data.
 
 If you are looking for a **simple way to prettify, minify, and edit JSON data** in Google Sheets™️, this add-on is for you!
 
-## Features
+## Features ![GitHub Repo stars](https://img.shields.io/github/stars/ilanlal/ss-json-editor?style=social) ![GitHub Repo forks](https://img.shields.io/github/forks/ilanlal/ss-json-editor?style=social)
 
 - **Prettify JSON**: Format JSON data to make it more readable.
 - **Minify JSON**: Remove unnecessary whitespace and line breaks from JSON data.
@@ -13,9 +13,6 @@ If you are looking for a **simple way to prettify, minify, and edit JSON data** 
 - **User-friendly Interface**: Easy-to-use interface for working with JSON data.
 - **Integration with Google Sheets™️**: Seamlessly integrates with Google Sheets™️ for easy data manipulation.
 - **Cross-platform Compatibility**: Works on any device with Google Sheets™️ access.
-
-![GitHub Repo stars](https://img.shields.io/github/stars/ilanlal/ss-json-editor?style=social)
-![GitHub Repo forks](https://img.shields.io/github/forks/ilanlal/ss-json-editor?style=social)
 
 ## Roadmap for the Add-on
 
