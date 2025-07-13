@@ -23,7 +23,7 @@
   ],
   "addOns": {
     "common": {
-      "name": "JSON Studio for Google Sheets™️",
+      "name": "JSON Studio",
       "logoUrl": "https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo24.png",
       "layoutProperties": {
         "primaryColor": "#333",
@@ -31,7 +31,24 @@
       },
       "homepageTrigger": {
         "runFunction": "onHomepage"
-      }
+      },
+      "openLinkUrlPrefixes": [
+        "https://www.google.com",
+        "https://raw.githubusercontent.com/ilanlal",
+        "https://www.github.com/ilanlal",
+        "https://www.easyadm.com"
+      ],
+      "useLocaleFromApp": true,
+      "universalActions": [
+        {
+          "label": "Website",
+          "openLink": "https://www.easyadm.com"
+        },
+        {
+          "label": "About",
+          "runFunction": "openAboutCard"
+        }
+      ]
     },
     "sheets": {}
   }

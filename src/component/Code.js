@@ -41,6 +41,53 @@ function onInstall(e) {
     setupMenu(e);
 }
 
+/**
+ * The event handler triggered when the selection changes in the spreadsheet.
+ * @param {Event} e The onSelectionChange event.
+ * @see https://developers.google.com/apps-script/guides/triggers#onselectionchangee
+ */
+function onSelectionChange(e) {
+  // Set background to red if a single empty cell is selected.
+  const range = e.range;
+  /*if (range.getNumRows() === 1 &&
+    range.getNumColumns() === 1 &&
+    range.getCell(1, 1).getValue() === '') {
+    range.setBackground('red');
+  }*/
+}
+
+/**
+ * The event handler triggered when editing the spreadsheet.
+ * @param {Event} e The onEdit event.
+ * @see https://developers.google.com/apps-script/guides/triggers#onedite
+ */
+function onEdit(e) {
+  // Set a comment on the edited cell to indicate when it was changed.
+  const range = e.range;
+  //range.setNote('Last modified: ' + new Date());
+}
+
+function openAboutCard(e) {
+    // Create a card with information about the add-on
+    var builder = CardService.newCardBuilder();
+
+    // Set the card header
+    builder.setHeader(
+        CardService.newCardHeader()
+            .setTitle('About JSON Studio')
+            .setSubtitle('Best JSON tools for Google Sheets™️')
+            .setImageStyle(CardService.ImageStyle.SQUARE)
+            .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
+            .setImageAltText('JSON Studio for Google Sheets™️'));
+
+    // Add a section with information about the add-on
+    builder.addSection(CardService.newCardSection()
+        .addWidget(CardService.newTextParagraph()
+            .setText('This add-on provides various tools for working with JSON data in Google Sheets.')));
+
+    return builder.build();
+}
+
 /** 
  * Callback for adding the sidebar menu.
  * @param {Object} e The event object.

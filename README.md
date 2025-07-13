@@ -18,12 +18,20 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 
 This add-on is built using [Google Apps Script](https://developers.google.com/apps-script) and is designed to enhance the functionality of Google Sheets™️ by providing tools for working with JSON data.
 
-## References
+## 🔥 Hot references
+
+- [Manifest File](https://developers.google.com/apps-script/concepts/manifests)
+- [Get user locale and timezone](https://developers.google.com/apps-script/reference/user/user#getLocale())
+- [Cards Concepts](https://developers.google.com/workspace/add-ons/concepts/cards)
+  - [Google Apps Script CardService](https://developers.google.com/apps-script/reference/card-service/card-service)
+- [Cards Navigation](https://developers.google.com/workspace/add-ons/how-tos/navigation)
+  - [Google Apps Script CardService Navigation](https://developers.google.com/apps-script/reference/card-service/navigation)
+
+### Additional References
 
 - [Google Workspace Add-ons](https://developers.google.com/workspace/add-ons)
 - [Google Apps Script](https://developers.google.com/apps-script)
 - [Google Sheets™️](https://www.google.com/sheets/about/)
-- [Card Navigation](https://developers.google.com/workspace/add-ons/how-tos/navigation)
 
 ## Development roadmap
 

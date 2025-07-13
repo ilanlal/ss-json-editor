@@ -1,4 +1,6 @@
-// HomeCrad.gs
+// Apps Script code for Google Workspace Add-ons
+// src/component/HomeCard.js
+
 /**
  * Callback for rendering the home card.
  * @see {https://developers.google.com/workspace/add-ons/concepts/cards}
@@ -21,7 +23,7 @@ function createHomeCard(e) {
 
     // Add a section for the range report
     // This section includes a button to open the sidebar for generating a report
-    builder.addSection(createMoreOptionsCardSection(e));
+    //builder.addSection(createMoreOptionsCardSection(e));
 
     // Add the footer to the card
     builder.setFixedFooter(createFixedFooter(e));
@@ -49,19 +51,19 @@ function createFormattingCardSection(e) {
                 .setDisabled(false)))
         .addWidget(CardService.newTextParagraph()
             //.setText('↹ Select a range of cells containing JSON data and use the buttons below to format the JSON.'))
-            .setText('Select <b>range</b> of cells containing JSON data and use the buttons below to minify the JSON.'))
+            .setText('Use the buttons below to minify the JSON.'))
         .addWidget(CardService.newButtonSet()
             .addButton(CardService.newTextButton()
                 .setText('{..} Minify')
                 .setOnClickAction(CardService.newAction().setFunctionName('minifyRange'))
-                .setDisabled(false)))
-        .addWidget(CardService.newTextParagraph()
-            .setText('Select <b>one</b> cell containing JSON data and use the button below to edit the JSON.'))
-        .addWidget(CardService.newButtonSet()
-            .addButton(CardService.newTextButton()
-                .setText('✏️ Open Editor')
-                .setOnClickAction(CardService.newAction().setFunctionName('openDialogEditor'))
                 .setDisabled(false)));
+    /*.addWidget(CardService.newTextParagraph()
+        .setText('Select <b>one</b> cell containing JSON data and use the button below to edit the JSON.'))
+    .addWidget(CardService.newButtonSet()
+        .addButton(CardService.newTextButton()
+            .setText('✏️ Open Editor')
+            .setOnClickAction(CardService.newAction().setFunctionName('openDialogEditor'))
+            .setDisabled(false)));*/
 }
 
 function createMoreOptionsCardSection(e) {
@@ -74,7 +76,7 @@ function createMoreOptionsCardSection(e) {
         .addWidget(CardService.newButtonSet()
             .addButton(CardService.newTextButton()
                 .setText('Start Report')
-                .setOnClickAction(CardService.newAction().setFunctionName('openSidebarRangeReport'))
+                .setOnClickAction(CardService.newAction().setFunctionName('openReportCard'))
                 .setDisabled(false)))
         .addWidget(CardService.newTextParagraph()
             .setText('This section can include more options in the future.'))
