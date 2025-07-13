@@ -18,6 +18,13 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 
 This add-on is built using [Google Apps Script](https://developers.google.com/apps-script) and is designed to enhance the functionality of Google Sheets™️ by providing tools for working with JSON data.
 
+## References
+
+- [Google Workspace Add-ons](https://developers.google.com/workspace/add-ons)
+- [Google Apps Script](https://developers.google.com/apps-script)
+- [Google Sheets™️](https://www.google.com/sheets/about/)
+- [Card Navigation](https://developers.google.com/workspace/add-ons/how-tos/navigation)
+
 ## Development roadmap
 
 This add-on is under active development. The roadmap for the JSON Studio add-on includes the following [phases](docs/ROADMAP.md):
