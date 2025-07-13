@@ -44,7 +44,7 @@ Note: This add-on is currently in development and not yet available in the Googl
 - [Google Apps Script](https://developers.google.com/apps-script)
 - [Google Sheets™️](https://www.google.com/sheets/about/)
 - [JSON](https://www.json.org/json-en.html)
-- [qUnit.js](https://qunitjs.com/)
+- [qUnit.js](https://qunitjs.com/) for unit testing. [Live Demo](https://script.google.com/macros/s/AKfycbz7FKpr7krvVbgdsGh8XerHG18C1r1hbzPUPInNXaGG/exec)
 - [Easy ADM](https://www.easyadm.com/)
 
 ## License
