@@ -52,3 +52,4 @@ If you would like to contribute to this project, please fork the [GitHub reposit
 ## Help and Support
 
 This is a simple markdown file that will be used to provide help and support to Google Sheets™️ users who are using this add-on.
+For any issues or feature requests, please open an issue on the [GitHub repository](https://www.github.com/ilanlal/ss-json-editor/issues).
