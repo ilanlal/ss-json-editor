@@ -21,7 +21,9 @@ This add-on is built using [Google Apps Script](https://developers.google.com/ap
 ## 🔥 Hot references
 
 - [Manifest File](https://developers.google.com/apps-script/concepts/manifests)
-- [Get user locale and timezone](https://developers.google.com/apps-script/reference/user/user#getLocale())
+- [Spreadsheet Service (SpreadsheetApp)](https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet)
+  - [Get Spreadsheet Locale](https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet?hl=en#getspreadsheetlocale)
+  - [Toast Message](https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet?hl=en#toastmsg)
 - [Cards Concepts](https://developers.google.com/workspace/add-ons/concepts/cards)
   - [Google Apps Script CardService](https://developers.google.com/apps-script/reference/card-service/card-service)
 - [Cards Navigation](https://developers.google.com/workspace/add-ons/how-tos/navigation)

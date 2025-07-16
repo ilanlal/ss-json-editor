@@ -6,14 +6,32 @@ class test_ServerCode {
     }
     runTests() {
         const tests = [
-            "test_AB"
+            "test_minifyRange",
+            "test_prettifyRange"
         ];
         tests.forEach(test => this[test]());
     }
 
-    test_AB() {
-        QUnit.test("AB Test", function (assert) {
-            assert.ok(false, "Not implemented");
+    test_minifyRange() {
+        QUnit.test("minifyRange", function (assert) {
+            // Mock the SpreadsheetApp and its methods
+            const mockSpreadsheet = {
+                getActiveSpreadsheet: () => ({
+                    getActiveSheet: () => ({
+                        getRange: () => ({
+                            getValue: () => '{"key": "value"}',
+                            setValue: (value) => assert.strictEqual(value, '{"key":"value"}', "Minified JSON value set correctly")
+                        })
+                    })
+                })
+            };
+            globalThis.SpreadsheetApp = { getActiveSpreadsheet: mockSpreadsheet.getActiveSpreadsheet };
+
+            // Call the function to test
+            minifyRange();
+
+            // Clean up
+            delete globalThis.SpreadsheetApp;
         });
     }
 }

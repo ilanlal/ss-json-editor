@@ -1,11 +1,16 @@
 // Apps Script code for Google Workspace Add-ons
-// src/component/rangeReport/Code.gs
+// src/cards/Report.gs
 
-// This function is called when the user clicks on the "Open Sidebar" button in the add-on menu
+/**
+ * Callback for rendering the report card.
+ * @param {Event} e The event object.
+ * @return {CardService.Card} The card to show the user.
+ * @see {https://developers.google.com/workspace/add-ons/concepts/cards}
+ * */
 function openReportCard(e) {
   // Only show the sidebar if the user is authorized to use the add-on
   if (e && e.authMode !== ScriptApp.AuthMode.NONE) {
-    const file = 'component/rangeReport/Index';
+    const file = 'cards/rangeReport/Index';
     const htmlOutput = HtmlService
       .createTemplateFromFile(file)
       .evaluate()

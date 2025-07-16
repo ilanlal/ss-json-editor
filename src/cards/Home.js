@@ -1,5 +1,5 @@
 // Apps Script code for Google Workspace Add-ons
-// src/component/HomeCard.js
+// src/cards/HomeCard.js
 
 /**
  * Callback for rendering the home card.
@@ -12,7 +12,7 @@ function createHomeCard(e) {
     // Set the card header
     builder.setHeader(
         CardService.newCardHeader()
-            .setTitle('JSON Studio')
+            .setTitle(Global_Resources.appName)
             .setSubtitle('Best JSON tools for Google Sheets™️')
             .setImageStyle(CardService.ImageStyle.SQUARE)
             .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
