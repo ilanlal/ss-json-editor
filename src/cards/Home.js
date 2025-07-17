@@ -21,7 +21,7 @@ function createHomeCard(e) {
 
     // Add the top section with the title and switch control
     builder.addSection(createHomeCardTopSection(e));
-    // Add the top section with formatting options
+    // Add the settings section
     builder.addSection(createSettingsCardSection(e));
     // Add the more options section
     builder.addSection(createMoreOptionsCardSection(e));
@@ -63,12 +63,16 @@ function createSettingsCardSection(e) {
         CardService.newSelectionInput()
             .setType(CardService.SelectionInputType.DROPDOWN)
             .setTitle(localization.cards.home.identSpaces)
-            .setFieldName('indentation_spaces')
+            .setFieldName('ident_spaces_selector')
             .addItem('1 {.}', '1', false)
             .addItem('2 {..}', '2', true) // Default selected
             .addItem('4 {....}', '4', false)
             .addItem('6 {......}', '6', false)
-            .addItem('8 {........}', '8', false);
+            .addItem('8 {........}', '8', false)
+            .setOnChangeAction(
+                CardService
+                .newAction()
+                .setFunctionName('onIdentSpacesSelectorChange'));
 
     // Create a card with formatting options
     return CardService.newCardSection()

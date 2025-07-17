@@ -7,7 +7,7 @@ function onMinifyRange(e) {
             .getActiveSpreadsheet()
             .toast(
                 localization.message.error,
-                error.toString(), 16);
+                error.toString(), 10);
     }
 }
 
@@ -20,7 +20,7 @@ function onPrettifyRange(e) {
             .getActiveSpreadsheet()
             .toast(
                 localization.message.error,
-                error.toString(), 16);
+                error.toString(), 10);
     }
 }
 

@@ -58,7 +58,7 @@ function showTipForMenu(e) {
     .getActiveSpreadsheet()
     .toast(
       localization.message.tipForMenu,
-      localization.message.tip,20);
+      localization.message.tip, 20);
 }
 /**
  * Gets the localization resources based on the user's locale.
@@ -87,18 +87,33 @@ function createAppMenu(e) {
     .addToUi();
 }
 
+function onIdentSpacesSelectorChange(e) {
+  const userProperties = PropertiesService.getUserProperties();
+  //Operation completed successfully.
+  const t = {
+    "ident_spaces_selector":
+    {
+      "stringInputs":
+      {
+        "value": ["2"]
+      }
+    }, "validate_json_switch": {
+      "stringInputs": {
+        "value": ["true"]
+      }
+    }
+  }
+
+  // field name: ident_spaces_selector
+  const selectedSpaces = e.commonEventObject?.formInputs?.ident_spaces_selector?.stringInputs?.value[0] || "2";
+  // Set the user property to the selected number of spaces
+  userProperties.setProperty('identSpaces', selectedSpaces);
+}
+
 function onValidateJsonSwitchChange(e) {
   const userProperties = PropertiesService.getUserProperties();
   // field name: validate_json_switch
   const isChecked = e.commonEventObject?.formInputs?.validate_json_switch?.stringInputs?.value[0] === 'true';
   // Set the user property to the value of the switch
   userProperties.setProperty('validateJson', isChecked);
-  
-  // Show a toast message to confirm the switch change
-  const localization = getLocalizationResources(e);
-  SpreadsheetApp
-    .getActiveSpreadsheet()
-    .toast(
-      isChecked ? localization.message.success : localization.message.warning,
-      localization.message.info, 3);
 }

@@ -1,6 +1,15 @@
 {
   "timeZone": "Asia/Jerusalem",
-  "dependencies": {},
+  "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "QUnit",
+        "version": "0",
+        "libraryId": "1jvNKvJric7Kbc6wWphMJZIfJ0w8wurlHymoGpkE-i26P_srJifxQhFr1",
+        "developmentMode": true
+      }
+    ]
+  },
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
   "webapp": {
@@ -8,6 +17,45 @@
     "access": "ANYONE"
   },
   "oauthScopes": [
+    "https://www.googleapis.com/auth/script.locale",
     "https://www.googleapis.com/auth/spreadsheets.currentonly"
-  ]
+  ],
+  "addOns": {
+    "common": {
+      "name": "Json Studio",
+      "logoUrl": "https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo24.png",
+      "layoutProperties": {
+        "primaryColor": "#333",
+        "secondaryColor": "#f1f1f1"
+      },
+      "openLinkUrlPrefixes": [
+        "https://raw.githubusercontent.com/ilanlal",
+        "https://www.github.com/ilanlal",
+        "https://www.easyadm.com"
+      ],
+      "homepageTrigger": {
+        "runFunction": "onDefaultHomePageOpen"
+      },
+      "useLocaleFromApp": true,
+      "universalActions": [
+        {
+          "label": "ℹ️ About Json Studio",
+          "runFunction": "onShowAboutInfo"
+        },
+        {
+          "label": "❔ Help & Support",
+          "openLink": "https://github.com/ilanlal/ss-json-editor#readme"
+        },
+        {
+          "label": "⚠️ Report an issue",
+          "openLink": "https://github.com/ilanlal/ss-json-editor/issues"
+        },
+        {
+          "label": "🌐 Easy ADM",
+          "openLink": "https://www.easyadm.com/add-ons/json-studio"
+        }
+      ]
+    },
+    "sheets": {}
+  }
 }
