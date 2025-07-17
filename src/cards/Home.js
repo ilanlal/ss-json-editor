@@ -52,27 +52,29 @@ function createSettingsCardSection(e) {
             .setSwitchControl(
                 CardService.newSwitch()
                     .setFieldName('validate_json_switch')
-                    .setSelected(true) // Default to true
+                    .setSelected(false) // Default to true
                     .setValue("true")
                     .setOnChangeAction(
                         CardService.newAction()
                             .setFunctionName('onValidateJsonSwitchChange')));
 
+    const userProperties = PropertiesService.getUserProperties();
+    const storedIdentSpaces = userProperties.getProperty('ident_spaces_selector') || '2';
     // DROPDOWN
     const identSpacesSelector =
         CardService.newSelectionInput()
             .setType(CardService.SelectionInputType.DROPDOWN)
             .setTitle(localization.cards.home.identSpaces)
             .setFieldName('ident_spaces_selector')
-            .addItem('1 {.}', '1', false)
-            .addItem('2 {..}', '2', true) // Default selected
-            .addItem('4 {....}', '4', false)
-            .addItem('6 {......}', '6', false)
-            .addItem('8 {........}', '8', false)
+            .addItem('1 {.}', '1', storedIdentSpaces === '1')
+            .addItem('2 {..}', '2', storedIdentSpaces === '2') // Default selected
+            .addItem('4 {....}', '4', storedIdentSpaces === '4')
+            .addItem('6 {......}', '6', storedIdentSpaces === '6')
+            .addItem('8 {........}', '8', storedIdentSpaces === '8')
             .setOnChangeAction(
                 CardService
-                .newAction()
-                .setFunctionName('onIdentSpacesSelectorChange'));
+                    .newAction()
+                    .setFunctionName('onIdentSpacesSelectorChange'));
 
     // Create a card with formatting options
     return CardService.newCardSection()

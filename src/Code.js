@@ -25,11 +25,14 @@ function minifyRange() {
   range.setValues(newValues);
 }
 
-function prettifyRange(nofIndentationSpaces) {
-  let nofSpaces = nofIndentationSpaces; // Use the provided number of spaces for indentation
-  if (typeof nofSpaces !== 'number' || nofSpaces <= 0) {
-    nofSpaces = 2; // Default to 2 spaces if the input is invalid
+function prettifyRange() {
+  const userProperties = PropertiesService.getUserProperties();
+  const nofSpaces = parseInt(userProperties.getProperty('ident_spaces_selector')) || 2; // Default to 2 spaces if not set
+
+  if (isNaN(nofSpaces) || nofSpaces <= 0) {
+    nofSpaces = 2;
   }
+  const validateJson = userProperties.getProperty('validate_json_switch') === 'true';
   const sheet = SpreadsheetApp
     .getActiveSpreadsheet()
     .getActiveSheet();
@@ -44,8 +47,17 @@ function prettifyRange(nofIndentationSpaces) {
           return;
         }
         try {
+          // Clean existing notes before setting new ones
+          range.getCell(i + 1, j + 1).clearNote();
           return JSON.stringify(JSON.parse(cell), null, nofSpaces);
         } catch (error) {
+          if (validateJson) {
+            // If validation is enabled, throw an error
+
+            // Set note about validation error handling
+            const note = `Error parsing JSON in cell ${range.getCell(i + 1, j + 1).getA1Notation()}: ${error.message}`;
+            range.getCell(i + 1, j + 1).setNote(note);
+          }
           return cell;
         }
       }));
@@ -89,25 +101,11 @@ function createAppMenu(e) {
 
 function onIdentSpacesSelectorChange(e) {
   const userProperties = PropertiesService.getUserProperties();
-  //Operation completed successfully.
-  const t = {
-    "ident_spaces_selector":
-    {
-      "stringInputs":
-      {
-        "value": ["2"]
-      }
-    }, "validate_json_switch": {
-      "stringInputs": {
-        "value": ["true"]
-      }
-    }
-  }
 
   // field name: ident_spaces_selector
   const selectedSpaces = e.commonEventObject?.formInputs?.ident_spaces_selector?.stringInputs?.value[0] || "2";
   // Set the user property to the selected number of spaces
-  userProperties.setProperty('identSpaces', selectedSpaces);
+  userProperties.setProperty('ident_spaces_selector', selectedSpaces);
 }
 
 function onValidateJsonSwitchChange(e) {
@@ -115,5 +113,5 @@ function onValidateJsonSwitchChange(e) {
   // field name: validate_json_switch
   const isChecked = e.commonEventObject?.formInputs?.validate_json_switch?.stringInputs?.value[0] === 'true';
   // Set the user property to the value of the switch
-  userProperties.setProperty('validateJson', isChecked);
+  userProperties.setProperty('validate_json_switch', isChecked);
 }

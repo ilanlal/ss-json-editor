@@ -13,7 +13,7 @@ function onMinifyRange(e) {
 
 function onPrettifyRange(e) {
     try {
-        prettifyRange(4);
+        prettifyRange();
     } catch (error) {
         const localization = getLocalizationResources(e);
         SpreadsheetApp
