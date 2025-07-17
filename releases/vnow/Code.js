@@ -25,13 +25,17 @@ function minifyRange() {
   range.setValues(newValues);
 }
 
-function prettifyRange() {
+function prettifyRange(nofIndentationSpaces = 2) {
   const sheet = SpreadsheetApp
     .getActiveSpreadsheet()
     .getActiveSheet();
   const lastRow = sheet.getLastRow();
   const range = sheet.getActiveRange();
   const values = range.getValues();
+  let nofSpaces = nofIndentationSpaces; // Use the provided number of spaces for indentation
+  if (typeof nofSpaces !== 'number' || nofSpaces <= 0) {
+    nofSpaces = 2; // Default to 2 spaces if the input is invalid
+  }
   const newValues = values
     .map((row, i) => row
       .map((cell, j) => {
@@ -40,7 +44,7 @@ function prettifyRange() {
           return;
         }
         try {
-          return JSON.stringify(JSON.parse(cell), null, 2);
+          return JSON.stringify(JSON.parse(cell), null, nofSpaces);
         } catch (error) {
           return cell;
         }

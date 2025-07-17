@@ -28,7 +28,7 @@
         "secondaryColor": "#f1f1f1"
       },
       "homepageTrigger": {
-        "runFunction": "onHomepage"
+        "runFunction": "onDefaultHomePageOpen"
       },
       "openLinkUrlPrefixes": [
         "https://www.google.com",

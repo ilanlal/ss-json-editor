@@ -7,21 +7,19 @@ function onMinifyRange(e) {
             .getActiveSpreadsheet()
             .toast(
                 localization.message.error,
-                error.toString(),
                 error.toString(), 16);
     }
 }
 
 function onPrettifyRange(e) {
     try {
-        prettifyRange();
+        prettifyRange(4);
     } catch (error) {
         const localization = getLocalizationResources(e);
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
                 localization.message.error,
-                error.toString(),
                 error.toString(), 16);
     }
 }
@@ -43,7 +41,12 @@ function onShowAboutInfo(e) {
  * It returns the home card to be displayed in the sidebar.
  * @see appsscript.json -->homepageTrigger
  */
-function onHomepage(e) {
+function onDefaultHomePageOpen(e) {
     // Return the home card
     return createHomeCard(e);
+}
+
+function onAddExtensionMenu(e) {
+    createAppMenu(e);
+    showTipForMenu(e);
 }

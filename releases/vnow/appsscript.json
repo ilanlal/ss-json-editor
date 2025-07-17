@@ -9,21 +9,5 @@
   },
   "oauthScopes": [
     "https://www.googleapis.com/auth/spreadsheets.currentonly"
-  ],
-  "addOns": {
-    "common": {
-      "name": "Json Studio",
-      "logoUrl": "https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo24.png",
-      "layoutProperties": {
-        "primaryColor": "#333",
-        "secondaryColor": "#f1f1f1"
-      },
-      "openLinkUrlPrefixes": [
-        "https://raw.githubusercontent.com/ilanlal",
-        "https://www.github.com/ilanlal",
-        "https://www.easyadm.com"
-      ]
-    },
-    "sheets": {}
-  }
+  ]
 }

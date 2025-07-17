@@ -32,11 +32,11 @@ function createHelpCard(e) {
         .addWidget(CardService.newTextParagraph()
             .setText('<b>Need help?</b> Visit our <a href="https://www.easyadm.com/json-studio">documentation</a> or <a href="https://www.easyadm.com/contact">contact us</a> for support.')));
     // Add a footer with links to documentation and support
-    builder.setFixedFooter(createFixedFooter(e));
+    builder.setFixedFooter(createHelpCardFixedFooter(e));
     return builder.build();
 }
 
-function createFixedFooter(e) {
+function createHelpCardFixedFooter(e) {
     return CardService.newFixedFooter()
         .setPrimaryButton(CardService.newTextButton()
             .setText('Documentation')

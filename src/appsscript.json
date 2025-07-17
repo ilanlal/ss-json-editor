@@ -8,6 +8,7 @@
     "access": "ANYONE"
   },
   "oauthScopes": [
+    "https://www.googleapis.com/auth/script.locale",
     "https://www.googleapis.com/auth/spreadsheets.currentonly"
   ],
   "addOns": {
@@ -22,6 +23,28 @@
         "https://raw.githubusercontent.com/ilanlal",
         "https://www.github.com/ilanlal",
         "https://www.easyadm.com"
+      ],
+      "homepageTrigger": {
+        "runFunction": "onDefaultHomePageOpen"
+      },
+      "useLocaleFromApp": true,
+      "universalActions": [
+        {
+          "label": "ℹ️ About Json Studio",
+          "runFunction": "onShowAboutInfo"
+        },
+        {
+          "label": "❔ Help & Support",
+          "openLink": "https://github.com/ilanlal/ss-json-editor#readme"
+        },
+        {
+          "label": "⚠️ Report an issue",
+          "openLink": "https://github.com/ilanlal/ss-json-editor/issues"
+        },
+        {
+          "label": "🌐 Easy ADM",
+          "openLink": "https://www.easyadm.com/add-ons/json-studio"
+        }
       ]
     },
     "sheets": {}
