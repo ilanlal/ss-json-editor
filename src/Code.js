@@ -51,7 +51,7 @@ function minifyRange() {
 
 function prettifyRange() {
   const userStore = new UserStore();
-  const identSpace = parseInt(userStore.getIdentSpaces()) || 2; // Default to 2 spaces
+  const identSpace = parseInt(userStore.getIdentSpaces()) || "2"; // Default to 2 spaces
   const failNoteFlag = userStore.getFailNoteFlag(); // Get the fail note flag
   const showErrors = userStore.getShowErrorsFlag(); // Get the show errors flag
   const sheet = SpreadsheetApp
@@ -60,11 +60,12 @@ function prettifyRange() {
   const lastRow = sheet.getLastRow();
   const range = sheet.getActiveRange();
   const values = range.getValues();
-
+  const localization = getLocalizationResources();
   // Check if the range exceeds the maximum allowed size.
   // This is to prevent performance issues with large ranges
-  if (range.getNumRows() * range.getNumColumns() > Static_Resources.limits.maxCellSize) {
-    const localization = getLocalizationResources();
+  const totalCells = range.getNumRows() * range.getNumColumns();
+  if (totalCells > Static_Resources.limits.maxCellSize) {
+
     SpreadsheetApp
       .getActiveSpreadsheet()
       .toast(
@@ -102,9 +103,8 @@ function prettifyRange() {
             range.getCell(i + 1, j + 1).setNote(message);
           }
 
-          if (showErrors && i === lastRow - 1 && j === row.length - 1) {
+          if (showErrors && (i + 1) * (j + 1) >= totalCells - 1) {
             // Show error in a toast if showErrors is enabled
-            const localization = getLocalizationResources();
             SpreadsheetApp
               .getActiveSpreadsheet()
               .toast(
