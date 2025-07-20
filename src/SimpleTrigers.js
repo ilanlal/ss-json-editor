@@ -12,7 +12,7 @@ function onInstall(e) {
     // Set a value in the property store.   
     const userProperties = PropertiesService.getUserProperties();
     userProperties.setProperty('localization', "en"); // Default to English
-    createAppMenu(e);
+    _initializeAppMenu(e);
 }
 
 /** 
@@ -22,5 +22,23 @@ function onInstall(e) {
  * @see https://developers.google.com/apps-script/guides/triggers
  */
 function onOpen(e) {
-    createAppMenu(e);
+    _initializeAppMenu(e);
+}
+
+/**
+ * Sets up the custom menu in the Google Sheets UI.
+ * This function is called when the add-on is installed or opened.
+ */
+function _initializeAppMenu(e) {
+  const localization = getLocalizationResources(e);
+  const ui = SpreadsheetApp.getUi();
+
+  // The label for a menu item should be in sentence case (only the first word capitalized).
+  // see https://developers.google.com/apps-script/reference/base/menu#detailed-documentation
+  ui.createMenu(localization.menu.top)
+    .addItem(localization.menu.format, 'onPrettifyRange')
+    .addItem(localization.menu.minify, 'onMinifyRange')
+    .addSeparator()
+    .addItem(localization.menu.about, 'onShowAboutInfo')
+    .addToUi();
 }

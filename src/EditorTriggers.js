@@ -1,3 +1,24 @@
+/**
+ * Callback for the add-on homepage.
+ * This function is called when the user opens the add-on.
+ * It returns the home card to be displayed in the sidebar.
+ * @see appsscript.json -->homepageTrigger
+ */
+function onDefaultHomePageOpen(e) {
+    try {
+        // Return the home card
+        return createHomeCard(e);
+    } catch (error) {
+        const localization = getLocalizationResources(e);
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.message.error,
+                10);
+    }
+}
+
 function onMinifyRange(e) {
     try {
         minifyRange();
@@ -6,8 +27,9 @@ function onMinifyRange(e) {
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
+                error.toString(),
                 localization.message.error,
-                error.toString(), 10);
+                10);
     }
 }
 
@@ -19,34 +41,81 @@ function onPrettifyRange(e) {
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
+                error.toString(),
                 localization.message.error,
-                error.toString(), 10);
+                10);
     }
 }
 
 function onShowAboutInfo(e) {
-    // Show an alert with information about the add-on
-    const localization = getLocalizationResources(e);
-    SpreadsheetApp
-        .getActiveSpreadsheet()
-        .toast(
-            localization.dialogs.about.content,
-            localization.dialogs.about.title,
-            0);
+    try {
+        // Show an alert with information about the add-on
+        const localization = getLocalizationResources(e);
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                localization.dialogs.about.content,
+                localization.dialogs.about.title,
+                0);
+    }
+    catch (error) {
+        const localization = getLocalizationResources(e);
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.message.error,
+                10);
+    }
 }
 
-/**
- * Callback for the add-on homepage.
- * This function is called when the user opens the add-on.
- * It returns the home card to be displayed in the sidebar.
- * @see appsscript.json -->homepageTrigger
- */
-function onDefaultHomePageOpen(e) {
-    // Return the home card
-    return createHomeCard(e);
+function onIdentSpacesSelectorChange(e) {
+    try {
+        const userStore = new UserStore();
+        const selectedSpaces = e.commonEventObject?.formInputs?.[Static_Resources.keys.identSpaces]?.stringInputs?.value[0] || "2";
+        userStore.setIdentSpaces(selectedSpaces); // Store the selected spaces in user properties
+    }
+    catch (error) {
+        const localization = getLocalizationResources(e);
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.message.error,
+                10);
+    }
 }
 
-function onAddExtensionMenu(e) {
-    createAppMenu(e);
-    showTipForMenu(e);
+function onFailNoteFlagChange(e) {
+    try {
+        const userStore = new UserStore();
+        const isChecked = e.commonEventObject?.formInputs?.[Static_Resources.keys.failNoteFlag]?.stringInputs?.value[0] === 'true';
+        userStore.setFailNoteFlag(isChecked);
+    }
+    catch (error) {
+        const localization = getLocalizationResources(e);
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.message.error,
+                10);
+    }
+}
+
+function onShowErrorFlagChange(e) {
+    try {
+        const userStore = new UserStore();
+        const isChecked = e.commonEventObject?.formInputs?.[Static_Resources.keys.showErrorsFlag]?.stringInputs?.value[0] === 'true';
+        userStore.setShowErrorsFlag(isChecked);
+    }
+    catch (error) {
+        const localization = getLocalizationResources(e);
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.message.error,
+                10);
+    }
 }
