@@ -8,7 +8,11 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 
 - **Prettify JSON**: Format JSON data to make it more readable.
 - **Minify JSON**: Remove unnecessary whitespace and line breaks from JSON data.
-- **Validate JSON**: Check if the JSON data is valid and well-formed.
+- **Set notes**: Add notes to your JSON data for better context and understanding.
+- **Show error messages**: Display error messages for invalid JSON data to help users identify and fix issues.
+- **Select Indentation**: Choose the indentation level for prettified JSON data. (1, 2, 4, 6 or 8 spaces)
+
+![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/sketch001.jpg)
 
 ## Deployment Status
 
@@ -25,8 +29,6 @@ For additional resources and references, check out the [REFERENCES.md](docs/REFE
 ## Development roadmap
 
 This add-on is under active development. The roadmap for the JSON Studio add-on includes the following [phases](docs/ROADMAP.md):
-
-![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/sketch001.jpg)
 
 ## Installation
 
