@@ -1,40 +1,5 @@
 // Apps Script code for Google Workspace Add-ons
-// src/cards/Report.gs
-
-/**
- * Callback for rendering the report card.
- * @param {Event} e The event object.
- * @return {CardService.Card} The card to show the user.
- * @see {https://developers.google.com/workspace/add-ons/concepts/cards}
- * */
-function openReportCard(e) {
-  // Only show the sidebar if the user is authorized to use the add-on
-  if (e && e.authMode !== ScriptApp.AuthMode.NONE) {
-    const file = 'cards/rangeReport/Index';
-    const htmlOutput = HtmlService
-      .createTemplateFromFile(file)
-      .evaluate()
-      .setTitle('JSON Studio')
-      // Uncomment the following lines to set the width and height of the sidebar
-      // .setWidth(300)
-      // .setHeight(600)
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-    // Show the sidebar in Google Sheets
-    // SpreadsheetApp.getUi().showSidebar(htmlOutput);
-
-    // todo: open child card with the "htmlOutput" content (the sidebar is already opened)
-    const card = createReportCard(e);
-    
-    // Create an action response to push the card to the navigation stack
-    // This will replace the current card with the new card in the navigation stack
-    const actionResponse = CardService.newActionResponseBuilder()
-      .setNavigation(CardService.newNavigation().pushCard(card))
-      .build();
-    return actionResponse;
-  } else {
-    SpreadsheetApp.getUi().alert('This add-on can only be used in Google Sheets™️.');
-  }
-}
+// src/cards/Report.g
 
 function createReportCard(e) {
   var builder = CardService.newCardBuilder();

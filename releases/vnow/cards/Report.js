@@ -1,5 +1,5 @@
 // Apps Script code for Google Workspace Add-ons
-// src/cards/Report.gs
+// src/cards/Report.g
 
 function createReportCard(e) {
   var builder = CardService.newCardBuilder();
@@ -14,7 +14,7 @@ function createReportCard(e) {
       .setImageAltText('JSON Studio for Google Sheets™️'));
 
   // Add state section with buttons for generating and clearing the report
-  builder.addSection(createReportStatesCardSection(e));
+  builder.addSection(createStatesCardSection(e));
 
 
   // Add a section for the range report
@@ -26,7 +26,7 @@ function createReportCard(e) {
   return builder.build();
 }
 
-function createReportStatesCardSection(e) {
+function createStatesCardSection(e) {
   // Create a card with formatting options
   return CardService.newCardSection()
     .setHeader('👁️ State')

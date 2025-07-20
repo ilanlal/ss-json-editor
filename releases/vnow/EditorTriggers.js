@@ -70,8 +70,9 @@ function onShowAboutInfo(e) {
 }
 function onShowAboutCard(e) {
     try {
-        // Return the about card
-        return createAboutCard(e);
+        const card = createAboutCard(e);
+        // Return the card to be displayed in the sidebar
+        return card;
     } catch (error) {
         const localization = getLocalizationResources(e);
         SpreadsheetApp
