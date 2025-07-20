@@ -12,8 +12,6 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 - **Show error messages**: Display error messages for invalid JSON data to help users identify and fix issues.
 - **Select Indentation**: Choose the indentation level for prettified JSON data. (1, 2, 4, 6 or 8 spaces)
 
-![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/sketch001.jpg)
-
 ## Deployment Status
 
 This project is currently in development. The add-on is not yet available in the Google Workspace Marketplace, but you can test it using the provided links below.
@@ -21,6 +19,8 @@ This project is currently in development. The add-on is not yet available in the
 ![GitHub repo size](https://img.shields.io/github/repo-size/ilanlal/ss-json-editor)
 ![GitHub last commit](https://img.shields.io/github/last-commit/ilanlal/ss-json-editor)
 ![GitHub issues](https://img.shields.io/github/issues/ilanlal/ss-json-editor)
+
+![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/sketch001.jpg)
 
 ## References
 
