@@ -23,15 +23,3 @@ function createAboutCard(e) {
 
   return builder.build();
 }
-
-function createFixedFooter(e) {
-  return CardService.newFixedFooter()
-    .setPrimaryButton(CardService.newTextButton()
-      .setText('Documentation')
-      .setOpenLink(CardService.newOpenLink()
-        .setUrl('https://www.easyadm.com/json-studio')))
-    .setSecondaryButton(CardService.newTextButton()
-      .setText('Contact Support')
-      .setOpenLink(CardService.newOpenLink()
-        .setUrl('https://www.easyadm.com/contact')));
-}

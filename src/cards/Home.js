@@ -26,7 +26,7 @@ function createHomeCard(e) {
     // Add the subtitle section
     builder.addSection(createSubtitleCardTopSection(e));
     // Add the footer to the card
-    builder.setFixedFooter(createHomeCardFixedFooter(e));
+    builder.setFixedFooter(createFixedFooter(e));
     return builder.build();
 }
 
@@ -116,7 +116,7 @@ function createMoreOptionsCardSection(e) {
             .setText(localization.cards.home.moreOptionsContent));
 }
 
-function createHomeCardFixedFooter(e) {
+function createFixedFooter(e) {
     const localization = getLocalizationResources(e);
 
     // Create a fixed footer with a button to open the help dialog

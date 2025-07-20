@@ -5,11 +5,11 @@ function doGet(e) {
         title: `${Global_Resources.appName}. my qunit 🚨`
             + ` | version: ${Global_Resources.version}`
     });
-    QUnit.load(doGetMainTest);
+    QUnit.load(allTests);
     return QUnit.getHtml();
 }
 
-function doGetMainTest() {
+function allTests() {
     //new test_Components();
-    new test_Events();
+    new test_EditorTriggers();
 }
