@@ -26,7 +26,7 @@ For additional resources and references, check out the [REFERENCES.md](docs/REFE
 
 This add-on is under active development. The roadmap for the JSON Studio add-on includes the following [phases](docs/ROADMAP.md):
 
-![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/v100.png)
+![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/sketch001.jpg)
 
 ## Installation
 
