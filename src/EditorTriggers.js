@@ -68,6 +68,21 @@ function onShowAboutInfo(e) {
                 10);
     }
 }
+function onShowAboutCard(e) {
+    try {
+        const card = createAboutCard(e);
+        // Return the card to be displayed in the sidebar
+        return card;
+    } catch (error) {
+        const localization = getLocalizationResources(e);
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.message.error,
+                10);
+    }
+}
 
 function onIdentSpacesSelectorChange(e) {
     try {

@@ -10,8 +10,7 @@ function openHelpCard(e) {
             .setNavigation(CardService.newNavigation().pushCard(card))
             .build();
         return actionResponse;
-    }
-    else {
+    } else {
         SpreadsheetApp.getUi().alert('This add-on can only be used in Google Sheets™️.');
     }
 }
@@ -32,6 +31,19 @@ function createHelpCard(e) {
     builder.addSection(CardService.newCardSection()
         .addWidget(CardService.newTextParagraph()
             .setText('<b>Need help?</b> Visit our <a href="https://www.easyadm.com/json-studio">documentation</a> or <a href="https://www.easyadm.com/contact">contact us</a> for support.')));
-
+    // Add a footer with links to documentation and support
+    builder.setFixedFooter(createHelpCardFixedFooter(e));
     return builder.build();
+}
+
+function createHelpCardFixedFooter(e) {
+    return CardService.newFixedFooter()
+        .setPrimaryButton(CardService.newTextButton()
+            .setText('Documentation')
+            .setOpenLink(CardService.newOpenLink()
+                .setUrl('https://www.easyadm.com/json-studio')))
+        .setSecondaryButton(CardService.newTextButton()
+            .setText('Contact Support')
+            .setOpenLink(CardService.newOpenLink()
+                .setUrl('https://www.easyadm.com/contact')));
 }

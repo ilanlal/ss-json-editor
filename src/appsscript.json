@@ -41,11 +41,11 @@
       "useLocaleFromApp": true,
       "universalActions": [
         {
-          "label": "ℹ️ About Json Studio",
-          "runFunction": "onShowAboutInfo"
+          "label": "💡 About Json Studio",
+          "runFunction": "onShowAboutCard"
         },
         {
-          "label": "❔ Help & Support",
+          "label": "🚨 Help & Support",
           "openLink": "https://github.com/ilanlal/ss-json-editor#readme"
         },
         {

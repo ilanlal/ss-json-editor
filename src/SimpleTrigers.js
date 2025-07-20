@@ -39,6 +39,6 @@ function _initializeAppMenu(e) {
     .addItem(localization.menu.format, 'onPrettifyRange')
     .addItem(localization.menu.minify, 'onMinifyRange')
     .addSeparator()
-    .addItem(localization.menu.about, 'onShowAboutInfo')
+    .addItem(localization.menu.about, 'onShowAboutCard')
     .addToUi();
 }
