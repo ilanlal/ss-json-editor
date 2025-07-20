@@ -1,4 +1,3 @@
-/// <reference path="../Global_Resources.js" />
 // test_Run.sg
 function doGet(e) {
     QUnit.urlParams(e.parameter);

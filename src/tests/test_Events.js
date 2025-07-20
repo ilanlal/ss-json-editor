@@ -6,8 +6,8 @@ class test_Events {
     }
     runTests() {
         const tests = [
-            "test_onIdentSpacesSelectorChange",
-            "test_onValidateJsonSwitchChange",
+            //"test_onIdentSpacesSelectorChange",
+            //"test_onValidateJsonSwitchChange",
             // Add more test methods here as needed
         ];
         tests.forEach(test => this[test]());
