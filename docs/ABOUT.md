@@ -1,5 +1,7 @@
 # About JSON Studio
 
+![GitHub Repo stars](https://img.shields.io/github/stars/ilanlal/ss-json-editor?style=social) ![GitHub Repo forks](https://img.shields.io/github/forks/ilanlal/ss-json-editor?style=social) ![GitHub issues](https://img.shields.io/github/issues/ilanlal/ss-json-editor)
+
 The "JSON Studio" is a simple Google Sheets™️ add-on that allows users to edit and validate JSON data in a Google Sheets™️.
 
 ## Features
