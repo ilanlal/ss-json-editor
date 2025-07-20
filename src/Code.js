@@ -12,6 +12,20 @@ function minifyRange() {
   const lastRow = sheet.getLastRow();
   const range = sheet.getActiveRange();
   const values = range.getValues();
+
+  // Check if the range exceeds the maximum allowed size (10,000 cells)
+  // This is to prevent performance issues with large ranges
+  if (range.getNumRows() * range.getNumColumns() > Static_Resources.limits.maxCellSize) {
+    const localization = getLocalizationResources();
+    SpreadsheetApp
+      .getActiveSpreadsheet()
+      .toast(
+        localization.message.outOfRange,
+        localization.message.error,
+        15);
+    return;
+  }
+
   const newValues = values
     .map((row, i) => row
       .map((cell, j) => {
@@ -46,6 +60,19 @@ function prettifyRange() {
   const lastRow = sheet.getLastRow();
   const range = sheet.getActiveRange();
   const values = range.getValues();
+
+  // Check if the range exceeds the maximum allowed size.
+  // This is to prevent performance issues with large ranges
+  if (range.getNumRows() * range.getNumColumns() > Static_Resources.limits.maxCellSize) {
+    const localization = getLocalizationResources();
+    SpreadsheetApp
+      .getActiveSpreadsheet()
+      .toast(
+        localization.message.outOfRange,
+        localization.message.error,
+        15);
+    return;
+  }
   const newValues = values
     .map((row, i) => row
       .map((cell, j) => {
@@ -57,7 +84,7 @@ function prettifyRange() {
           // clean spaces /n and \r from the cell value
           cell = cell?.toString().replace(/[\n\r]/g, '').trim();
           // if cell is empty after cleaning, return empty string
-          if(!cell || cell === '') {
+          if (!cell || cell === '') {
             return ''; // Return empty string if cell is empty after cleaning
           }
           const res = JSON.stringify(JSON.parse(cell), null, identSpace);
@@ -75,7 +102,7 @@ function prettifyRange() {
             range.getCell(i + 1, j + 1).setNote(message);
           }
 
-          if (showErrors) {
+          if (showErrors && i === lastRow - 1 && j === row.length - 1) {
             // Show error in a toast if showErrors is enabled
             const localization = getLocalizationResources();
             SpreadsheetApp

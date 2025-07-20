@@ -6,5 +6,8 @@ const Static_Resources = {
     "identSpaces": "identSpaces",
     "failNoteFlag": "failNoteFlag",
     "showErrorsFlag": "showErrorsFlag"
+  },
+  "limits": {
+    "maxCellSize": 5000 // Maximum number of cells in a range
   }
 };

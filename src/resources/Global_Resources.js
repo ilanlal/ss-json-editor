@@ -23,6 +23,10 @@ const Global_Resources = {
             "notSupported": "This operation is not supported in the current context.",
             "dialogClosed": "Dialog closed.",
             "addOnOnly": "This add-on can only be used in Google Sheets™️.",
+            "errorParsingJson": "Error parsing JSON data.",
+            "errorMinifyingJson": "Error minifying JSON data.",
+            "outOfRange": "The selected range exceeds the maximum allowed size of 5,000 cells. Please select a smaller range.",
+            "errorPrettifyingJson": "Error prettifying JSON data.",
         },
         "menu": {
             "top": "Json studio",
