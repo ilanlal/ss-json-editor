@@ -10,6 +10,7 @@ function doGet(e) {
 }
 
 function allTests() {
-    //new test_Components();
+    new test_UserStore();
+    new test_JsonStudio();
     new test_EditorTriggers();
 }

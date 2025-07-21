@@ -1,7 +1,7 @@
 // Apps Script code for Google Workspace Add-ons
 // src/cards/Report.g
 
-function createReportCard(e) {
+function createReportCard() {
   var builder = CardService.newCardBuilder();
 
   // Set the card header
@@ -14,19 +14,19 @@ function createReportCard(e) {
       .setImageAltText('JSON Studio for Google Sheets™️'));
 
   // Add state section with buttons for generating and clearing the report
-  builder.addSection(createStatesCardSection(e));
+  builder.addSection(createStatesCardSection());
 
 
   // Add a section for the range report
   // This section includes a button to open the sidebar for generating a report
-  //builder.addSection(createMoreOptionsCardSection(e));
+  //builder.addSection(createMoreOptionsCardSection());
 
   // Add the footer to the card
-  // builder.setFixedFooter(createFixedFooter(e));
+  // builder.setFixedFooter(createFixedFooter());
   return builder.build();
 }
 
-function createStatesCardSection(e) {
+function createStatesCardSection() {
   // Create a card with formatting options
   return CardService.newCardSection()
     .setHeader('👁️ State')

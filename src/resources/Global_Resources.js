@@ -2,7 +2,7 @@
 const Global_Resources = {
     "appName": "Json Studio",
     "module": "core-server",
-    "version": "7.0.0",
+    "version": "7.1.0",
     "en": {
         "appDescription": "Json Studio is json tools for Google Sheets™️ to format, minify, and edit JSON data.",
         "message": {

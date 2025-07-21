@@ -7,74 +7,89 @@
 function onDefaultHomePageOpen(e) {
     try {
         // Return the home card
-        return createHomeCard(e);
+        return createHomeCard();
     } catch (error) {
-        const localization = getLocalizationResources(e);
+        const localization = getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
                 localization.message.error,
-                10);
+                15);
     }
 }
 
 function onMinifyRange(e) {
     try {
-        minifyRange();
+        const localization = getLocalizationResources();
+        const userStore = new UserStore();
+        const jsonStudio = new JsonStudio(localization, userStore);
+        const range = SpreadsheetApp
+            .getActiveSpreadsheet()
+            .getActiveRange();
+
+        // Call the minifyRange method of JsonStudio
+        if (!jsonStudio.isRangeValid(range)) {
+            SpreadsheetApp
+                .getActiveSpreadsheet()
+                .toast(
+                    localization.message.outOfRange,
+                    localization.message.error,
+                    15);
+            return;
+        }
+        jsonStudio.minifyRange(range);
+
     } catch (error) {
-        const localization = getLocalizationResources(e);
+        const localization = getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
                 localization.message.error,
-                10);
+                15);
     }
 }
 
-function onPrettifyRange(e) {
+function onFormatRange(e) {
     try {
-        prettifyRange();
+        const localization = getLocalizationResources();
+        const userStore = new UserStore();
+        const jsonStudio = new JsonStudio(localization, userStore);
+        const range = SpreadsheetApp
+            .getActiveSpreadsheet()
+            .getActiveRange();
+
+        // Validate the range before formatting
+        if (!jsonStudio.isRangeValid(range)) {
+            SpreadsheetApp
+                .getActiveSpreadsheet()
+                .toast(
+                    localization.message.outOfRange,
+                    localization.message.error,
+                    15);
+            return;
+        }
+        // Call the formatRange method of JsonStudio
+        jsonStudio.formatRange(range, userStore.getIdentSpaces());
     } catch (error) {
-        const localization = getLocalizationResources(e);
+        const localization = getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
                 localization.message.error,
-                10);
+                15);
     }
 }
 
-function onShowAboutInfo(e) {
-    try {
-        // Show an alert with information about the add-on
-        const localization = getLocalizationResources(e);
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                localization.dialogs.about.content,
-                localization.dialogs.about.title,
-                0);
-    }
-    catch (error) {
-        const localization = getLocalizationResources(e);
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.message.error,
-                10);
-    }
-}
 function onShowAboutCard(e) {
     try {
         const card = createAboutCard(e);
         // Return the card to be displayed in the sidebar
         return card;
     } catch (error) {
-        const localization = getLocalizationResources(e);
+        const localization = getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
@@ -87,50 +102,49 @@ function onShowAboutCard(e) {
 function onIdentSpacesSelectorChange(e) {
     try {
         const userStore = new UserStore();
-        const selectedSpaces = e.commonEventObject?.formInputs?.[Static_Resources.keys.identSpaces]?.stringInputs?.value[0] || "2";
+        const selectedSpaces = e?.commonEventObject?.formInputs?.[Static_Resources.keys.identSpaces]?.stringInputs?.value[0] || "2";
         userStore.setIdentSpaces(selectedSpaces); // Store the selected spaces in user properties
-    }
-    catch (error) {
-        const localization = getLocalizationResources(e);
+    } catch (error) {
+        const localization = getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
                 localization.message.error,
-                10);
+                15);
     }
 }
 
 function onFailNoteFlagChange(e) {
     try {
         const userStore = new UserStore();
-        const isChecked = e.commonEventObject?.formInputs?.[Static_Resources.keys.failNoteFlag]?.stringInputs?.value[0] === 'true';
+        const isChecked = e?.commonEventObject?.formInputs?.[Static_Resources.keys.failNoteFlag]?.stringInputs?.value[0] === 'true';
         userStore.setFailNoteFlag(isChecked);
     }
     catch (error) {
-        const localization = getLocalizationResources(e);
+        const localization = getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
                 localization.message.error,
-                10);
+                15);
     }
 }
 
 function onShowErrorFlagChange(e) {
     try {
         const userStore = new UserStore();
-        const isChecked = e.commonEventObject?.formInputs?.[Static_Resources.keys.showErrorsFlag]?.stringInputs?.value[0] === 'true';
+        const isChecked = e?.commonEventObject?.formInputs?.[Static_Resources.keys.showErrorsFlag]?.stringInputs?.value[0] === 'true';
         userStore.setShowErrorsFlag(isChecked);
     }
     catch (error) {
-        const localization = getLocalizationResources(e);
+        const localization = getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
                 localization.message.error,
-                10);
+                15);
     }
 }

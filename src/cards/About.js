@@ -1,7 +1,7 @@
 // Apps Script code for Google Workspace Add-ons
 // src/cards/About.gs
 
-function createAboutCard(e) {
+function createAboutCard() {
   var builder = CardService.newCardBuilder();
 
   // Set the card header
@@ -19,7 +19,7 @@ function createAboutCard(e) {
       .setText('<b>JSON Studio</b> is a powerful tool for working with JSON data in Google Sheets.')));
   
   // Add a footer with links to documentation and support
-  builder.setFixedFooter(createFixedFooter(e));
+  builder.setFixedFooter(createFixedFooter());
 
   return builder.build();
 }

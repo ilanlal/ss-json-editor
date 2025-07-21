@@ -6,8 +6,8 @@
  * @see {https://developers.google.com/workspace/add-ons/concepts/cards}
  * @return {CardService.Card} The card to show the user.
  */
-function createHomeCard(e) {
-    const localization = getLocalizationResources(e);
+function createHomeCard() {
+    const localization = getLocalizationResources();
     var builder = CardService.newCardBuilder();
 
     // Set the card header
@@ -20,18 +20,18 @@ function createHomeCard(e) {
             .setImageAltText(localization.cards.home.imageAltText));
 
     // Add the settings section
-    builder.addSection(createSettingsCardSection(e));
+    builder.addSection(createSettingsCardSection());
     // Add the more options section
-    builder.addSection(createMoreOptionsCardSection(e));
+    builder.addSection(createMoreOptionsCardSection());
     // Add the subtitle section
-    builder.addSection(createSubtitleCardTopSection(e));
+    builder.addSection(createSubtitleCardTopSection());
     // Add the footer to the card
-    builder.setFixedFooter(createFixedFooter(e));
+    builder.setFixedFooter(createFixedFooter());
     return builder.build();
 }
 
-function createSubtitleCardTopSection(e) {
-    const localization = getLocalizationResources(e);
+function createSubtitleCardTopSection() {
+    const localization = getLocalizationResources();
 
     // Create a card section with the decorated text
     return CardService.newCardSection()
@@ -42,8 +42,8 @@ function createSubtitleCardTopSection(e) {
                 .setWrapText(true));
 }
 
-function createSettingsCardSection(e) {
-    const localization = getLocalizationResources(e);
+function createSettingsCardSection() {
+    const localization = getLocalizationResources();
     const settingsSection = CardService.newCardSection()
         .setHeader(localization.cards.home.settings)
         .setCollapsible(true);
@@ -104,8 +104,8 @@ function createSettingsCardSection(e) {
     return settingsSection;
 }
 
-function createMoreOptionsCardSection(e) {
-    const localization = getLocalizationResources(e);
+function createMoreOptionsCardSection() {
+    const localization = getLocalizationResources();
 
 
     // Create a card with more options
@@ -116,15 +116,15 @@ function createMoreOptionsCardSection(e) {
             .setText(localization.cards.home.moreOptionsContent));
 }
 
-function createFixedFooter(e) {
-    const localization = getLocalizationResources(e);
+function createFixedFooter() {
+    const localization = getLocalizationResources();
 
     // Create a fixed footer with a button to open the help dialog
     return CardService.newFixedFooter()
         .setPrimaryButton(
             CardService.newTextButton()
                 .setText(localization.menu.format)
-                .setOnClickAction(CardService.newAction().setFunctionName('onPrettifyRange')))
+                .setOnClickAction(CardService.newAction().setFunctionName('onFormatRange')))
         .setSecondaryButton(
             CardService.newTextButton()
                 .setText(localization.menu.minify)
