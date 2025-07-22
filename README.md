@@ -20,7 +20,7 @@ This project is currently in development. The add-on is not yet available in the
 ![GitHub last commit](https://img.shields.io/github/last-commit/ilanlal/ss-json-editor)
 ![GitHub issues](https://img.shields.io/github/issues/ilanlal/ss-json-editor)
 
-![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/sketch001.jpg)
+![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/Screenshot%202025-07-22%20015159.jpg)
 
 ## References
 
