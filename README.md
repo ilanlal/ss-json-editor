@@ -1,4 +1,8 @@
-# ![Logo](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/logo24.png) JSON Studio for Google Sheets™️
+# ![Logo](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/logo24.png) Json Studio
+
+[![GitHub repo size](https://img.shields.io/github/repo-size/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
+[![GitHub last commit](https://img.shields.io/github/last-commit/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
+[![GitHub issues](https://img.shields.io/github/issues/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor/issues)
 
 This Google Sheets™️ add-on that allows users to format JSON data directly within their spreadsheets. It provides a user-friendly interface for working with JSON data, making it easier to manage and manipulate structured data.
 
@@ -8,17 +12,9 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 
 - **Prettify JSON**: Format JSON data to make it more readable.
 - **Minify JSON**: Remove unnecessary whitespace and line breaks from JSON data.
-- **Set notes**: Add notes to your JSON data for better context and understanding.
-- **Show error messages**: Display error messages for invalid JSON data to help users identify and fix issues.
 - **Select Indentation**: Choose the indentation level for prettified JSON data. (1, 2, 4, 6 or 8 spaces)
 
-## Deployment Status
-
-This project is currently in development. The add-on is not yet available in the Google Workspace Marketplace, but you can test it using the provided links below.
-
-![GitHub repo size](https://img.shields.io/github/repo-size/ilanlal/ss-json-editor)
-![GitHub last commit](https://img.shields.io/github/last-commit/ilanlal/ss-json-editor)
-![GitHub issues](https://img.shields.io/github/issues/ilanlal/ss-json-editor)
+## Screenshots
 
 ![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/Screenshot%202025-07-22%20015159.jpg)
 
@@ -37,10 +33,6 @@ Note: This add-on is currently in development and not yet available in the Googl
 ## Powered by
 
 - [Easy ADM](https://www.easyadm.com/)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](docs/LICENSE.md) file for details.
 
 ## Help and Support
 
