@@ -19,12 +19,13 @@ class JsonStudio {
 
     formatRange() {
         const range = SpreadsheetHelper.getOptimalRange(this.sheet);
-        if (!range || !range.getNumRows || !range.getNumColumns) {
-            return; // If range is invalid, exit the function
+        // Check if the range is valid and does not exceed the maximum allowed size
+        if (!JsonStudio.isRangeWithinLimits(range)) {
+            throw new Error(this.localization.messages.outOfRange);
         }
 
         const values = range.getValues();
-        this.report = new Array(values.length).fill(null).map(() => new Array(values[0].length).fill(null));
+        
         // Check if the range is valid and does not exceed the maximum allowed size
         const newValues = values
             .map((row, i) => row
@@ -64,8 +65,8 @@ class JsonStudio {
     minifyRange() {
         const range = SpreadsheetHelper.getOptimalRange(this.sheet);
         // Check if the range is valid and does not exceed the maximum allowed size
-        if (!range || !range.getNumRows || !range.getNumColumns) {
-            return; // If range is invalid, exit the function
+        if (!JsonStudio.isRangeWithinLimits(range)) {
+            throw new Error(this.localization.messages.outOfRange);
         }
         const values = range.getValues();
         this.report = new Array(values.length).fill(null).map(() => new Array(values[0].length).fill(null));
@@ -113,6 +114,13 @@ class JsonStudio {
 
     handleParseSuccess(a1Notation, cell) {
         // Handle the success case, e.g., by returning the cell value
+        if (!this.report[a1Notation.getRow() - 1]) {
+            this.report[a1Notation.getRow() - 1] = [];
+        }
+        if (!this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1]) {
+            this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1] = {};
+        }
+        // Update the report with the success status
         this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1] = {
             isValid: true,
             icon: '✓',
@@ -126,7 +134,17 @@ class JsonStudio {
 
     handleParseException(a1Notation, cell, error) {
         // Handle the error by adding a note to the cell
-        const errorMessage = `Error: ${error.message}`;
+        if (!this.report[a1Notation.getRow() - 1]) {
+            this.report[a1Notation.getRow() - 1] = [];
+        }
+        if (!this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1]) {
+            this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1] = {};
+        }
+        // Update the report with the error status
+        this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1] = {};
+        // Create a detailed error message
+        const errorMessage = `Error parsing JSON: ${error.message}`;
+        // Optionally, you can set a note on the cell with the error message
         this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1] = {
             isValid: false,
             icon: '⊗',

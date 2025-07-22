@@ -6,6 +6,9 @@ class test_JsonStudio {
         this.dummySheet = this.initializeTestSheet();
         this.jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
         this.runTests();
+        QUnit.done(() => {
+            this.tearDown();
+        });
     }
 
     runTests() {
