@@ -2,10 +2,10 @@
 const Global_Resources = {
     "appName": "Json Studio",
     "module": "core-server",
-    "version": "7.1.0",
+    "version": "7",
     "en": {
-        "appDescription": "Json Studio is json tools for Google Sheets™️ to format, minify, and edit JSON data.",
-        "message": {
+        "appDescription": "Json Studio is json tools for Google Sheets™️ to format, minify, and validate JSON data.",
+        "messages": {
             "tip": "Tip!",
             "deprecated": "This feature is deprecated and may be removed in future versions.",
             "tipForMenu": "Use the menu to access the JSON tools.",
@@ -48,6 +48,7 @@ const Global_Resources = {
                 "imageAltText": "Json Studio for Google Sheets™️",
                 "footer": "Use the buttons below to format (prettify) or minify JSON data in your spreadsheet.",
                 "settings": "Settings",
+                "advanced": "Advanced",
                 "moreOptions": "More Options",
                 "moreOptionsContent": "Select a <b>range</b> of cells containing JSON data and use the buttons below to format (prettify) or minify the JSON.",
                 "identSpaces": "Indentation Spaces",

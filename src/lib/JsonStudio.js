@@ -1,81 +1,103 @@
 // src/lib/JsonStudio.js
 class JsonStudio {
     /**
+     * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - The sheet to get the optimal range for.
      * @param {Global_Resources["en"]} localization - Localization resources
      * @param {UserStore} userStore - User store instance
      */
-    constructor(localization, userStore) {
-        this.maxCellSize = Static_Resources.limits.maxCellSize; // Maximum number of cells in a range
+    constructor(sheet, localization, userStore) {
         this.localization = localization || getLocalizationResources();
+        this.sheet = sheet;
+
         this.userStore = userStore || new UserStore();
+        this.maxCellSize = Static_Resources.limits.maxCellSize;
+        this.identSpaces = this.userStore.getIdentSpaces();
+        // Allocate a 2D array to store the validation report
+        this.report = [[]];
         // Initialization code
     }
 
-    formatRange(range, identSpaces = this.userStore.getIdentSpaces()) {
-        if (!this.isRangeValid(range)) {
-            return;
+    formatRange() {
+        const range = SpreadsheetHelper.getOptimalRange(this.sheet);
+        if (!range || !range.getNumRows || !range.getNumColumns) {
+            return; // If range is invalid, exit the function
         }
+
         const values = range.getValues();
+        this.report = new Array(values.length).fill(null).map(() => new Array(values[0].length).fill(null));
+        // Check if the range is valid and does not exceed the maximum allowed size
         const newValues = values
-            .map(row => row
-                .map(cell => {
+            .map((row, i) => row
+                .map((cell, j) => {
                     // Format JSON code
-                    return this.formatCell(cell, identSpaces);
+                    return this.formatCell(range.getCell(i + 1, j + 1), cell);
                 }));
 
         range.setValues(newValues);
     }
 
-    formatCell(cell, identSpaces = this.userStore.getIdentSpaces()) {
+    formatCell(a1Notation, cell) {
         const trimmedCell = this.trimCell(cell);
         // if cell is empty after cleaning, return empty string
         if (!trimmedCell || trimmedCell === '') {
-            return cell;
+            this.handleParseSuccess(a1Notation, cell);
+            return cell; // Return the original cell value
         }
 
         try {
-            return JSON.stringify(
+            const formatted = JSON.stringify(
                 // value
                 JSON.parse(trimmedCell),
                 // replacer
                 null,
                 // space
-                identSpaces*1);
+                this.identSpaces * 1);
+            this.handleParseSuccess(a1Notation, formatted);
+            return formatted; // Return the formatted JSON string
         } catch (error) {
             // If parsing fails, handle the error
-            return this.handleCellError(cell, error);
+            this.handleParseException(a1Notation, cell, error);
+            return cell; // Return the original cell value
         }
     }
 
-    minifyRange(range) {
-        if (!this.isRangeValid(range)) {
-            return;
+    minifyRange() {
+        const range = SpreadsheetHelper.getOptimalRange(this.sheet);
+        // Check if the range is valid and does not exceed the maximum allowed size
+        if (!range || !range.getNumRows || !range.getNumColumns) {
+            return; // If range is invalid, exit the function
         }
         const values = range.getValues();
-
+        this.report = new Array(values.length).fill(null).map(() => new Array(values[0].length).fill(null));
+        // Map through the values and minify each cell
         const newValues = values
             .map((row, i) => row
                 .map((cell, j) => {
                     // Minify JSON code
-                    return this.minifyCell(cell);
+                    return this.minifyCell(range.getCell(i + 1, j + 1), cell);
                 }));
 
         range.setValues(newValues);
     }
 
-    minifyCell(cell) {
+    minifyCell(a1Notation, cell) {
         const trimmedCell = this.trimCell(cell);
         // if cell is empty after cleaning, return empty string
         if (!trimmedCell || trimmedCell === '') {
-            return cell;
+            this.handleParseSuccess(a1Notation, cell);
+            return cell; // Return the original cell value
         }
 
         try {
-            return JSON.stringify(
+            const minified = JSON.stringify(
                 JSON.parse(trimmedCell));
+
+            this.handleParseSuccess(a1Notation, minified);
+            return minified; // Return the minified JSON string
         } catch (error) {
             // If parsing fails, handle the error
-            return this.handleCellError(cell, error);
+            this.handleParseException(a1Notation, cell, error);
+            return cell; // Return the original cell value
         }
     }
 
@@ -89,21 +111,55 @@ class JsonStudio {
         return cell?.toString().replace(/[\n\r]/g, '').trim();
     }
 
-    handleCellError(cell, error) {
-        if (this.userStore.getFailNoteFlag()) {
-            const message = `Error parsing JSON in cell ${cell.getA1Notation()}: ${error.message}`;
-            // Add a note to the cell if JSON parsing fails
-            cell.setNote(message);
-        }
-        return cell;
+    handleParseSuccess(a1Notation, cell) {
+        // Handle the success case, e.g., by returning the cell value
+        this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1] = {
+            isValid: true,
+            icon: '✓',
+            range: a1Notation.getA1Notation(),
+            input: cell,
+            message: 'Valid JSON'
+        };
+
+        return cell; // Return the original cell value
     }
 
-    isRangeValid(range) {
+    handleParseException(a1Notation, cell, error) {
+        // Handle the error by adding a note to the cell
+        const errorMessage = `Error: ${error.message}`;
+        this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1] = {
+            isValid: false,
+            icon: '⊗',
+            range: a1Notation.getA1Notation(),
+            message: errorMessage,
+            input: cell
+        };
+
+        //a1Notation.setNote(errorMessage);
+        return cell; // Return the original cell value
+    }
+
+    getTotalFailures() {
+        // Count the total number of failures in the report
+        return this.report.flat().filter(cell => !cell.isValid).length;
+    }
+
+    /**
+     * Check if the provided range is valid and does not exceed the maximum allowed size.
+     * @param {GoogleAppsScript.Spreadsheet.Range} range - The range to validate.
+     * @returns {boolean} - True if the range is valid, false otherwise.
+     */
+    static isRangeWithinLimits(range) {
         // Check if the range is valid and does not exceed the maximum allowed size
         if (!range || !range.getNumRows || !range.getNumColumns) {
-            return false;
+            return true; // If range is not valid, consider it within limits
+        }
+
+        // if not selected range, return true
+        if (range.getA1Notation() === 'A1') {
+            return true;
         }
         // Check if the range is valid
-        return range.getNumRows() * range.getNumColumns() <= this.maxCellSize
+        return range.getNumRows() * range.getNumColumns() <= Static_Resources.limits.maxCellSize;
     }
 }

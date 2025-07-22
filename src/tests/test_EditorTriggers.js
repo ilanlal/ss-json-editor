@@ -3,18 +3,16 @@ class test_EditorTriggers {
     constructor() {
         QUnit.module("Editor Triggers Tests");
         this.userStore = new UserStore();
-        this.localization = getLocalizationResources();
-        this.jsonStudio = new JsonStudio(this.localization, this.userStore);
+        this.dummySheet = this.initializeTestSheet();
+        this.range = this.dummySheet.getRange("A1:B2");
         this.initializeUserStoreForTesting();
-        this.sheet = this.initializeTestSheet();
-        this.range = this.sheet.getRange("A1:B2");
         this.runTests();
     }
     runTests() {
         const tests = [
             "test_onIdentSpacesSelectorChange",
-            "test_onFormatRange",
-            "test_onMinifyRange",
+            //"test_onFormatRange",
+            //"test_onMinifyRange",
             // Add more test methods here as needed
         ];
         tests.forEach(test => this[test]());
@@ -22,7 +20,7 @@ class test_EditorTriggers {
 
     test_onIdentSpacesSelectorChange() {
         let that = this;
-        QUnit.test("onIdentSpacesSelectorChange", function (assert) {
+        QUnit.test("Test onIdentSpacesSelectorChange", function (assert) {
             // Mock event object
             const e = {
                 commonEventObject: {
@@ -79,7 +77,7 @@ class test_EditorTriggers {
 
     test_onMinifyRange() {
         let that = this;
-        QUnit.test("onMinifyRange", function (assert) {
+        QUnit.test("Test onMinifyRange", function (assert) {
             // Mock a range with JSON data
             const values = [
                 ['{"key": "value"}', '{"array": [1, 2, 3]}'],

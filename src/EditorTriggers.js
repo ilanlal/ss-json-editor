@@ -14,71 +14,47 @@ function onDefaultHomePageOpen(e) {
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
-                localization.message.error,
+                localization.messages.error,
                 15);
     }
 }
 
 function onMinifyRange(e) {
+    const localization = getLocalizationResources();
     try {
-        const localization = getLocalizationResources();
         const userStore = new UserStore();
-        const jsonStudio = new JsonStudio(localization, userStore);
-        const range = SpreadsheetApp
-            .getActiveSpreadsheet()
-            .getActiveRange();
+        const jsonStudio = new JsonStudio(SpreadsheetApp
+            .getActiveSpreadsheet(), localization, userStore);
 
-        // Call the minifyRange method of JsonStudio
-        if (!jsonStudio.isRangeValid(range)) {
-            SpreadsheetApp
-                .getActiveSpreadsheet()
-                .toast(
-                    localization.message.outOfRange,
-                    localization.message.error,
-                    15);
-            return;
-        }
-        jsonStudio.minifyRange(range);
+        // minify the range
+        jsonStudio.minifyRange();
 
     } catch (error) {
-        const localization = getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
-                localization.message.error,
+                localization.messages.error,
                 15);
     }
 }
 
 function onFormatRange(e) {
-    try {
-        const localization = getLocalizationResources();
-        const userStore = new UserStore();
-        const jsonStudio = new JsonStudio(localization, userStore);
-        const range = SpreadsheetApp
-            .getActiveSpreadsheet()
-            .getActiveRange();
+    const localization = getLocalizationResources();
 
-        // Validate the range before formatting
-        if (!jsonStudio.isRangeValid(range)) {
-            SpreadsheetApp
-                .getActiveSpreadsheet()
-                .toast(
-                    localization.message.outOfRange,
-                    localization.message.error,
-                    15);
-            return;
-        }
+    try {
+        const userStore = new UserStore();
+        const jsonStudio = new JsonStudio(SpreadsheetApp
+            .getActiveSpreadsheet(), localization, userStore);
+
         // Call the formatRange method of JsonStudio
-        jsonStudio.formatRange(range, userStore.getIdentSpaces());
+        jsonStudio.formatRange();
     } catch (error) {
-        const localization = getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
-                localization.message.error,
+                localization.messages.error,
                 15);
     }
 }
@@ -94,7 +70,7 @@ function onShowAboutCard(e) {
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
-                localization.message.error,
+                localization.messages.error,
                 10);
     }
 }
@@ -110,7 +86,7 @@ function onIdentSpacesSelectorChange(e) {
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
-                localization.message.error,
+                localization.messages.error,
                 15);
     }
 }
@@ -127,7 +103,7 @@ function onFailNoteFlagChange(e) {
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
-                localization.message.error,
+                localization.messages.error,
                 15);
     }
 }
@@ -144,7 +120,7 @@ function onShowErrorFlagChange(e) {
             .getActiveSpreadsheet()
             .toast(
                 error.toString(),
-                localization.message.error,
+                localization.messages.error,
                 15);
     }
 }

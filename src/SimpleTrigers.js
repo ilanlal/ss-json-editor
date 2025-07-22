@@ -9,10 +9,7 @@
  * @param {Event} e The event object.
  **/
 function onInstall(e) {
-    // Set a value in the property store.   
-    const userProperties = PropertiesService.getUserProperties();
-    userProperties.setProperty('localization', "en"); // Default to English
-    _initializeAppMenu(e);
+    onOpen(e);
 }
 
 /** 
@@ -22,14 +19,14 @@ function onInstall(e) {
  * @see https://developers.google.com/apps-script/guides/triggers
  */
 function onOpen(e) {
-    _initializeAppMenu(e);
+    initializeAppMenu(e);
 }
 
 /**
  * Sets up the custom menu in the Google Sheets UI.
  * This function is called when the add-on is installed or opened.
  */
-function _initializeAppMenu(e) {
+function initializeAppMenu(e) {
   const localization = getLocalizationResources(e);
   const ui = SpreadsheetApp.getUi();
 

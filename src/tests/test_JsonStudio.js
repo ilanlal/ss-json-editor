@@ -3,7 +3,8 @@ class test_JsonStudio {
         QUnit.module("Json Studio Tests");
         this.localization = getLocalizationResources();
         this.userStore = new UserStore();
-        this.jsonStudio = new JsonStudio(this.localization, this.userStore);
+        this.dummySheet = this.initializeTestSheet();
+        this.jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
         this.runTests();
     }
 
@@ -16,42 +17,40 @@ class test_JsonStudio {
     }
 
     test_minifyRange() {
-        QUnit.test("minifyRange", (assert) => {
-            const range = this.initializeTestSheet().getRange("A1:B2");
+        QUnit.test("Test minifyRange", (assert) => {
             // Mock a range with JSON data
             const values = [
                 ['{"key": "value"}', '{"array": [1, 2, 3]}'],
                 ['{"nested": {"key": "value"}}', '{"boolean": true}']
             ];
-            range.setValues(values);
+            this.dummySheet.getRange("A1:B2").setValues(values);
 
-            this.jsonStudio.minifyRange(range);
+            this.jsonStudio.minifyRange();
 
             const expectedValues = [
                 ['{"key":"value"}', '{"array":[1,2,3]}'],
                 ['{"nested":{"key":"value"}}', '{"boolean":true}']
             ];
-            assert.deepEqual(range.getValues(), expectedValues, "Range should be minified correctly");
+            assert.deepEqual(this.dummySheet.getRange("A1:B2").getValues(), expectedValues, "Range should be minified correctly");
         });
     }
 
     test_formatRange() {
-        QUnit.test("formatRange", (assert) => {
-            const range = this.initializeTestSheet().getRange("A1:B2");
+        QUnit.test("Test formatRange", (assert) => {
             // Mock a range with minified JSON data
             const values = [
                 ['{"key":"value"}', '{"array":[1,2,3]}'],
                 ['{"nested":{"key":"value"}}', '{"boolean":true}']
             ];
-            range.setValues(values);
+            this.dummySheet.getRange("A1:B2").setValues(values);
 
-            this.jsonStudio.formatRange(range, 2);
+            this.jsonStudio.formatRange();
 
             const expectedValues = [
                 ['{\n  "key": "value"\n}', '{\n  "array": [\n    1,\n    2,\n    3\n  ]\n}'],
                 ['{\n  "nested": {\n    "key": "value"\n  }\n}', '{\n  "boolean": true\n}']
             ];
-            assert.deepEqual(range.getValues(), expectedValues, "Range should be formatted correctly");
+            assert.deepEqual(this.dummySheet.getRange("A1:B2").getValues(), expectedValues, "Range should be formatted correctly");
         });
     }
 
