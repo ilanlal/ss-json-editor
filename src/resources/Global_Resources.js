@@ -45,7 +45,7 @@ const Global_Resources = {
                 "title": "🏠 Home",
                 "subtitle": "Best JSON tools for Google Sheets™",
                 "content": "Welcome to Json Studio! Use the buttons below to format, minify, or edit JSON data in your spreadsheet.",
-                "imageAltText": "Json Studio for  Google Sheets™",,
+                "imageAltText": "Json Studio for  Google Sheets™",
                 "footer": "Use the buttons below to format (prettify) or minify JSON data in your spreadsheet.",
                 "settings": "Settings",
                 "advanced": "Advanced",
