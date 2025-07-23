@@ -33,7 +33,7 @@ function initializeAppMenu(e) {
   // The label for a menu item should be in sentence case (only the first word capitalized).
   // see https://developers.google.com/apps-script/reference/base/menu#detailed-documentation
   ui.createMenu(localization.menu.top)
-    .addItem(localization.menu.format, 'onPrettifyRange')
+    .addItem(localization.menu.format, 'onFormatRange')
     .addItem(localization.menu.minify, 'onMinifyRange')
     .addSeparator()
     .addItem(localization.menu.about, 'onShowAboutCard')

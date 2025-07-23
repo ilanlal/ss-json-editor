@@ -2,9 +2,9 @@
 const Global_Resources = {
     "appName": "Json Studio",
     "module": "core-server",
-    "version": "7",
+    "version": "7.1",
     "en": {
-        "appDescription": "Json Studio is json tools for Google Sheets™️ to format, minify, and validate JSON data.",
+        "appDescription": "Json Studio is json tools for Google Sheets™ to format, minify, and validate JSON data.",
         "messages": {
             "tip": "Tip!",
             "deprecated": "This feature is deprecated and may be removed in future versions.",
@@ -22,7 +22,7 @@ const Global_Resources = {
             "rangeSelected": "Range selected successfully.",
             "notSupported": "This operation is not supported in the current context.",
             "dialogClosed": "Dialog closed.",
-            "addOnOnly": "This add-on can only be used in Google Sheets™️.",
+            "addOnOnly": "This add-on can only be used in Google Sheets™.",
             "errorParsingJson": "Error parsing JSON data.",
             "errorMinifyingJson": "Error minifying JSON data.",
             "outOfRange": "The selected range exceeds the maximum allowed size of 5,000 cells. Please select a smaller range.",
@@ -38,14 +38,14 @@ const Global_Resources = {
             "support": "💬 Support",
             "about": "ℹ️ About",
             "settings": "⚙️ Settings",
-            "easyAdm": "Easy ADM™️",
+            "easyAdm": "Easy ADM",
         },
         "cards": {
             "home": {
                 "title": "🏠 Home",
-                "subtitle": "Best JSON tools for Google Sheets™️",
+                "subtitle": "Best JSON tools for Google Sheets™",
                 "content": "Welcome to Json Studio! Use the buttons below to format, minify, or edit JSON data in your spreadsheet.",
-                "imageAltText": "Json Studio for Google Sheets™️",
+                "imageAltText": "Json Studio for  Google Sheets™",,
                 "footer": "Use the buttons below to format (prettify) or minify JSON data in your spreadsheet.",
                 "settings": "Settings",
                 "advanced": "Advanced",
