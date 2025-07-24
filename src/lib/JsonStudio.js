@@ -11,9 +11,9 @@ class JsonStudio {
         this.userStore = userStore || new UserStore();
         this.maxCellSize = Static_Resources.limits.maxCellSize;
         this.identSpaces = this.userStore.getIdentSpaces();
-        // Allocate a 2D array to store the validation report
-        this.report = [ReportItem];
-        // Initialization code
+        // Error report array of ReportItem objects
+        /** @type {ReportItem[]} */
+        this.report = new Array();
     }
 
     formatRange() {
@@ -30,17 +30,19 @@ class JsonStudio {
             .map((row, i) => row
                 .map((cell, j) => {
                     // Format JSON code
-                    return this.formatCell(range.getCell(i + 1, j + 1), cell);
+                    return this.formatCell(
+                        range.getCell(i + 1, j + 1), cell);
                 }));
 
         range.setValues(newValues);
+
+        return this.getReport();
     }
 
-    formatCell(a1Notation, cell) {
+    formatCell(range, cell) {
         const trimmedCell = this.trimCell(cell);
         // if cell is empty after cleaning, return empty string
         if (!trimmedCell || trimmedCell === '') {
-            this.handleParseSuccess(a1Notation, cell);
             return cell; // Return the original cell value
         }
 
@@ -52,15 +54,20 @@ class JsonStudio {
                 null,
                 // space
                 this.identSpaces * 1);
-            this.handleParseSuccess(a1Notation, formatted, true);
             return formatted; // Return the formatted JSON string
         } catch (error) {
             // If parsing fails, handle the error
-            this.handleParseException(a1Notation, cell, error);
+            this.handleParseException(range.getA1Notation(), cell, error);
             return cell; // Return the original cell value
         }
     }
 
+    /**
+     * Minify the range of cells in the sheet.
+     * 
+     * @returns {ReportItem[]} - Returns an array of ReportItem objects containing validation results.
+     * @throws {Error} - Throws an error if the selected range exceeds the maximum allowed.
+     */
     minifyRange() {
         const range = SpreadsheetHelper.getOptimalRange(this.sheet);
         // Check if the range is valid and does not exceed the maximum allowed size
@@ -68,7 +75,7 @@ class JsonStudio {
             throw new Error(this.localization.messages.outOfRange);
         }
         const values = range.getValues();
-       
+
         // Map through the values and minify each cell
         const newValues = values
             .map((row, i) => row
@@ -78,13 +85,14 @@ class JsonStudio {
                 }));
 
         range.setValues(newValues);
+
+        return this.getReport();
     }
 
     minifyCell(range, cell) {
         const trimmedCell = this.trimCell(cell);
         // if cell is empty after cleaning, return empty string
         if (!trimmedCell || trimmedCell === '') {
-            this.handleParseSuccess(range, cell);
             return cell; // Return the original cell value
         }
 
@@ -92,11 +100,10 @@ class JsonStudio {
             const minified = JSON.stringify(
                 JSON.parse(trimmedCell));
 
-            this.handleParseSuccess(range, minified, true);
             return minified; // Return the minified JSON string
         } catch (error) {
             // If parsing fails, handle the error
-            this.handleParseException(range, cell, error);
+            this.handleParseException(range.getA1Notation(), cell, error);
             return cell; // Return the original cell value
         }
     }
@@ -154,40 +161,21 @@ class JsonStudio {
         }
 
         // Trim whitespace from the cell value
-        return cell?.toString().replace(/[\n\r]/g, '').trim();
+        return cell?.toString()?.replace(/[\n\r]/g, '')?.trim();
     }
 
-    handleParseSuccess(range, cell, modified = false) {
-        // Handle the success case, e.g., by returning the cell value
-        const reportItem = new ReportItem({
-            a1Notation: range.getA1Notation(),
-            input: cell,
-            isValid: true,
-            message: '',
-            modified: modified
-        });
-
-        // Add the report item to the report
-        this.report.push(reportItem);
-
-        return cell; // Return the original cell value
-    }
-
-    handleParseException(range, cell, error) {
+    handleParseException(a1Notation, cell, error) {
         // Create a detailed error message
-        const errorMessage = `${error.message}`;
+        const message = `${error.message}`;
         // Optionally, you can set a note on the cell with the error message
-        const reportItem = new ReportItem({
-            a1Notation: range.getA1Notation(),
-            input: cell,
-            isValid: false,
-            message: errorMessage
-        });
+        const reportItem = new ReportItem(
+            a1Notation,
+            message
+        );
 
         // Add the report item to the report
         this.report.push(reportItem);
 
-        //a1Notation.setNote(errorMessage);
         return cell; // Return the original cell value
     }
 

@@ -29,13 +29,12 @@ function onMinifyRange(e) {
                 .getActiveSpreadsheet(), localization, userStore);
 
         // minify the range
-        jsonStudio.minifyRange();
+        const report = jsonStudio.minifyRange();
 
-        /*const report = jsonStudio.getReport();
         if (report.length > 0) {
             const reportCard = new ReportCard(report, localization);
             return reportCard.createReportCard();
-        }*/
+        }
     } catch (error) {
         SpreadsheetApp
             .getActiveSpreadsheet()
@@ -55,13 +54,12 @@ function onFormatRange(e) {
             .getActiveSpreadsheet(), localization, userStore);
 
         // Call the formatRange method of JsonStudio
-        jsonStudio.formatRange();
+        const report =jsonStudio.formatRange();
 
-        /*const report = jsonStudio.getReport();
         if (report.length > 0) {
             const reportCard = new ReportCard(report, localization);
             return reportCard.createReportCard();
-        }*/
+        }
     } catch (error) {
         SpreadsheetApp
             .getActiveSpreadsheet()

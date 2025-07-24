@@ -42,12 +42,9 @@ class ReportCard {
       .setNumColumns(1);
     // Iterate over the report items and add them to the grid
     this.report.forEach((item,i) => {
-      if (i === 0 || !item) {
-        return; // Skip if the report item is not defined
-      }
       const gridItem = CardService.newGridItem()
-        .setTitle(`${item.icon} - ${item.a1Notation}`)
-        .setSubtitle(item.message || '');
+        .setTitle(item.a1Notation || '?')
+        .setSubtitle(item.message || '-');
 
       grid.addItem(gridItem);
     });
