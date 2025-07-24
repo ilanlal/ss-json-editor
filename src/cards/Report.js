@@ -1,56 +1,59 @@
 // Apps Script code for Google Workspace Add-ons
-// src/cards/Report.g
+// src/cards/Report.js
+class ReportCard {
+  /**
+   * Constructor for the ReportCard class.
+   * @param {[ReportItem]} report - The report data.
+   * @param {Global_Resources["en"]} localization - Localization resources.
+   */
+  constructor(report, localization) {
+    this.report = report;
+    // Assuming AppManager is a global object that provides localization resources
+    this.localization = localization || AppManager.getLocalizationResources();
+  }
 
-function createReportCard() {
-  var builder = CardService.newCardBuilder();
+  createReportCard() {
+    const builder = CardService.newCardBuilder();
 
-  // Set the card header
-  builder.setHeader(
-    CardService.newCardHeader()
-      .setTitle('Range Report')
-      .setSubtitle('Generate a report for selected range')
-      .setImageStyle(CardService.ImageStyle.SQUARE)
-      .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
-      .setImageAltText('JSON Studio for Google Sheets™️'));
+    // Set the card header
+    builder.setHeader(
+      CardService.newCardHeader()
+        .setTitle(this.localization.cards.report.title)
+        .setSubtitle(this.localization.cards.report.content)
+        .setImageStyle(CardService.ImageStyle.SQUARE)
+        .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
+        .setImageAltText(this.localization.cards.report.imageAltText));
 
-  // Add state section with buttons for generating and clearing the report
-  builder.addSection(createStatesCardSection());
+    // Create the report section
+    const reportSection = this.createReportSection();
+    builder.addSection(reportSection);
 
+    return builder.build();
+  }
 
-  // Add a section for the range report
-  // This section includes a button to open the sidebar for generating a report
-  //builder.addSection(createMoreOptionsCardSection());
+  createReportSection() {
+    const section = CardService.newCardSection()
+      .setHeader(this.localization.cards.report.sectionHeader);
 
-  // Add the footer to the card
-  // builder.setFixedFooter(createFixedFooter());
-  return builder.build();
-}
+    // todo: create clickable Grid 
+    // @see https://developers.google.com/apps-script/reference/card-service/grid
+    const grid = CardService.newGrid()
+      .setTitle(this.localization.cards.report.title)
+      .setNumColumns(1);
+    // Iterate over the report items and add them to the grid
+    this.report.forEach((item,i) => {
+      if (i === 0 || !item) {
+        return; // Skip if the report item is not defined
+      }
+      const gridItem = CardService.newGridItem()
+        .setTitle(`${item.icon} - ${item.a1Notation}`)
+        .setSubtitle(item.message || '');
 
-function createStatesCardSection() {
-  // Create a card with formatting options
-  return CardService.newCardSection()
-    .setHeader('👁️ State')
-    //.setCollapsible(true)
-    .addWidget(CardService.newTextParagraph()
-      .setText('Select <b>range</b> of cells containing JSON data and use the buttons below to format (prettify) the JSON.'))
-    .addWidget(CardService.newButtonSet()
-      .addButton(CardService.newTextButton()
-        .setText('↹ Prettify')
-        .setOnClickAction(CardService.newAction().setFunctionName('prettifyRange'))
-        .setDisabled(false)))
-    .addWidget(CardService.newTextParagraph()
-      //.setText('↹ Select a range of cells containing JSON data and use the buttons below to format the JSON.'))
-      .setText('Select <b>range</b> of cells containing JSON data and use the buttons below to minify the JSON.'))
-    .addWidget(CardService.newButtonSet()
-      .addButton(CardService.newTextButton()
-        .setText('{..} Minify')
-        .setOnClickAction(CardService.newAction().setFunctionName('minifyRange'))
-        .setDisabled(false)))
-    .addWidget(CardService.newTextParagraph()
-      .setText('Select <b>one</b> cell containing JSON data and use the button below to edit the JSON.'))
-    .addWidget(CardService.newButtonSet()
-      .addButton(CardService.newTextButton()
-        .setText('✏️ Open Editor')
-        .setOnClickAction(CardService.newAction().setFunctionName('openDialogEditor'))
-        .setDisabled(false)));
+      grid.addItem(gridItem);
+    });
+    // Add the grid to the section
+    section.addWidget(grid);
+    // Add a button to close the report
+    return section;
+  }
 }

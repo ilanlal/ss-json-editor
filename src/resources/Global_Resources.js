@@ -2,9 +2,9 @@
 const Global_Resources = {
     "appName": "Json Studio",
     "module": "core-server",
-    "version": "7",
+    "version": "8.0.0",
     "en": {
-        "appDescription": "Json Studio is json tools for Google Sheets™️ to format, minify, and validate JSON data.",
+        "appDescription": "Json Studio is json tools for Google Sheets™ to format, minify, and validate JSON data.",
         "messages": {
             "tip": "Tip!",
             "deprecated": "This feature is deprecated and may be removed in future versions.",
@@ -22,7 +22,7 @@ const Global_Resources = {
             "rangeSelected": "Range selected successfully.",
             "notSupported": "This operation is not supported in the current context.",
             "dialogClosed": "Dialog closed.",
-            "addOnOnly": "This add-on can only be used in Google Sheets™️.",
+            "addOnOnly": "This add-on can only be used in Google Sheets™.",
             "errorParsingJson": "Error parsing JSON data.",
             "errorMinifyingJson": "Error minifying JSON data.",
             "outOfRange": "The selected range exceeds the maximum allowed size of 5,000 cells. Please select a smaller range.",
@@ -30,7 +30,7 @@ const Global_Resources = {
         },
         "menu": {
             "top": "Json studio",
-            "format": "{..} Format",
+            "format": "Format",
             "minify": "Minify",
             "prettify": "👁️ Prettify",
             "edit": "✏️ Edit",
@@ -38,14 +38,14 @@ const Global_Resources = {
             "support": "💬 Support",
             "about": "ℹ️ About",
             "settings": "⚙️ Settings",
-            "easyAdm": "Easy ADM™️",
+            "easyAdm": "Easy ADM",
         },
         "cards": {
             "home": {
                 "title": "🏠 Home",
-                "subtitle": "Best JSON tools for Google Sheets™️",
-                "content": "Welcome to Json Studio! Use the buttons below to format, minify, or edit JSON data in your spreadsheet.",
-                "imageAltText": "Json Studio for Google Sheets™️",
+                "subtitle": "Best JSON tools for Google Sheets™",
+                "content": "Welcome to Json Studio! Use the buttons below to format JSON data in your spreadsheet.",
+                "imageAltText": "Json Studio for  Google Sheets™",
                 "footer": "Use the buttons below to format (prettify) or minify JSON data in your spreadsheet.",
                 "settings": "Settings",
                 "advanced": "Advanced",
@@ -58,24 +58,37 @@ const Global_Resources = {
                 "showErrorsSwitch": "Show Errors",
                 "showErrorsToastFlagContent": "Enable this option to show errors prompt when JSON parsing fails.",
                 "failNoteFlag": "Fail Note Flag",
-            }
-        },
-        "dialogs": {
-            "editor": {
-                "title": "JSON Editor ✏️",
-                "subtitle": "Edit your JSON data",
-                "content": "Use this editor to format, minify, or edit JSON data in your spreadsheet."
             },
-            "help": {
-                "title": "Help & Support ❔",
-                "subtitle": "Need assistance?",
-                "content": "This add-on provides tools for working with JSON data in Google Sheets. Use the buttons to format, minify, or edit JSON data in your spreadsheet."
+            "report": {
+                "title": "📊 Report",
+                "subtitle": "Generate a report for selected range",
+                "content": "Use this card to generate a report for the selected range of cells containing JSON data.",
+                "imageAltText": "Json Studio Report Card",
+                "sectionHeader": "Report Details",
             },
             "about": {
                 "title": "ℹ️ About",
                 "subtitle": "About Json Studio",
-                "content": "Json Studio is a powerful tool for working with JSON data in Google Sheets. It allows you to format, minify, and edit JSON data easily."
+                "content": "Json Studio is a powerful tool for working with JSON data in Google Sheets. It allows you to format, minify, and edit JSON data easily.",
+                "imageAltText": "Json Studio for Google Sheets™",
+            },
+            "dialogs": {
+                "editor": {
+                    "title": "JSON Editor ✏️",
+                    "subtitle": "Edit your JSON data",
+                    "content": "Use this editor to format, minify, or edit JSON data in your spreadsheet."
+                },
+                "help": {
+                    "title": "Help & Support ❔",
+                    "subtitle": "Need assistance?",
+                    "content": "This add-on provides tools for working with JSON data in Google Sheets. Use the buttons to format, minify, or edit JSON data in your spreadsheet."
+                },
+                "about": {
+                    "title": "ℹ️ About",
+                    "subtitle": "About Json Studio",
+                    "content": "Json Studio is a powerful tool for working with JSON data in Google Sheets. It allows you to format, minify, and edit JSON data easily."
+                }
             }
         }
     }
-};
+}

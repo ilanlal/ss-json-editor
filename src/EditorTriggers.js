@@ -1,3 +1,4 @@
+// Apps Script code for Google Workspace Add-ons
 /**
  * Callback for the add-on homepage.
  * This function is called when the user opens the add-on.
@@ -9,7 +10,7 @@ function onDefaultHomePageOpen(e) {
         // Return the home card
         return createHomeCard();
     } catch (error) {
-        const localization = getLocalizationResources();
+        const localization = AppManager.getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
@@ -20,15 +21,21 @@ function onDefaultHomePageOpen(e) {
 }
 
 function onMinifyRange(e) {
-    const localization = getLocalizationResources();
+    const localization = AppManager.getLocalizationResources();
     try {
         const userStore = new UserStore();
-        const jsonStudio = new JsonStudio(SpreadsheetApp
-            .getActiveSpreadsheet(), localization, userStore);
+        const jsonStudio = new JsonStudio(
+            SpreadsheetApp
+                .getActiveSpreadsheet(), localization, userStore);
 
         // minify the range
         jsonStudio.minifyRange();
 
+        /*const report = jsonStudio.getReport();
+        if (report.length > 0) {
+            const reportCard = new ReportCard(report, localization);
+            return reportCard.createReportCard();
+        }*/
     } catch (error) {
         SpreadsheetApp
             .getActiveSpreadsheet()
@@ -40,7 +47,7 @@ function onMinifyRange(e) {
 }
 
 function onFormatRange(e) {
-    const localization = getLocalizationResources();
+    const localization = AppManager.getLocalizationResources();
 
     try {
         const userStore = new UserStore();
@@ -49,6 +56,12 @@ function onFormatRange(e) {
 
         // Call the formatRange method of JsonStudio
         jsonStudio.formatRange();
+
+        /*const report = jsonStudio.getReport();
+        if (report.length > 0) {
+            const reportCard = new ReportCard(report, localization);
+            return reportCard.createReportCard();
+        }*/
     } catch (error) {
         SpreadsheetApp
             .getActiveSpreadsheet()
@@ -65,7 +78,7 @@ function onShowAboutCard(e) {
         // Return the card to be displayed in the sidebar
         return card;
     } catch (error) {
-        const localization = getLocalizationResources();
+        const localization = AppManager.getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
@@ -81,7 +94,7 @@ function onIdentSpacesSelectorChange(e) {
         const selectedSpaces = e?.commonEventObject?.formInputs?.[Static_Resources.keys.identSpaces]?.stringInputs?.value[0] || "2";
         userStore.setIdentSpaces(selectedSpaces); // Store the selected spaces in user properties
     } catch (error) {
-        const localization = getLocalizationResources();
+        const localization = AppManager.getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
@@ -98,7 +111,7 @@ function onFailNoteFlagChange(e) {
         userStore.setFailNoteFlag(isChecked);
     }
     catch (error) {
-        const localization = getLocalizationResources();
+        const localization = AppManager.getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
@@ -115,7 +128,30 @@ function onShowErrorFlagChange(e) {
         userStore.setShowErrorsFlag(isChecked);
     }
     catch (error) {
-        const localization = getLocalizationResources();
+        const localization = AppManager.getLocalizationResources();
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.messages.error,
+                15);
+    }
+}
+
+function onReportItemClick(e) {
+    try {
+        const a1Notation = e?.parameters?.a1Notation;
+        if (a1Notation) {
+            const range = SpreadsheetApp.getActiveSpreadsheet().getRange(a1Notation);
+            // Show the cell value in a toast
+            const cellValue = range.getValue();
+            SpreadsheetApp.getActiveSpreadsheet().toast(
+                `Cell ${a1Notation} value: ${cellValue}`,
+                'Cell Value',
+                10);
+        }
+    } catch (error) {
+        const localization = AppManager.getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(

@@ -7,7 +7,7 @@
  * @return {CardService.Card} The card to show the user.
  */
 function createHomeCard() {
-    const localization = getLocalizationResources();
+    const localization = AppManager.getLocalizationResources();
     var builder = CardService.newCardBuilder();
 
     // Set the card header
@@ -30,7 +30,7 @@ function createHomeCard() {
 }
 
 function createSubtitleCardTopSection() {
-    const localization = getLocalizationResources();
+    const localization = AppManager.getLocalizationResources();
 
     // Create a card section with the decorated text
     return CardService.newCardSection()
@@ -42,7 +42,7 @@ function createSubtitleCardTopSection() {
 }
 
 function createAdvancedCardSection() {
-    const localization = getLocalizationResources();
+    const localization = AppManager.getLocalizationResources();
     const settingsSection = CardService.newCardSection()
         .setHeader(localization.cards.home.advanced)
         .setCollapsible(true);
@@ -89,7 +89,7 @@ function createAdvancedCardSection() {
 }
 
 function createFixedFooter() {
-    const localization = getLocalizationResources();
+    const localization = AppManager.getLocalizationResources();
 
     // Create a fixed footer with a button to open the help dialog
     return CardService.newFixedFooter()
