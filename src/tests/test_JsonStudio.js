@@ -1,7 +1,7 @@
 class test_JsonStudio {
     constructor() {
         QUnit.module("Json Studio Tests");
-        this.localization = getLocalizationResources();
+        this.localization = AppManager.getLocalizationResources();
         this.userStore = new UserStore();
         this.dummySheet = this.initializeTestSheet();
         this.jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);

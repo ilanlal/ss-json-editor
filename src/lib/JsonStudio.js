@@ -6,14 +6,13 @@ class JsonStudio {
      * @param {UserStore} userStore - User store instance
      */
     constructor(sheet, localization, userStore) {
-        this.localization = localization || getLocalizationResources();
         this.sheet = sheet;
-
+        this.localization = localization || AppManager.getLocalizationResources();
         this.userStore = userStore || new UserStore();
         this.maxCellSize = Static_Resources.limits.maxCellSize;
         this.identSpaces = this.userStore.getIdentSpaces();
         // Allocate a 2D array to store the validation report
-        this.report = [[]];
+        this.report = [ReportItem];
         // Initialization code
     }
 
@@ -25,7 +24,7 @@ class JsonStudio {
         }
 
         const values = range.getValues();
-        
+
         // Check if the range is valid and does not exceed the maximum allowed size
         const newValues = values
             .map((row, i) => row
@@ -53,7 +52,7 @@ class JsonStudio {
                 null,
                 // space
                 this.identSpaces * 1);
-            this.handleParseSuccess(a1Notation, formatted);
+            this.handleParseSuccess(a1Notation, formatted, true);
             return formatted; // Return the formatted JSON string
         } catch (error) {
             // If parsing fails, handle the error
@@ -69,7 +68,7 @@ class JsonStudio {
             throw new Error(this.localization.messages.outOfRange);
         }
         const values = range.getValues();
-        this.report = new Array(values.length).fill(null).map(() => new Array(values[0].length).fill(null));
+       
         // Map through the values and minify each cell
         const newValues = values
             .map((row, i) => row
@@ -81,11 +80,11 @@ class JsonStudio {
         range.setValues(newValues);
     }
 
-    minifyCell(a1Notation, cell) {
+    minifyCell(range, cell) {
         const trimmedCell = this.trimCell(cell);
         // if cell is empty after cleaning, return empty string
         if (!trimmedCell || trimmedCell === '') {
-            this.handleParseSuccess(a1Notation, cell);
+            this.handleParseSuccess(range, cell);
             return cell; // Return the original cell value
         }
 
@@ -93,12 +92,58 @@ class JsonStudio {
             const minified = JSON.stringify(
                 JSON.parse(trimmedCell));
 
-            this.handleParseSuccess(a1Notation, minified);
+            this.handleParseSuccess(range, minified, true);
             return minified; // Return the minified JSON string
         } catch (error) {
             // If parsing fails, handle the error
-            this.handleParseException(a1Notation, cell, error);
+            this.handleParseException(range, cell, error);
             return cell; // Return the original cell value
+        }
+    }
+
+    focusCell(a1n) {
+        const range = this.sheet.getRange(a1n);
+        range.activateAsCurrentCell();
+    }
+
+    focusRange(a1n) {
+        const range = this.sheet.getRange(a1n);
+        range.activate();
+    }
+
+    highlightRange(a1n) {
+        const range = this.sheet.getRange(a1n);
+        range.activateAsCurrentCell();
+        const orgColor = range.getBackground();
+        for (let i = 0; i < 3; i++) {
+            // set the background color blink to yellow for 1 second
+            range.setBackground('#FFFF00');
+            // flush the changes
+            SpreadsheetApp.flush();
+            // sleep for 1 seconds
+            Utilities.sleep(300);
+            range.setBackground(orgColor);
+            SpreadsheetApp.flush();
+            Utilities.sleep(400);
+        }
+    }
+
+    saveValuToCell(a1n, value) {
+        const localization = AppManager.getLocalizationResources();
+
+        try {
+            const range = this.sheet.getRange(a1n);
+            range.setValue(value);
+            return {
+                a1n: a1n,
+                input: value,
+                message: localization.message.success,
+            };
+        }
+        catch (error) {
+            this.sheet.toast(
+                localization.message.error, error.toString(), 15);
+            throw error;
         }
     }
 
@@ -112,54 +157,43 @@ class JsonStudio {
         return cell?.toString().replace(/[\n\r]/g, '').trim();
     }
 
-    handleParseSuccess(a1Notation, cell) {
+    handleParseSuccess(range, cell, modified = false) {
         // Handle the success case, e.g., by returning the cell value
-        if (!this.report[a1Notation.getRow() - 1]) {
-            this.report[a1Notation.getRow() - 1] = [];
-        }
-        if (!this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1]) {
-            this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1] = {};
-        }
-        // Update the report with the success status
-        this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1] = {
-            isValid: true,
-            icon: '✓',
-            range: a1Notation.getA1Notation(),
+        const reportItem = new ReportItem({
+            a1Notation: range.getA1Notation(),
             input: cell,
-            message: 'Valid JSON'
-        };
+            isValid: true,
+            message: '',
+            modified: modified
+        });
+
+        // Add the report item to the report
+        this.report.push(reportItem);
 
         return cell; // Return the original cell value
     }
 
-    handleParseException(a1Notation, cell, error) {
-        // Handle the error by adding a note to the cell
-        if (!this.report[a1Notation.getRow() - 1]) {
-            this.report[a1Notation.getRow() - 1] = [];
-        }
-        if (!this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1]) {
-            this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1] = {};
-        }
-        // Update the report with the error status
-        this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1] = {};
+    handleParseException(range, cell, error) {
         // Create a detailed error message
-        const errorMessage = `Error parsing JSON: ${error.message}`;
+        const errorMessage = `${error.message}`;
         // Optionally, you can set a note on the cell with the error message
-        this.report[a1Notation.getRow() - 1][a1Notation.getColumn() - 1] = {
+        const reportItem = new ReportItem({
+            a1Notation: range.getA1Notation(),
+            input: cell,
             isValid: false,
-            icon: '⊗',
-            range: a1Notation.getA1Notation(),
-            message: errorMessage,
-            input: cell
-        };
+            message: errorMessage
+        });
+
+        // Add the report item to the report
+        this.report.push(reportItem);
 
         //a1Notation.setNote(errorMessage);
         return cell; // Return the original cell value
     }
 
-    getTotalFailures() {
-        // Count the total number of failures in the report
-        return this.report.flat().filter(cell => !cell.isValid).length;
+    getReport() {
+        // Return the report containing validation results
+        return this.report;
     }
 
     /**
