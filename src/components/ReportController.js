@@ -1,8 +1,9 @@
 // src/lib/ReportController.gs
+
 /**
- * Class representing a report controller for a specific range in Google Sheets.
- * This class manages the report items for a given range and provides methods to add items and retrieve the report.
- * @param {GoogleAppsScript.Spreadsheet.Range} range - The range to report on
+ * ReportController class to manage reports for specific ranges in Google Sheets.
+ * It allows adding items to the report and retrieving the report results.
+ * @class
  */
 class ReportController {
     /**

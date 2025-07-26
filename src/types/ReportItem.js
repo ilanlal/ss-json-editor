@@ -12,6 +12,8 @@ class ReportItem {
     this.a1Notation = a1Notation; // A1 notation of the cell
     this.message = message; // Error message, if any
     this.status = status; // Status of the report item
+    // Icon representing the status
+    /** @type {string} */
     this.icon = ReportItem.Icons[status] || ReportItem.Icons.VALID; // Icon representing the status
   }
 };

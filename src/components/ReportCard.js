@@ -86,12 +86,13 @@ class ReportCard {
           .setText(this.localization.actions.reload)
           .setOnClickAction(
             CardService.newAction()
-              .setFunctionName('onDefaultHomePageOpen')
-              .setParameters({
-                a1Notation: this.reportController
-                  .getResults()
-                  .getA1Notation()
-              })));
+              .setFunctionName('onReportRefresh')))
+      .setSecondaryButton(
+        CardService.newTextButton()
+          .setText(this.localization.actions.close)
+          .setOnClickAction(
+            CardService.newAction()
+              .setFunctionName('onReportClose')));
 
     return footer;
   }

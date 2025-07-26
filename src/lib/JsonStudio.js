@@ -29,7 +29,7 @@ class JsonStudio {
                 .map((cell, j) => {
                     // Format JSON code
                     return this.formatCell(
-                        range.getCell(i + 1, j + 1), cell);
+                        range.getCell(i + 1, j + 1).getA1Notation(), cell);
                 }));
 
         range.setValues(newValues);
@@ -37,7 +37,7 @@ class JsonStudio {
         return this.getReport();
     }
 
-    formatCell(range, cell) {
+    formatCell(a1Notation, cell) {
         const trimmedCell = this.trimCell(cell);
         // if cell is empty after cleaning, return empty string
         if (!trimmedCell || trimmedCell === '') {
@@ -57,7 +57,7 @@ class JsonStudio {
             // If parsing fails, handle the error
             this.rangeReport.addItem(
                 new ReportItem(
-                    range.getA1Notation(),
+                    a1Notation,
                     `${error.message}`,
                     ReportItem.Status.INVALID
                 )
@@ -85,7 +85,8 @@ class JsonStudio {
             .map((row, i) => row
                 .map((cell, j) => {
                     // Minify JSON code
-                    return this.minifyCell(range.getCell(i + 1, j + 1), cell);
+                    return this.minifyCell(
+                        range.getCell(i + 1, j + 1).getA1Notation(), cell);
                 }));
 
         range.setValues(newValues);
@@ -93,7 +94,7 @@ class JsonStudio {
         return this.getReport();
     }
 
-    minifyCell(range, cell) {
+    minifyCell(a1Notation, cell) {
         const trimmedCell = this.trimCell(cell);
         // if cell is empty after cleaning, return empty string
         if (!trimmedCell || trimmedCell === '') {
@@ -109,7 +110,7 @@ class JsonStudio {
             // If parsing fails, handle the error
             this.rangeReport.addItem(
                 new ReportItem(
-                    range.getA1Notation(),
+                    a1Notation,
                     `${error.message}`,
                     ReportItem.Status.INVALID
                 )
@@ -131,11 +132,6 @@ class JsonStudio {
     getReport() {
         // Return the report containing validation results
         return this.rangeReport;
-    }
-
-    getResults() {
-        // Get the results from the range report
-        return this.rangeReport.getResults();
     }
 
     /**
