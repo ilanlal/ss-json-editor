@@ -36,7 +36,7 @@ function onMinifyRange(e) {
         // If there are results, create and return the report card
         if (results?.items?.length > 0) {
             const reportCard = new ReportCard(results.items, localization);
-            return reportCard.createReportCard();
+            return reportCard.createReportCard().build();
         }
     } catch (error) {
         SpreadsheetApp
@@ -63,7 +63,7 @@ function onFormatRange(e) {
         // If there are results, create and return the report card
         if (results?.items?.length > 0) {
             const reportCard = new ReportCard(results.items, localization);
-            return reportCard.createReportCard();
+            return reportCard.createReportCard().build();
         }
     } catch (error) {
         SpreadsheetApp

@@ -14,6 +14,7 @@ function allTests() {
     new test_RangeReport();
     new test_UserStore();
     new test_JsonStudio();
+    new test_ReportCard();
     new test_EditorTriggers();
 }
 

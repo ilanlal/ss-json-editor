@@ -27,6 +27,12 @@ const Global_Resources = {
             "errorMinifyingJson": "Error minifying JSON data.",
             "outOfRange": "The selected range exceeds the maximum allowed size of 5,000 cells. Please select a smaller range.",
             "errorPrettifyingJson": "Error prettifying JSON data.",
+            "cell": "Cell",
+            "cellUpdated": "Cell updated successfully.",
+            "cellCleared": "Cell cleared successfully.",
+            "totalCellsProcessed": "Total cells processed: {count}",
+            "totalCellsUpdated": "Total cells updated: {count}",
+            "totalCellFailed": "Total cells failed: {count}"
         },
         "menu": {
             "top": "Json studio",
@@ -60,11 +66,13 @@ const Global_Resources = {
                 "failNoteFlag": "Fail Note Flag",
             },
             "report": {
-                "title": "📊 Report",
-                "subtitle": "Generate a report for selected range",
-                "content": "Use this card to generate a report for the selected range of cells containing JSON data.",
+                "title": "Error Report",
+                "subtitle": "Report for invalid JSON data",
+                "content": "This report contains details about the JSON data that could not be processed.",
                 "imageAltText": "Json Studio Report Card",
                 "sectionHeader": "Report Details",
+                "itemButton": "View Item",
+                "sectionFooter": "This report contains details about the JSON data that could not be processed.",
             },
             "about": {
                 "title": "ℹ️ About",

@@ -39,22 +39,28 @@ class ReportCard {
   createReportSection() {
     const section = CardService.newCardSection()
       .setHeader(this.localization.cards.report.sectionHeader);
-
-    // todo: create clickable Grid 
     // @see https://developers.google.com/apps-script/reference/card-service/grid
-    const grid = CardService.newGrid()
-      .setTitle(this.localization.cards.report.title)
-      .setNumColumns(1);
-    // Iterate over the report items and add them to the grid
-    this.reportItems.forEach((item,i) => {
-      const gridItem = CardService.newGridItem()
-        .setTitle(item.a1Notation || '?')
-        .setSubtitle(item.message || '-');
 
-      grid.addItem(gridItem);
+    // Iterate over the report items and add them to section
+    this.reportItems.forEach((item, i) => {
+      // create a text paragraph widget for each report item
+      let itemWidget = CardService.newDecoratedText()
+        .setText(`${item.a1Notation}: ${item.message}`)
+        .setWrapText(true)
+        .setTopLabel(`Item ${i + 1}`)
+        .setBottomLabel(`${item.icon} ${item.status}`)
+        .setButton(
+          CardService.newTextButton()
+            .setText(this.localization.cards.report.itemButton)
+            .setOnClickAction(
+              CardService.newAction()
+                .setFunctionName('onReportItemClick')
+                .setParameters({ a1Notation: item.a1Notation })));
+
+      // Add the item widget to the section
+      section.addWidget(itemWidget);
     });
-    // Add the grid to the section
-    section.addWidget(grid);
+
     // Add a button to close the report
     return section;
   }
