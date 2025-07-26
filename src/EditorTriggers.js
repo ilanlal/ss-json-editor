@@ -31,8 +31,11 @@ function onMinifyRange(e) {
         // minify the range
         const report = jsonStudio.minifyRange();
 
-        if (report.length > 0) {
-            const reportCard = new ReportCard(report, localization);
+        // Extract the results from the range report
+        const results = report.getResults();
+        // If there are results, create and return the report card
+        if (results?.items?.length > 0) {
+            const reportCard = new ReportCard(results.items, localization);
             return reportCard.createReportCard();
         }
     } catch (error) {
@@ -50,14 +53,16 @@ function onFormatRange(e) {
 
     try {
         const userStore = new UserStore();
-        const jsonStudio = new JsonStudio(SpreadsheetApp
-            .getActiveSpreadsheet(), localization, userStore);
+        const jsonStudio = new JsonStudio(
+            SpreadsheetApp.getActiveSpreadsheet(), localization, userStore);
 
         // Call the formatRange method of JsonStudio
-        const report =jsonStudio.formatRange();
-
-        if (report.length > 0) {
-            const reportCard = new ReportCard(report, localization);
+        const report = jsonStudio.formatRange();
+        // Extract the results from the range report
+        const results = report.getResults();
+        // If there are results, create and return the report card
+        if (results?.items?.length > 0) {
+            const reportCard = new ReportCard(results.items, localization);
             return reportCard.createReportCard();
         }
     } catch (error) {

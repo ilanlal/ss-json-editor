@@ -3,15 +3,20 @@
 class ReportCard {
   /**
    * Constructor for the ReportCard class.
-   * @param {[ReportItem]} report - The report data.
+   * @param {[ReportItem]} reportItems - The report data.
    * @param {Global_Resources["en"]} localization - Localization resources.
    */
-  constructor(report, localization) {
-    this.report = report;
+  constructor(reportItems, localization) {
+    this.reportItems = reportItems;
     // Assuming AppManager is a global object that provides localization resources
     this.localization = localization || AppManager.getLocalizationResources();
   }
 
+  /**
+   * Create a card to display the report.
+   * @returns {CardService.CardBuilder} - The card containing the report.
+   * @throws {Error} - Throws an error if the report is empty or invalid.
+   */
   createReportCard() {
     const builder = CardService.newCardBuilder();
 
@@ -28,7 +33,7 @@ class ReportCard {
     const reportSection = this.createReportSection();
     builder.addSection(reportSection);
 
-    return builder.build();
+    return builder;
   }
 
   createReportSection() {
@@ -41,7 +46,7 @@ class ReportCard {
       .setTitle(this.localization.cards.report.title)
       .setNumColumns(1);
     // Iterate over the report items and add them to the grid
-    this.report.forEach((item,i) => {
+    this.reportItems.forEach((item,i) => {
       const gridItem = CardService.newGridItem()
         .setTitle(item.a1Notation || '?')
         .setSubtitle(item.message || '-');

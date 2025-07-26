@@ -4,15 +4,14 @@ class test_EditorTriggers {
         QUnit.module("Editor Triggers Tests");
         this.userStore = new UserStore();
         this.dummySheet = this.initializeTestSheet();
-        this.range = this.dummySheet.getRange("A1:B4");
         this.initializeUserStoreForTesting();
         this.runTests();
     }
     runTests() {
         const tests = [
             "test_onIdentSpacesSelectorChange",
-            //"test_onFormatRange",
-            //"test_onMinifyRange",
+            "test_onFormatRange",
+            "test_onMinifyRange",
             // Add more test methods here as needed
         ];
         tests.forEach(test => this[test]());
@@ -52,13 +51,17 @@ class test_EditorTriggers {
 
     test_onFormatRange() {
         let that = this;
-        QUnit.test("onFormatRange", function (assert) {
+        QUnit.test("Format Range Tests", function (assert) {
             // Mock a range with minified JSON data
             const values = [
                 ['{"key":"value"}', '{"array":[1,2,3]}'],
                 ['{"nested":{"key":"value"}}', '{"boolean":true}']
             ];
-            that.range.setValues(values);
+
+            // Set the values in the dummy sheet
+            that.dummySheet.getRange("A1:B2").setValues(values);
+            // Activate the range to be formatted
+            that.dummySheet.getRange("A1:B2").activate();
 
             // Mock event object
             const e = undefined; // No specific event object needed for this test
@@ -69,7 +72,7 @@ class test_EditorTriggers {
                 ['{\n  "nested": {\n    "key": "value"\n  }\n}', '{\n  "boolean": true\n}']
             ];
             assert.deepEqual(
-                that.range.getValues(),
+                that.dummySheet.getRange("A1:B2").getValues(),
                 expectedValues,
                 "Range should be formatted correctly");
         });
@@ -77,14 +80,16 @@ class test_EditorTriggers {
 
     test_onMinifyRange() {
         let that = this;
-        QUnit.test("Test onMinifyRange", function (assert) {
+        QUnit.test("Minify Range Tests", function (assert) {
             // Mock a range with JSON data
             const values = [
                 ['{"key": "value"}', '{"array": [1, 2, 3]}'],
                 ['{"nested": {"key": "value"}}', '{"boolean": true}']
             ];
-            that.range.setValues(values);
-
+            // Set the values in the dummy sheet
+            that.dummySheet.getRange("A1:B2").setValues(values);
+            // Activate the range to be minified
+            that.dummySheet.getRange("A1:B2").activate();
             // Mock event object
             const e = undefined; // No specific event object needed for this test
             onMinifyRange(e);
@@ -93,7 +98,10 @@ class test_EditorTriggers {
                 ['{"key":"value"}', '{"array":[1,2,3]}'],
                 ['{"nested":{"key":"value"}}', '{"boolean":true}']
             ];
-            assert.deepEqual(that.range.getValues(), expectedValues, "Range should be minified correctly");
+            assert.deepEqual(
+                that.dummySheet.getRange("A1:B2").getValues(),
+                expectedValues,
+                "Range should be minified correctly");
         });
     }
 
