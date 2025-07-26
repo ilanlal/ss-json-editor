@@ -4,7 +4,6 @@ class test_EditorTriggers {
         QUnit.module("Editor Triggers Tests");
         this.userStore = new UserStore();
         this.dummySheet = this.initializeTestSheet();
-        this.initializeUserStoreForTesting();
         this.runTests();
     }
     runTests() {
@@ -105,12 +104,6 @@ class test_EditorTriggers {
         });
     }
 
-    initializeUserStoreForTesting() {
-        // This method is used to initialize the UserStore for testing purposes
-        this.userStore.setIdentSpaces("2"); // Default value for identSpaces
-        this.userStore.setFailNoteFlag(false); // Default value for failNoteFlag
-        this.userStore.setShowErrorsFlag(false); // Default value for showErrorsFlag
-    }
     // Create Sheet for testing
     initializeTestSheet() {
         const ss = SpreadsheetApp.getActiveSpreadsheet();

@@ -12,7 +12,8 @@ class UserStore {
    * @return {string} The user's localization setting, defaulting to "en".
    */
   getLocalization() {
-    return this.userProperties.getProperty('localization') || "en"; // Default to English
+    return this.userProperties
+      .getProperty('localization') || "en"; // Default to English
   }
 
   /**
@@ -28,7 +29,8 @@ class UserStore {
    * @return {string} The number of spaces for indentation, defaulting to "2".
    */
   getIdentSpaces() {
-    return this.userProperties.getProperty(Static_Resources.keys.identSpaces) || "2"; // Default to 2 spaces
+    return this.userProperties.getProperty(
+      Static_Resources.keys.identSpaces) || "2"; // Default to 2 spaces
   }
 
   /**
@@ -36,38 +38,48 @@ class UserStore {
    * @param {string} value The number of spaces for indentation, default is "2".
    */
   setIdentSpaces(value = "2") {
-    this.userProperties.setProperty(Static_Resources.keys.identSpaces, value);
+    this.userProperties.setProperty(
+      Static_Resources.keys.identSpaces,
+      value);
   }
 
   /**
-   * Gets the fail note flag.
-   * @return {boolean} The fail note flag, defaulting to false.
+   * Gets the license information for the user.
+   * This function retrieves the user's license information from the user properties.
+   *
+   * @return {UserLicense | undefined} The user's license information, or undefined if not set.
+   * @see UserLicense
    */
-  getFailNoteFlag() {
-    return this.userProperties.getProperty(Static_Resources.keys.failNoteFlag) === "true"; // Default to false
+  getUserLicense() {
+    const licenseData =
+      this.userProperties.getProperty(
+        Static_Resources.keys.userLicense);
+    return licenseData ? JSON.parse(licenseData) : undefined;
   }
 
   /**
-   * Sets the fail note flag.
-   * @param {boolean} value The fail note flag, default is false.
+   * Sets the license information for the user.
+   * @param {UserLicense} license The license information to set.
    */
-  setFailNoteFlag(value = "false") {
-    this.userProperties.setProperty(Static_Resources.keys.failNoteFlag, value);
+  setUserLicense(license) {
+    if (!(license instanceof UserLicense)) {
+      throw new Error("Invalid license data");
+    }
+    const licenseJson = JSON.stringify(license);
+    if (!licenseJson) {
+      throw new Error("Invalid license data");
+    }
+    this.userProperties.setProperty(
+      Static_Resources.keys.userLicense,
+      licenseJson
+    );
+    return license;
   }
 
   /**
-   * Gets the show errors flag.
-   * @return {boolean} The show errors flag, defaulting to false.
+   * Clears the user's license information.
    */
-  getShowErrorsFlag() {
-    return this.userProperties.getProperty(Static_Resources.keys.showErrorsFlag) === "true"; // Default to false
-  }
-
-  /**
-   * Sets the show errors flag.
-   * @param {boolean} value The show errors flag, default is false.
-   */
-  setShowErrorsFlag(value = "false") {
-    this.userProperties.setProperty(Static_Resources.keys.showErrorsFlag, value);
+  clearUserLicense() {
+    this.userProperties.deleteProperty(Static_Resources.keys.userLicense);
   }
 }
