@@ -17,4 +17,38 @@ class SpreadsheetHelper {
         // shrink the range to the last row and last column
         return range.offset(0, 0, numRows, numColumns);
     }
+
+    static focusCell(a1n) {
+        const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+        const range = sheet.getRange(a1n);
+        range.activateAsCurrentCell();
+    }
+
+    static focusRange(a1n) {
+        const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+        const range = sheet.getRange(a1n);
+        range.activate();
+    }
+
+    static highlightRange(a1n) {
+        const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+        const range = sheet.getRange(a1n);
+        range.activateAsCurrentCell();
+        const orgColor = range.getBackground();
+        for (let i = 0; i < 3; i++) {
+            // set the background color blink to yellow for 1 second
+            range.setBackground('#FFFF00');
+            // flush the changes
+            SpreadsheetApp.flush();
+            // sleep for 1 seconds
+            Utilities.sleep(300);
+            range.setBackground(orgColor);
+            SpreadsheetApp.flush();
+            Utilities.sleep(400);
+        }
+    }
+
+    static saveValuToCell(a1n, value) {
+        throw new Error("Not implemented");
+    }
 }

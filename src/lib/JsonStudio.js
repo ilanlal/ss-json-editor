@@ -11,9 +11,7 @@ class JsonStudio {
         this.userStore = userStore || new UserStore();
         this.maxCellSize = Static_Resources.limits.maxCellSize;
         this.identSpaces = this.userStore.getIdentSpaces();
-        // Error report array of ReportItem objects
-        /** @type {ReportItem[]} */
-        this.report = new Array();
+        this.rangeReport = new RangeReport(sheet.getActiveRange());
     }
 
     formatRange() {
@@ -57,15 +55,19 @@ class JsonStudio {
             return formatted; // Return the formatted JSON string
         } catch (error) {
             // If parsing fails, handle the error
-            this.handleParseException(range.getA1Notation(), cell, error);
+            this.rangeReport.addItem(
+                range.getA1Notation(),
+                `${error.message}`,
+                ReportItem.Status.INVALID
+            );
             return cell; // Return the original cell value
         }
     }
 
     /**
      * Minify the range of cells in the sheet.
-     * 
-     * @returns {ReportItem[]} - Returns an array of ReportItem objects containing validation results.
+     *
+     * @returns {RangeReport} - Returns a RangeReport object containing validation results.
      * @throws {Error} - Throws an error if the selected range exceeds the maximum allowed.
      */
     minifyRange() {
@@ -103,54 +105,12 @@ class JsonStudio {
             return minified; // Return the minified JSON string
         } catch (error) {
             // If parsing fails, handle the error
-            this.handleParseException(range.getA1Notation(), cell, error);
+            this.rangeReport.addItem(
+                range.getA1Notation(),
+                `${error.message}`,
+                ReportItem.Status.INVALID
+            );
             return cell; // Return the original cell value
-        }
-    }
-
-    focusCell(a1n) {
-        const range = this.sheet.getRange(a1n);
-        range.activateAsCurrentCell();
-    }
-
-    focusRange(a1n) {
-        const range = this.sheet.getRange(a1n);
-        range.activate();
-    }
-
-    highlightRange(a1n) {
-        const range = this.sheet.getRange(a1n);
-        range.activateAsCurrentCell();
-        const orgColor = range.getBackground();
-        for (let i = 0; i < 3; i++) {
-            // set the background color blink to yellow for 1 second
-            range.setBackground('#FFFF00');
-            // flush the changes
-            SpreadsheetApp.flush();
-            // sleep for 1 seconds
-            Utilities.sleep(300);
-            range.setBackground(orgColor);
-            SpreadsheetApp.flush();
-            Utilities.sleep(400);
-        }
-    }
-
-    saveValuToCell(a1n, value) {
-        const localization = AppManager.getLocalizationResources();
-
-        try {
-            const range = this.sheet.getRange(a1n);
-            range.setValue(value);
-            return {
-                a1n: a1n,
-                input: value,
-                message: localization.message.success,
-            };
-        }
-        catch (error) {
-            this.sheet.toast(
-                localization.message.error, error.toString(), 15);
-            throw error;
         }
     }
 
@@ -164,24 +124,14 @@ class JsonStudio {
         return cell?.toString()?.replace(/[\n\r]/g, '')?.trim();
     }
 
-    handleParseException(a1Notation, cell, error) {
-        // Create a detailed error message
-        const message = `${error.message}`;
-        // Optionally, you can set a note on the cell with the error message
-        const reportItem = new ReportItem(
-            a1Notation,
-            message
-        );
-
-        // Add the report item to the report
-        this.report.push(reportItem);
-
-        return cell; // Return the original cell value
-    }
-
     getReport() {
         // Return the report containing validation results
-        return this.report;
+        return this.rangeReport;
+    }
+
+    getResults() {
+        // Get the results from the range report
+        return this.rangeReport.getResults();
     }
 
     /**

@@ -10,6 +10,8 @@ function doGet(e) {
 }
 
 function allTests() {
+    new test_ReportItem();
+    new test_RangeReport();
     new test_UserStore();
     new test_JsonStudio();
     new test_EditorTriggers();

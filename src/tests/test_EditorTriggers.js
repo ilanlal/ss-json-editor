@@ -4,7 +4,7 @@ class test_EditorTriggers {
         QUnit.module("Editor Triggers Tests");
         this.userStore = new UserStore();
         this.dummySheet = this.initializeTestSheet();
-        this.range = this.dummySheet.getRange("A1:B2");
+        this.range = this.dummySheet.getRange("A1:B4");
         this.initializeUserStoreForTesting();
         this.runTests();
     }
@@ -90,8 +90,8 @@ class test_EditorTriggers {
             onMinifyRange(e);
 
             const expectedValues = [
-                ['{"key":"value"}','{"array":[1,2,3]}'],
-                ['{"nested":{"key":"value"}}','{"boolean":true}']
+                ['{"key":"value"}', '{"array":[1,2,3]}'],
+                ['{"nested":{"key":"value"}}', '{"boolean":true}']
             ];
             assert.deepEqual(that.range.getValues(), expectedValues, "Range should be minified correctly");
         });
@@ -106,16 +106,17 @@ class test_EditorTriggers {
     // Create Sheet for testing
     initializeTestSheet() {
         const ss = SpreadsheetApp.getActiveSpreadsheet();
-        let sheet = ss.getSheetByName("TestSheet");
+        var sheet = ss.getSheetByName("TestSheet");
         if (!sheet) {
             sheet = ss.insertSheet("TestSheet");
-        } else {
-            sheet.clear(); // Clear existing data
         }
-
+        // Activate the sheet to ensure it's ready for testing
         // set as active sheet
         ss.setActiveSheet(sheet);
-        ss.setActiveRange(sheet.getRange("A1:B2")); // Set a default range for testing
+        ss.setActiveRange(sheet.getRange("A1:B4")); // Set a default range for testing
+
+        // Clear existing data
+        sheet.clear(); // Clear the sheet before adding new data
         return sheet;
     }
 }

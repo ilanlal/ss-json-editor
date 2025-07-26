@@ -4,11 +4,8 @@ class test_JsonStudio {
         this.localization = AppManager.getLocalizationResources();
         this.userStore = new UserStore();
         this.dummySheet = this.initializeTestSheet();
-        this.jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
+
         this.runTests();
-        QUnit.done(() => {
-            this.tearDown();
-        });
     }
 
     runTests() {
@@ -27,14 +24,37 @@ class test_JsonStudio {
                 ['{"nested": {"key": "value"}}', '{"boolean": true}']
             ];
             this.dummySheet.getRange("A1:B2").setValues(values);
-
-            this.jsonStudio.minifyRange();
-
+            let jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
+            let report = jsonStudio.minifyRange();
+            // Extract results from the report
+            let results = report.getResults();
             const expectedValues = [
                 ['{"key":"value"}', '{"array":[1,2,3]}'],
                 ['{"nested":{"key":"value"}}', '{"boolean":true}']
             ];
-            assert.deepEqual(this.dummySheet.getRange("A1:B2").getValues(), expectedValues, "Range should be minified correctly");
+            assert.deepEqual(
+                this.dummySheet.getRange("A1:B2").getValues(),
+                expectedValues, "Range should be minified correctly");
+
+            // Check the report for any errors
+            assert.strictEqual(results.items.length, 0, "There should be no errors in the report");
+
+            // Check invalid JSON handling
+            const invalidValues = [
+                ['{"key": "value"', '{"array": [1, 2, 3]}'],
+                ['{"nested": {"key": "value"}}', '{"boolean": true']
+            ];
+            this.dummySheet.getRange("A1:B2").setValues(invalidValues);
+
+            jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
+            report = jsonStudio.minifyRange();
+            // extract results from the report
+            results = report.getResults();
+            assert.strictEqual(results.items.length, 2, "There should be two errors in the report");
+            assert.strictEqual(results.items[0].status, ReportItem.Status.INVALID, "First item should be INVALID");
+            assert.strictEqual(results.items[1].status, ReportItem.Status.INVALID, "Second item should be INVALID");
+            assert.strictEqual(results.range, "A1:B4", "Range A1 notation should match");
+            
         });
     }
 
@@ -46,14 +66,37 @@ class test_JsonStudio {
                 ['{"nested":{"key":"value"}}', '{"boolean":true}']
             ];
             this.dummySheet.getRange("A1:B2").setValues(values);
-
-            this.jsonStudio.formatRange();
-
+            let jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
+            // Call formatRange to format the JSON data
+            let report = jsonStudio.formatRange();
+            // Extract results from the report
+            let results = report.getResults();
             const expectedValues = [
                 ['{\n  "key": "value"\n}', '{\n  "array": [\n    1,\n    2,\n    3\n  ]\n}'],
                 ['{\n  "nested": {\n    "key": "value"\n  }\n}', '{\n  "boolean": true\n}']
             ];
-            assert.deepEqual(this.dummySheet.getRange("A1:B2").getValues(), expectedValues, "Range should be formatted correctly");
+            assert.deepEqual(
+                this.dummySheet.getRange("A1:B2").getValues(),
+                expectedValues, "Range should be formatted correctly");
+
+            // Check the report for any errors
+            assert.strictEqual(results.items.length, 0, "There should be no errors in the report");
+
+            // Check invalid JSON handling
+            const invalidValues = [
+                ['{"key": "value"', '{"array": [1, 2, 3]}'],
+                ['{"nested": {"key": "value"}}', '{"boolean": true']
+            ];
+            this.dummySheet.getRange("A1:B2").setValues(invalidValues);
+            jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
+            // Call formatRange to format the JSON data
+            report = jsonStudio.formatRange();
+            // extract results from the report
+            results = report.getResults();
+            assert.strictEqual(results.items.length, 2, "There should be two errors in the report");
+            assert.strictEqual(results.items[0].status, ReportItem.Status.INVALID, "First item should be INVALID");
+            assert.strictEqual(results.items[1].status, ReportItem.Status.INVALID, "Second item should be INVALID");
+            assert.strictEqual(results.range, "A1:B4", "Range A1 notation should match");
         });
     }
 
@@ -65,8 +108,12 @@ class test_JsonStudio {
         if (!sheet) {
             sheet = ss.insertSheet("TestSheet");
         }
-        // Clear the sheet before adding new data
-        sheet.clear();
+
+        // Activate the sheet to ensure it's ready for testing
+        ss.setActiveSheet(sheet);
+        ss.setActiveRange(sheet.getRange("A1:B4")); // Set a default range for testing
+        // Clear existing data
+        sheet.clear(); // Clear the sheet before adding new data
         return sheet;
     }
 
