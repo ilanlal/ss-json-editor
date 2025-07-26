@@ -3,12 +3,17 @@
 class ReportCard {
   /**
    * Constructor for the ReportCard class.
-   * @param {[ReportItem]} reportItems - The report data.
+   * @param {RangeReport} rangeReport - The report for the range.
    * @param {Global_Resources["en"]} localization - Localization resources.
    */
-  constructor(reportItems, localization) {
-    this.reportItems = reportItems;
-    // Assuming AppManager is a global object that provides localization resources
+  constructor(rangeReport, localization) {
+    if (!rangeReport || !rangeReport.getA1Notation) {
+      throw new Error("Invalid range provided. Must be a Google Sheets Range object.");
+    }
+    // Initialize the range report
+    /** @type {RangeReport} */
+    this.rangeReport = rangeReport;
+    this.reportController = new ReportController(rangeReport);
     this.localization = localization || AppManager.getLocalizationResources();
   }
 
@@ -32,7 +37,9 @@ class ReportCard {
     // Create the report section
     const reportSection = this.createReportSection();
     builder.addSection(reportSection);
-
+    // Create the fixed footer with a close button
+    const footer = this.createFixedFooter();
+    builder.setFixedFooter(footer);
     return builder;
   }
 
@@ -42,26 +49,50 @@ class ReportCard {
     // @see https://developers.google.com/apps-script/reference/card-service/grid
 
     // Iterate over the report items and add them to section
-    this.reportItems.forEach((item, i) => {
-      // create a text paragraph widget for each report item
-      let itemWidget = CardService.newDecoratedText()
-        .setText(`${item.message}`)
-        .setWrapText(true)
-        .setTopLabel(`${item.icon} ${item.a1Notation}`)
-        //.setBottomLabel(`${item.status}`)
-        .setButton(
-          CardService.newTextButton()
-            .setText(`${item.a1Notation}`)
-            .setOnClickAction(
-              CardService.newAction()
-                .setFunctionName('onReportItemClick')
-                .setParameters({ a1Notation: item.a1Notation })));
+    this.reportController
+      .getResults()
+      .getItems()
+      .forEach((item) => {
+        // Create a text paragraph widget for each report item
+        let itemWidget = CardService.newDecoratedText()
+          .setText(`${item.message}`)
+          .setWrapText(true)
+          .setTopLabel(`${item.icon} ${item.a1Notation}`)
+          //.setBottomLabel(`${item.status}`)
+          .setButton(
+            CardService.newTextButton()
+              .setText(`${item.a1Notation}`)
+              .setOnClickAction(
+                CardService.newAction()
+                  .setFunctionName('onReportItemClick')
+                  .setParameters({ a1Notation: item.a1Notation })));
 
-      // Add the item widget to the section
-      section.addWidget(itemWidget);
-    });
-
+        // Add the item widget to the section
+        section.addWidget(itemWidget);
+      });
+    // If there are no items, add a message indicating no issues found
+    if (this.reportController.getResults().getItems().length === 0) {
+      section.addWidget(CardService.newTextParagraph()
+        .setText(this.localization.cards.report.noIssuesFound));
+    }
     // Add a button to close the report
     return section;
+  }
+
+  createFixedFooter() {
+    const footer = CardService.newFixedFooter()
+      .setPrimaryButton(
+        CardService.newTextButton()
+          .setText(this.localization.actions.reload)
+          .setOnClickAction(
+            CardService.newAction()
+              .setFunctionName('onDefaultHomePageOpen')
+              .setParameters({
+                a1Notation: this.reportController
+                  .getResults()
+                  .getA1Notation()
+              })));
+
+    return footer;
   }
 }

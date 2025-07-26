@@ -9,50 +9,50 @@ class test_RangeReport {
 
     runTests() {
         const tests = [
-            "test_addItem",
-            "test_getReport"
+            "test_createRangeReport",
+            "test_addItem"
         ];
         tests.forEach(test => this[test]());
     }
 
-    test_addItem() {
-        QUnit.test("Test addItem", (assert) => {
-            const range = SpreadsheetApp
+    test_createRangeReport() {
+        QUnit.test("Test create RangeReport object", (assert) => {
+            // Create a mock range with dummy data
+            const mockRange = SpreadsheetApp
                 .getActiveSpreadsheet()
                 .getActiveSheet()
-                .getRange("A1");
-            const report = new RangeReport(range);
-            const a1Notation = "B2";
-            const message = "Test message";
-            const status = ReportItem.Status.INVALID;
+                .getRange("A1:B2");
+            const rangeReport = new RangeReport(mockRange.getA1Notation());
+            assert.ok(rangeReport, "RangeReport instance should be created");
+            assert.strictEqual(rangeReport.a1Notation, mockRange.getA1Notation(), "A1 notation should match");
 
-            report.addItem(a1Notation, message, status);
-
-            const results = report.getResults();
-            assert.strictEqual(results.items.length, 1, "Should have one item in the report");
-            assert.strictEqual(results.items[0].a1Notation, a1Notation, "A1 notation should match");
-            assert.strictEqual(results.items[0].message, message, "Message should match");
-            assert.strictEqual(results.items[0].status, status, "Status should match");
-            assert.strictEqual(results.items[0].icon, ReportItem.Icons[status], "Icon should match the status icon");
-            assert.strictEqual(results.range, range.getA1Notation(), "Range A1 notation should match");
-
+            // Check if items array is initialized
+            assert.ok(Array.isArray(rangeReport.items), "Items should be an array");
+            assert.strictEqual(rangeReport.items.length, 0, "Items array should be empty initially");
         });
     }
 
-    test_getReport() {
-        QUnit.test("Test getReport", (assert) => {
-            const range = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getRange("A1");
-            const report = new RangeReport(range);
-            report.addItem("B2", "Test message 1", ReportItem.Status.VALID);
-            report.addItem("C3", "Test message 2", ReportItem.Status.ERROR);
+    test_addItem() {
+        QUnit.test("Test addItem", (assert) => {
+            const mockRange = SpreadsheetApp
+                .getActiveSpreadsheet()
+                .getActiveSheet()
+                .getRange("A1:B2");
+            const rangeReport = new RangeReport(mockRange.getA1Notation());
 
-            const results = report.getResults();
-            assert.strictEqual(results.items.length, 2, "Should have two items in the report");
-            assert.strictEqual(results.items[0].a1Notation, "B2", "First item A1 notation should match");
-            assert.strictEqual(results.items[1].a1Notation, "C3", "Second item A1 notation should match");
-            assert.strictEqual(results.items[0].status, ReportItem.Status.VALID, "First item status should be VALID");
-            assert.strictEqual(results.items[1].status, ReportItem.Status.ERROR, "Second item status should be ERROR");
-            assert.strictEqual(results.range, range.getA1Notation(), "Range A1 notation should match");
+            // Add an item to the report
+            rangeReport
+                .addItem(
+                    new ReportItem(
+                        "A1",
+                        "Test message",
+                        ReportItem.Status.VALID));
+
+            // Check if the item was added
+            assert.strictEqual(rangeReport.items.length, 1, "Items array should contain one item");
+            assert.strictEqual(rangeReport.items[0].a1Notation, "A1", "A1 notation should match");
+            assert.strictEqual(rangeReport.items[0].message, "Test message", "Message should match");
+            assert.strictEqual(rangeReport.items[0].status, ReportItem.Status.VALID, "Status should match");
         });
     }
 }

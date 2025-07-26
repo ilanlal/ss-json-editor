@@ -54,15 +54,19 @@ function onFormatRange(e) {
     try {
         const userStore = new UserStore();
         const jsonStudio = new JsonStudio(
-            SpreadsheetApp.getActiveSpreadsheet(), localization, userStore);
+            SpreadsheetApp
+                .getActiveSpreadsheet(),
+            localization,
+            userStore);
 
         // Call the formatRange method of JsonStudio
         const report = jsonStudio.formatRange();
-        // Extract the results from the range report
-        const results = report.getResults();
+        const reportItems = report.getItems();
         // If there are results, create and return the report card
-        if (results?.items?.length > 0) {
-            const reportCard = new ReportCard(results.items, localization);
+        if (reportItems?.length > 0) {
+            const reportCard = new ReportCard(
+                SpreadsheetApp.getActiveSpreadsheet().getActiveRange(),
+                localization);
             return reportCard.createReportCard().build();
         }
     } catch (error) {
@@ -152,6 +156,32 @@ function onReportItemClick(e) {
                 `Cell ${a1Notation} value: ${cellValue}`,
                 'Cell Value',
                 10);
+        }
+    } catch (error) {
+        const localization = AppManager.getLocalizationResources();
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.messages.error,
+                15);
+    }
+}
+
+function onReportRefresh(e) {
+    try {
+        const userStore = new UserStore();
+        const jsonStudio = new JsonStudio(
+            SpreadsheetApp.getActiveSpreadsheet(), AppManager.getLocalizationResources(), userStore);
+
+        // Refresh the current range
+        const report = jsonStudio.refreshRange();
+        // Extract the results from the range report
+        const results = report.getResults();
+        // If there are results, create and return the report card
+        if (results?.items?.length > 0) {
+            const reportCard = new ReportCard(results.items, AppManager.getLocalizationResources());
+            return reportCard.createReportCard().build();
         }
     } catch (error) {
         const localization = AppManager.getLocalizationResources();

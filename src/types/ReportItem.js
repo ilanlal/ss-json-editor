@@ -1,3 +1,7 @@
+// src/types/ReportItem.js
+/**
+ * Represents a report item for a specific cell in Google Sheets.
+ */
 class ReportItem {
     /**
      * @param {string} a1Notation - A1 notation of the cell

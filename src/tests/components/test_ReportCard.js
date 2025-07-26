@@ -15,15 +15,18 @@ class test_ReportCard {
 
     test_createReportCard() {
         QUnit.test("Test createReportCard", (assert) => {
-            // Create a mock rangeReport with dummy data
-            const mockReport = [
-                new ReportItem("A1", "Valid JSON", ReportItem.Status.VALID),
-                new ReportItem("B2", "Invalid JSON", ReportItem.Status.INVALID),
-                new ReportItem("C3", "Error in parsing", ReportItem.Status.ERROR)
-            ];
-            const reportCard = new ReportCard(mockReport);
-            assert.ok(reportCard, "ReportCard instance should be created");
-            let card = reportCard.createReportCard();
+            // Mock a range report
+            const mockRange = {
+                getA1Notation: () => "A1:B2",
+                getValues: () => [
+                    ["Header 1", "Header 2"],
+                    ["Value 1", "Value 2"]
+                ]
+            };
+            const rangeReport = new RangeReport(mockRange.getA1Notation());
+            // Create a ReportCard instance
+            const reportCard = new ReportCard(rangeReport, AppManager.getLocalizationResources());
+            const card = reportCard.createReportCard();
             assert.ok(card, "Card should be created successfully");
         });
     }

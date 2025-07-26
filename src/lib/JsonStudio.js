@@ -56,9 +56,11 @@ class JsonStudio {
         } catch (error) {
             // If parsing fails, handle the error
             this.rangeReport.addItem(
-                range.getA1Notation(),
-                `${error.message}`,
-                ReportItem.Status.INVALID
+                new ReportItem(
+                    range.getA1Notation(),
+                    `${error.message}`,
+                    ReportItem.Status.INVALID
+                )
             );
             return cell; // Return the original cell value
         }
@@ -106,9 +108,11 @@ class JsonStudio {
         } catch (error) {
             // If parsing fails, handle the error
             this.rangeReport.addItem(
-                range.getA1Notation(),
-                `${error.message}`,
-                ReportItem.Status.INVALID
+                new ReportItem(
+                    range.getA1Notation(),
+                    `${error.message}`,
+                    ReportItem.Status.INVALID
+                )
             );
             return cell; // Return the original cell value
         }

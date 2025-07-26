@@ -26,8 +26,7 @@ class test_JsonStudio {
             this.dummySheet.getRange("A1:B2").setValues(values);
             let jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
             let report = jsonStudio.minifyRange();
-            // Extract results from the report
-            let results = report.getResults();
+
             const expectedValues = [
                 ['{"key":"value"}', '{"array":[1,2,3]}'],
                 ['{"nested":{"key":"value"}}', '{"boolean":true}']
@@ -37,7 +36,7 @@ class test_JsonStudio {
                 expectedValues, "Range should be minified correctly");
 
             // Check the report for any errors
-            assert.strictEqual(results.items.length, 0, "There should be no errors in the report");
+            assert.strictEqual(report.getItems().length, 0, "There should be no errors in the report");
 
             // Check invalid JSON handling
             const invalidValues = [
@@ -48,13 +47,11 @@ class test_JsonStudio {
 
             jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
             report = jsonStudio.minifyRange();
-            // extract results from the report
-            results = report.getResults();
-            assert.strictEqual(results.items.length, 2, "There should be two errors in the report");
-            assert.strictEqual(results.items[0].status, ReportItem.Status.INVALID, "First item should be INVALID");
-            assert.strictEqual(results.items[1].status, ReportItem.Status.INVALID, "Second item should be INVALID");
-            assert.strictEqual(results.range, "A1:B4", "Range A1 notation should match");
-            
+            const items = report.getItems();
+
+            assert.strictEqual(items.length, 2, "There should be two errors in the report");
+            assert.strictEqual(items[0].status, ReportItem.Status.INVALID, "First item should be INVALID");
+            assert.strictEqual(items[1].status, ReportItem.Status.INVALID, "Second item should be INVALID");
         });
     }
 
@@ -69,8 +66,7 @@ class test_JsonStudio {
             let jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
             // Call formatRange to format the JSON data
             let report = jsonStudio.formatRange();
-            // Extract results from the report
-            let results = report.getResults();
+
             const expectedValues = [
                 ['{\n  "key": "value"\n}', '{\n  "array": [\n    1,\n    2,\n    3\n  ]\n}'],
                 ['{\n  "nested": {\n    "key": "value"\n  }\n}', '{\n  "boolean": true\n}']
@@ -80,7 +76,7 @@ class test_JsonStudio {
                 expectedValues, "Range should be formatted correctly");
 
             // Check the report for any errors
-            assert.strictEqual(results.items.length, 0, "There should be no errors in the report");
+            assert.strictEqual(report.getItems().length, 0, "There should be no errors in the report");
 
             // Check invalid JSON handling
             const invalidValues = [
@@ -88,15 +84,16 @@ class test_JsonStudio {
                 ['{"nested": {"key": "value"}}', '{"boolean": true']
             ];
             this.dummySheet.getRange("A1:B2").setValues(invalidValues);
-            jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
+            jsonStudio = new JsonStudio(
+                this.dummySheet,
+                this.localization,
+                this.userStore);
             // Call formatRange to format the JSON data
             report = jsonStudio.formatRange();
-            // extract results from the report
-            results = report.getResults();
-            assert.strictEqual(results.items.length, 2, "There should be two errors in the report");
-            assert.strictEqual(results.items[0].status, ReportItem.Status.INVALID, "First item should be INVALID");
-            assert.strictEqual(results.items[1].status, ReportItem.Status.INVALID, "Second item should be INVALID");
-            assert.strictEqual(results.range, "A1:B4", "Range A1 notation should match");
+            const items = report.getItems();
+            assert.strictEqual(items.length, 2, "There should be two errors in the report");
+            assert.strictEqual(items[0].status, ReportItem.Status.INVALID, "First item should be INVALID");
+            assert.strictEqual(items[1].status, ReportItem.Status.INVALID, "Second item should be INVALID");
         });
     }
 

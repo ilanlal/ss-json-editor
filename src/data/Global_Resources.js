@@ -73,6 +73,7 @@ const Global_Resources = {
                 "sectionHeader": "Report Details",
                 "itemButton": "View {a1Notation} Item",
                 "sectionFooter": "This report contains details about the JSON data that could not be processed.",
+                "noIssuesFound": "No issues found."
             },
             "about": {
                 "title": "ℹ️ About",
@@ -97,6 +98,31 @@ const Global_Resources = {
                     "content": "Json Studio is a powerful tool for working with JSON data in Google Sheets. It allows you to format, minify, and edit JSON data easily."
                 }
             }
-        }
+        },
+        "actions": {
+            "format": "Format JSON",
+            "minify": "Minify JSON",
+            "prettify": "Prettify JSON",
+            "edit": "Edit JSON",
+            "help": "Help & Support",
+            "about": "About Json Studio",
+            "settings": "Settings",
+            "close": "Close",
+            "reset": "Reset Settings",
+            "save": "Save Settings",
+            "apply": "Apply",
+            "cancel": "Cancel",
+            "clear": "Clear",
+            "ok": "OK",
+            "confirm": "Confirm",
+            "yes": "Yes",
+            "no": "No",
+            "done": "Done",
+            "continue": "Continue",
+            "selectRange": "Select Range",
+            "refresh": "Refresh",
+            "reload": "Reload",
+            "add": "Add"
+        },
     }
 }
