@@ -45,13 +45,13 @@ class ReportCard {
     this.reportItems.forEach((item, i) => {
       // create a text paragraph widget for each report item
       let itemWidget = CardService.newDecoratedText()
-        .setText(`${item.a1Notation}: ${item.message}`)
+        .setText(`${item.message}`)
         .setWrapText(true)
-        .setTopLabel(`Item ${i + 1}`)
-        .setBottomLabel(`${item.icon} ${item.status}`)
+        .setTopLabel(`${item.icon} ${item.a1Notation}`)
+        //.setBottomLabel(`${item.status}`)
         .setButton(
           CardService.newTextButton()
-            .setText(this.localization.cards.report.itemButton)
+            .setText(`${item.a1Notation}`)
             .setOnClickAction(
               CardService.newAction()
                 .setFunctionName('onReportItemClick')

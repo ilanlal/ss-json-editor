@@ -71,7 +71,7 @@ const Global_Resources = {
                 "content": "This report contains details about the JSON data that could not be processed.",
                 "imageAltText": "Json Studio Report Card",
                 "sectionHeader": "Report Details",
-                "itemButton": "View Item",
+                "itemButton": "View {a1Notation} Item",
                 "sectionFooter": "This report contains details about the JSON data that could not be processed.",
             },
             "about": {
