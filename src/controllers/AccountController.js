@@ -3,7 +3,8 @@ class AccountController {
         this.sheet = sheet;
         this.localization = AppManager.getLocalizationResources(sheet);
         this.userStore = new UserStore();
-        this.userLicense = this.userStore.getUserLicense();
+        this.userLicenseManager = new UserLicenseManager(this.userStore);
+        this.userLicense = this.userLicenseManager.getLicense();
     }
 
     /**
@@ -16,6 +17,23 @@ class AccountController {
     }
 
     activatePremium() {
-        throw new Error("Not implemented");
+        // Set the user license in the UserStore
+        const userId = 'me'; // Assuming 'me' refers to the current user
+        const planId = 'premium'; // Example plan ID
+        const createdOn = new Date();
+        const utcExpirationDate = new Date(
+            createdOn.getTime() + 14 * 24 * 60 * 60 * 1000); // 14 days from now
+        const amount = 0; // Assuming no cost for the trial
+        const userLicenseManager = new UserLicenseManager(this.userStore);
+        userLicenseManager.setLicense(
+            userId, planId, createdOn, utcExpirationDate, amount);
+
+        // navigate to root
+        const card = CardService.newActionResponseBuilder()
+            .setNavigation(
+                CardService.newNavigation()
+                    .popToRoot())
+            .build();
+        return card;
     }
 }

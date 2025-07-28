@@ -20,9 +20,10 @@ class test_HomeController {
             const localization = AppManager.getLocalizationResources();
             const userStore = new UserStore();
             const homeController = new HomeController(localization, userStore);
-            const card = JSON.parse(homeController
-                .createHomeCard()
-                .printJson());
+            const card = JSON.parse(
+                homeController
+                    .home()
+                    .printJson());
             assert.ok(card, "Home card should be created successfully");
             assert.strictEqual(
                 card.header.title,

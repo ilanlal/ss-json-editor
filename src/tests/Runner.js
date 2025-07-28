@@ -46,6 +46,7 @@ function test_modules() {
     new test_AppManager();
     new test_JsonStudio();
     new test_UserStore();
+    new test_UserLicenseManager();
 }
 
 function test_views() {

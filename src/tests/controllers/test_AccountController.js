@@ -11,7 +11,8 @@ class test_AccountController {
 
     runTests() {
         const tests = [
-            "test_home"
+            "test_home",
+            "test_activatePremium"
         ];
         tests.forEach(test => this[test]());
     }
@@ -30,6 +31,18 @@ class test_AccountController {
                 AppManager.getLocalizationResources().cards.account.title,
                 "Card title should match localization"
             );
+        });
+    }
+
+    test_activatePremium() {
+        QUnit.test("Test activatePremium action", (assert) => {
+            const controller = new AccountController();
+            const card = JSON.parse(
+                controller
+                    .activatePremium()
+                    .printJson());
+
+            assert.ok(card, "Card should be created");
         });
     }
 }

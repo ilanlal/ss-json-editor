@@ -50,10 +50,26 @@ class UserStore {
    * @see UserLicense
    */
   getUserLicense() {
-    const licenseData =
-      this.userProperties.getProperty(
-        Static_Resources.keys.userLicense);
-    return licenseData ? JSON.parse(licenseData) : undefined;
+    const data = this.userProperties
+      .getProperty(Static_Resources.keys.userLicense);
+
+    if (!data) {
+      return undefined; // Return undefined if no license is set
+    }
+    // Parse the JSON string into a UserLicense object
+    try {
+      const licenseData = JSON.parse(data);
+      return new UserLicense(
+        licenseData.userId,
+        licenseData.planId,
+        licenseData.createdOn,
+        licenseData.utcExpirationDate,
+        licenseData.amount
+      );
+    } catch (error) {
+      Logger.log(`UserStore.getUserLicense: error=${error}`);
+      return undefined;
+    }
   }
 
   /**
@@ -65,14 +81,12 @@ class UserStore {
       throw new Error("Invalid license data");
     }
     const licenseJson = JSON.stringify(license);
-    if (!licenseJson) {
-      throw new Error("Invalid license data");
-    }
-    this.userProperties.setProperty(
-      Static_Resources.keys.userLicense,
-      licenseJson
-    );
-    return license;
+
+    return this.userProperties
+      .setProperty(
+        Static_Resources.keys.userLicense,
+        licenseJson
+      );
   }
 
   /**

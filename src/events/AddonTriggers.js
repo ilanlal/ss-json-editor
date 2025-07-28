@@ -12,13 +12,13 @@ function onDefaultHomePageOpen(e) {
 
         // Return the home card
         return new HomeController(localization, userStore)
-            .createHomeCard();
+            .home();
 
     } catch (error) {
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
-                error.toString(),
+                error.message || error.toString(),
                 localization.messages.error,
                 7);
     }
@@ -226,7 +226,7 @@ function onEditCell(e) {
         if (range?.getNumRows() !== 1 || range?.getNumColumns() !== 1) {
             throw new Error("Please select a single cell to edit.");
         }
-        
+
         const a1Notation = range.getA1Notation();
         // Create a new JsonEditorController with the provided A1 notation
         const jsonEditorController = new JsonEditorController(
@@ -243,5 +243,41 @@ function onEditCell(e) {
                 7);
     }
 
+    return;
+}
+
+function onOpenAccountCard(e) {
+    try {
+        const controller = new AccountController();
+        return controller.home();
+    } catch (error) {
+        const localization = AppManager.getLocalizationResources();
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.messages.error,
+                7);
+    }
+
+    return;
+}
+
+function onActivatePremium(e) {
+    try {
+        const controller = new AccountController();
+
+        return controller.activatePremium();
+    } catch (error) {
+        const localization = AppManager.getLocalizationResources();
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.messages.error,
+                7);
+    }
+
+    // Return nothing as this is just an activation event
     return;
 }

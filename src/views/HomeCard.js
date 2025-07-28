@@ -1,106 +1,99 @@
 // Apps Script code for Google Workspace Add-ons
 class HomeCard {
-    /**
-     * Constructor for the HomeCard class.
-     * @param {Global_Resources['en']} localization - The localization resources.
-     * @param {UserStore} userStore - The user store instance.
-     */
-    constructor(localization, userStore) {
-        this.userStore = userStore || new UserStore();
-        this.localization = localization || AppManager.getLocalizationResources();
-    }
-    /**
-     * Callback for rendering the home card.
-     * @see {https://developers.google.com/workspace/add-ons/concepts/cards}
-     * @return {CardService.Card} The card to show the user.
-     */
-    createHomeCard() {
-        var builder = CardService.newCardBuilder();
+    static create(userLicense, localization, identSpaces = 2) {
+        const isPremium = userLicense?.isActive?.() || false;
+        const premiumIcon = isPremium ? (localization.actions.premiumIcon + ' ') : '';
+
+        const builder = CardService.newCardBuilder();
 
         // Set the card header
-        builder.setHeader(this.createHeader());
+        builder.setHeader(HomeCard.createHeader(localization, isPremium, premiumIcon));
 
         // Add Tools section
-        builder.addSection(this.createToolsSection());
+        builder.addSection(HomeCard.createToolsSection(localization, isPremium, premiumIcon));
         // Add the advanced section
-        builder.addSection(this.createAdvancedCardSection());
+        builder.addSection(HomeCard.createAdvancedCardSection(
+            localization, isPremium, premiumIcon, identSpaces));
 
         // Add the subtitle section
-        builder.addSection(this.createTipSection());
+        builder.addSection(HomeCard.createTipSection(localization, isPremium, premiumIcon));
         // Add the footer to the card
-        builder.setFixedFooter(this.createFixedFooter());
+        builder.setFixedFooter(HomeCard.createFixedFooter(localization, isPremium, premiumIcon));
         return builder;
     }
 
-    createHeader() {
+    static createHeader(localization, isPremium=false, premiumIcon = '') {
         return CardService.newCardHeader()
-            .setTitle(this.localization.cards.home.title)
-            .setSubtitle(this.localization.cards.home.subtitle)
+            .setTitle(localization.cards.home.title)
+            .setSubtitle(localization.cards.home.subtitle)
             .setImageStyle(CardService.ImageStyle.SQUARE)
             .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
-            .setImageAltText(this.localization.cards.home.imageAltText);
+            .setImageAltText(localization.cards.home.imageAltText);
     }
 
-    createToolsSection() {
+    static createToolsSection(localization, isPremium = false, premiumIcon = '') {
         const section = CardService.newCardSection();
         // Add tool buttons to the section
         section.addWidget(
             CardService.newTextButton()
-                .setText(this.localization.actions.format)
+                .setText(localization.actions.format)
                 .setOnClickAction(
                     CardService.newAction()
                         .setFunctionName('onFormatRange')));
         section.addWidget(
             CardService.newTextButton()
-                .setText(this.localization.actions.minify)
+                // Enable for premium users
+                .setDisabled(!isPremium)
+                .setText(localization.actions.minify)
                 .setOnClickAction(
                     CardService.newAction()
                         .setFunctionName('onMinifyRange')));
         section.addWidget(
             CardService.newTextButton()
-                .setText(this.localization.actions.edit)
+                // Enable for premium users
+                .setDisabled(!isPremium)
+                .setText(`${premiumIcon}${localization.actions.edit}`)
                 .setOnClickAction(
                     CardService.newAction()
                         .setFunctionName('onEditCell')));
         return section;
     }
 
-    createTipSection() {
+    static createTipSection(localization, isPremium=false, premiumIcon = '') {
         // Create a card section with the decorated text
         return CardService.newCardSection()
             //.setHeader(localization.cards.home.title)
             .addWidget(
                 CardService.newDecoratedText()
-                    .setText(this.localization.cards.home.tip)
+                    .setText(localization.cards.home.tip)
                     .setWrapText(true));
     }
 
-    createAdvancedCardSection() {
+    static createAdvancedCardSection(localization, isPremium=false, premiumIcon = '', identSpaces = 2) {
         const settingsSection = CardService.newCardSection()
-            .setHeader(this.localization.cards.home.advanced)
+            .setHeader(localization.cards.home.advanced)
             .setCollapsible(true);
 
         // Add the decorated text to the card section identSpacesContent
         const identSpacesText =
             CardService.newDecoratedText()
-                .setText(this.localization.cards.home.identSpacesContent)
+                .setText(localization.cards.home.identSpacesContent)
                 .setWrapText(true);
         // Add the ident spaces text to the card section
         settingsSection.addWidget(identSpacesText);
-        
-        // Add the ident spaces selector to the card section
-        const storedIdentSpaces = this.userStore.getIdentSpaces(); // Get the stored indentation spaces from user properties
+
         // Create a selection input for indentation spaces
         const spaceSelectionDropdown =
             CardService.newSelectionInput()
                 .setType(CardService.SelectionInputType.DROPDOWN)
-                .setTitle(this.localization.cards.home.identSpaces)
+                // Enable for premium users
+                .setTitle( premiumIcon + " " + localization.cards.home.identSpaces)
                 .setFieldName(Static_Resources.keys.identSpaces)
-                .addItem('1 {.}', '1', storedIdentSpaces === "1")
-                .addItem('2 {..}', '2', storedIdentSpaces === "2") // Default selected
-                .addItem('4 {....}', '4', storedIdentSpaces === "4")
-                .addItem('6 {......}', '6', storedIdentSpaces === "6")
-                .addItem('8 {........}', '8', storedIdentSpaces === "8")
+                .addItem('1 {.}', '1', identSpaces === "1")
+                .addItem('2 {..}', '2', identSpaces === "2") // Default selected
+                .addItem(`${premiumIcon}` + '4 {....}', '4', identSpaces === (isPremium ? "4" : "2"))
+                .addItem(`${premiumIcon}` + '6 {......}', '6', identSpaces === (isPremium ? "6" : "2"))
+                .addItem(`${premiumIcon}` + '8 {........}', '8', identSpaces === (isPremium ? "8" : "2"))
                 .setOnChangeAction(
                     CardService
                         .newAction()
@@ -111,20 +104,23 @@ class HomeCard {
         return settingsSection;
     }
 
-    createFixedFooter() {
+    static createFixedFooter(localization, isPremium = false, premiumIcon = '') {
+
         // Create a fixed footer with a button to open the help dialog
         return CardService.newFixedFooter()
             .setPrimaryButton(
                 CardService.newTextButton()
-                    .setText(this.localization.menu.format)
+                    .setText(localization.menu.format)
                     .setOnClickAction(
                         CardService.newAction()
                             .setFunctionName('onFormatRange')))
             .setSecondaryButton(
                 CardService.newTextButton()
-                    .setText(this.localization.menu.minify)
+                    .setDisabled(isPremium)
+                    .setText(isPremium ? localization.messages.premiumActivated : localization.actions.activatePremium)
+                    .setBackgroundColor(isPremium ? '#4CAF50' : '#FF9800')
                     .setOnClickAction(
                         CardService.newAction()
-                            .setFunctionName('onMinifyRange')));
+                            .setFunctionName('onOpenAccountCard')));
     }
 }

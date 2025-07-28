@@ -41,6 +41,10 @@
       "useLocaleFromApp": true,
       "universalActions": [
         {
+          "label": "🏆 Account",
+          "runFunction": "onOpenAccountCard"
+        },
+        {
           "label": "💡 About Json Studio",
           "runFunction": "onShowAboutCard"
         },

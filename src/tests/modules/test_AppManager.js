@@ -2,9 +2,9 @@
 class test_AppManager {
     constructor() {
         // Initialize QUnit for testing
-        QUnit.module("AppManager Tests", function () {
-            this.runTests();
-        });
+        QUnit.module("AppManager Tests");
+        this.localization = AppManager.getLocalizationResources();
+        this.runTests();
 
         QUnit.done(() => {
             // Cleanup or finalization if needed
@@ -31,14 +31,9 @@ class test_AppManager {
             const localization = AppManager.getLocalizationResources();
             assert.ok(localization, "Localization resources should be defined");
             assert.strictEqual(
-                localization.messages.totalCellFailed,
-                "Total cells failed: {0}",
-                "Localization message for total cell failed should match"
-            );
-            assert.strictEqual(
-                localization.messages.failure,
-                "Failure",
-                "Localization message for failure should match"
+                localization.cards.home.title,
+                "Welcome to Json Studio",
+                "Home card title should match expected value"
             );
         });
     }

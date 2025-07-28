@@ -33,6 +33,8 @@ const Global_Resources = {
             "totalCellsUpdated": "Total cells updated: {0}",
             "totalCellFailed": "Total cells failed: {0}",
             "authRequired": "Authentication is required to perform this operation.",
+            "premiumRequired": "This feature requires a premium license. Please activate your license to use this feature.",
+            "premiumActivated": "Premium Activated",
         },
         "menu": {
             "top": "Json studio",
@@ -111,7 +113,11 @@ const Global_Resources = {
                 "title": "👤 Account",
                 "subtitle": "Manage your account settings",
                 "description": "Use this section to manage your account settings and preferences.",
-                "license": "License: {0}"
+                "license": "License: {0}",
+                "activationInstructions": "To activate your premium license, click the button below.",
+                "activationSuccess": "Your premium license has been activated successfully.",
+                "activationError": "An error occurred while activating your premium license. Please try again later.",
+                "activationButton": "Activate Premium",
             }
         },
         "actions": {
@@ -137,7 +143,9 @@ const Global_Resources = {
             "selectRange": "Select Range",
             "refresh": "Refresh",
             "reload": "Reload",
-            "add": "Add"
+            "add": "Add",
+            "activatePremium": "🏆 Premium",
+            "premiumIcon": "🏆"
         },
     }
 }
