@@ -1,5 +1,4 @@
-// Apps Script code for Google Workspace Add-ons
-// src/events/SimpleTriggers.js
+// Google Apps Script code for Google Workspace Add-ons
 /**
  * @see https://developers.google.com/apps-script/guides/triggers#oninstalle
  **/

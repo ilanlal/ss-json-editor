@@ -1,4 +1,4 @@
-// src/lib/ReportController.gs
+// Google Apps Script code for Google Workspace Add-ons
 class ReportController {
     /**
      * Represents a report for a specific range in Google Sheets.

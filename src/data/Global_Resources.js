@@ -1,4 +1,3 @@
-// src/data/Global_Resources.js
 const Global_Resources = {
     "appName": "Json Studio",
     "module": "core-server",

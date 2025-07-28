@@ -1,4 +1,4 @@
-// Apps Script code for Google Workspace Add-ons
+// Google Apps Script code for Google Workspace Add-ons
 class test_AppManager {
     constructor() {
         // Initialize QUnit for testing

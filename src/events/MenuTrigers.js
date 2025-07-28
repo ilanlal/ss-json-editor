@@ -1,6 +1,4 @@
-// Apps Script code for Google Workspace Add-ons
-// src/events/MenuTriggers.js
-
+// Google Apps Script code for Google Workspace Add-ons
 function onMenuFormatRange(e) {
     // Code to format the selected range
     const localization = AppManager.getLocalizationResources();

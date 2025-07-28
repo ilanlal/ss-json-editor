@@ -1,7 +1,4 @@
-// src/types/RangeReport.js
-/**
- * Represents a report for a specific range in Google Sheets.
- */
+// Google Apps Script code for Google Workspace Add-ons
 class RangeReport {
     /**
      * Represents a report for a specific range in Google Sheets.

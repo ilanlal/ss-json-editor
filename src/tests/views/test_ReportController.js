@@ -1,4 +1,4 @@
-// Apps Script QUnit Tests for ReportController
+// Google Apps Script code for Google Workspace Add-ons
 class test_ReportController {
     constructor() {
         QUnit.module("Report controller Tests");

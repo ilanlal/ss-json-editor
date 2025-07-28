@@ -1,4 +1,3 @@
-// src/data/Static_Resources.js
 const Static_Resources = {
   "keys": {
     "identSpaces": "identSpaces",

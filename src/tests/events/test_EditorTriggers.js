@@ -1,4 +1,4 @@
-// test_EditorTriggers.gs
+// Google Apps Script code for Google Workspace Add-ons
 class test_EditorTriggers {
     constructor() {
         QUnit.module("Editor Triggers Tests");

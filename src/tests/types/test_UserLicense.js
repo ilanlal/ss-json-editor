@@ -1,3 +1,4 @@
+// Google Apps Script code for Google Workspace Add-ons
 class test_UserLicense {
     constructor() {
         QUnit.module("User License Tests");

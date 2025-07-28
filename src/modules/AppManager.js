@@ -1,6 +1,4 @@
-// Apps Script code for Google Workspace Add-ons
-// src/lib/AppManager.js
-
+// Google Apps Script code for Google Workspace Add-ons
 class AppManager {
     /**
      * Initializes the AppManager with the provided context.

@@ -1,5 +1,4 @@
-// Apps Script code for Google Workspace Add-ons
-// src/modules/UserLicense.js
+// Google Apps Script code for Google Workspace Add-ons
 class UserLicense {
     /**
      * Create a user license.

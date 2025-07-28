@@ -1,5 +1,4 @@
-// src/tests/test_UserStore.js
-// test_UserStore.gs
+// Google Apps Script code for Google Workspace Add-ons
 class test_UserStore {
     constructor() {
         QUnit.module("UserStore Tests");
