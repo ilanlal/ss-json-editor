@@ -55,7 +55,7 @@ function test_mvw() {
     new test_Home();
     new test_Report();
     new test_ReportController();
-
+    new test_JsonEditor();
 }
 
 function test_e2eTriggers() {

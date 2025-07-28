@@ -48,9 +48,10 @@ const Global_Resources = {
         },
         "cards": {
             "home": {
-                "title": "🏠 Home",
-                "subtitle": "Best JSON tools for Google Sheets™",
-                "content": "Welcome to Json Studio! Use the buttons below to format JSON data in your spreadsheet.",
+                "title": "Welcome to Json Studio",
+                "subtitle": "Free tools for Google Sheets™",
+                "content": "Use the buttons below to format JSON data in your spreadsheet.",
+                "tip": "💡 Select a range of cells containing JSON data and use the buttons below to format or minify the JSON.",
                 "imageAltText": "Json Studio for  Google Sheets™",
                 "footer": "Use the buttons below to format (prettify) or minify JSON data in your spreadsheet.",
                 "settings": "Settings",
@@ -65,8 +66,17 @@ const Global_Resources = {
                 "showErrorsToastFlagContent": "Enable this option to show errors prompt when JSON parsing fails.",
                 "failNoteFlag": "Fail Note Flag",
             },
+            "editor": {
+                "title": "JSON Editor",
+                "subtitle": "Edit your data cell: {0}",
+                "content": "Use this editor to parse and verify JON data.",
+                "imageAltText": "Json Studio Editor",
+                "footer": "Use the buttons below to save or cancel your changes.",
+                "saveButton": " 💾 Save",
+                "cancelButton": " ❌ Cancel"
+            },
             "report": {
-                "title": "⚠️ Problem Report",
+                "title": "Parse failed",
                 "subtitle": "Total {0} issue(s) found.",
                 "imageAltText": "Json Studio Report Card",
                 "sectionHeader": "Issues:",

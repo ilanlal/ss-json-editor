@@ -21,7 +21,7 @@ class HomeCard {
         builder.setHeader(
             CardService.newCardHeader()
                 .setTitle(this.localization.cards.home.title)
-                .setSubtitle(this.localization.cards.home.content)
+                .setSubtitle(this.localization.cards.home.subtitle)
                 .setImageStyle(CardService.ImageStyle.SQUARE)
                 .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
                 .setImageAltText(this.localization.cards.home.imageAltText));
@@ -30,19 +30,19 @@ class HomeCard {
         builder.addSection(this.createAdvancedCardSection());
 
         // Add the subtitle section
-        builder.addSection(this.createSubtitleCardTopSection());
+        builder.addSection(this.createTipSection());
         // Add the footer to the card
         builder.setFixedFooter(this.createFixedFooter());
         return builder;
     }
 
-    createSubtitleCardTopSection() {
+    createTipSection() {
         // Create a card section with the decorated text
         return CardService.newCardSection()
             //.setHeader(localization.cards.home.title)
             .addWidget(
                 CardService.newDecoratedText()
-                    .setText(this.localization.cards.home.subtitle)
+                    .setText(this.localization.cards.home.tip)
                     .setWrapText(true));
     }
 
@@ -50,24 +50,15 @@ class HomeCard {
         const settingsSection = CardService.newCardSection()
             .setHeader(this.localization.cards.home.advanced)
             .setCollapsible(true);
-        // Add the decorated text to the card section
-        /*const failNoteFlag = this.userStore.getFailNoteFlag(); // Get the fail note flag from user properties
-        const failNoteToggle =
-            CardService.newDecoratedText()
-                .setText(this.localization.cards.home.failNoteSwitchContent)
-                .setWrapText(true)
-                .setSwitchControl(
-                    CardService.newSwitch()
-                        .setFieldName(Static_Resources.keys.failNoteFlag)
-                        .setSelected(failNoteFlag) // Default to true
-                        .setValue("true")
-                        .setOnChangeAction(
-                            CardService.newAction()
-                                .setFunctionName('onFailNoteFlagChange')));
-        // Add the fail note toggle to the card section
-        settingsSection.addWidget(failNoteToggle);
-        */
 
+        // Add the decorated text to the card section identSpacesContent
+        const identSpacesText =
+            CardService.newDecoratedText()
+                .setText(this.localization.cards.home.identSpacesContent)
+                .setWrapText(true);
+        // Add the ident spaces text to the card section
+        settingsSection.addWidget(identSpacesText);
+        
         // Add the ident spaces selector to the card section
         const storedIdentSpaces = this.userStore.getIdentSpaces(); // Get the stored indentation spaces from user properties
         // Create a selection input for indentation spaces

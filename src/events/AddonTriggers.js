@@ -1,6 +1,4 @@
-// Apps Script code for Google Workspace Add-ons
-// src/events/EditorTriggers.js
-
+// Google Apps Script file for handling add-on triggers and events
 /**
  * Callback for the add-on homepage.
  * This function is called when the user opens the add-on.
@@ -9,7 +7,6 @@
  */
 function onDefaultHomePageOpen(e) {
     const localization = AppManager.getLocalizationResources();
-    // Check if the event is triggered by an add-on
     try {
         const userStore = new UserStore();
 
@@ -121,15 +118,26 @@ function onIdentSpacesSelectorChange(e) {
                 localization.messages.error,
                 15);
     }
+    // Return nothing as this is just a change event
+    return;
 }
 
-function onFailNoteFlagChange(e) {
+function onSaveEditor(e) {
     try {
-        const userStore = new UserStore();
-        const isChecked = e?.commonEventObject?.formInputs?.[Static_Resources.keys.failNoteFlag]?.stringInputs?.value[0] === 'true';
-        userStore.setFailNoteFlag(isChecked);
-    }
-    catch (error) {
+        const a1Notation = e?.parameters?.a1Notation;
+
+        if (!a1Notation) {
+            throw new Error("Invalid A1 notation or data provided");
+        }
+
+        const jsonEditorController = new JsonEditorController(
+            SpreadsheetApp.getActiveSpreadsheet());
+
+        // Get the data input from the event object
+        const dataInput = e?.commonEventObject?.formInputs?.dataInput?.stringInputs?.value[0] || '';
+
+        return jsonEditorController.onSaveEditor(a1Notation, dataInput);
+    } catch (error) {
         const localization = AppManager.getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
@@ -138,15 +146,16 @@ function onFailNoteFlagChange(e) {
                 localization.messages.error,
                 15);
     }
+
+    // Return nothing as this is just a save event
+    return;
 }
 
-function onShowErrorFlagChange(e) {
+function onCancelEditor(e) {
     try {
-        const userStore = new UserStore();
-        const isChecked = e?.commonEventObject?.formInputs?.[Static_Resources.keys.showErrorsFlag]?.stringInputs?.value[0] === 'true';
-        userStore.setShowErrorsFlag(isChecked);
-    }
-    catch (error) {
+        const jsonEditorController = new JsonEditorController();
+        return jsonEditorController.onCancelEditor();
+    } catch (error) {
         const localization = AppManager.getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
@@ -155,19 +164,20 @@ function onShowErrorFlagChange(e) {
                 localization.messages.error,
                 15);
     }
+
+    // Return nothing as this is just a cancel event
+    return;
 }
 
 function onReportItemClick(e) {
     try {
         const a1Notation = e?.parameters?.a1Notation;
         if (a1Notation) {
-            const range = SpreadsheetApp.getActiveSpreadsheet().getRange(a1Notation);
-            // Show the cell value in a toast
-            const cellValue = range.getValue();
-            SpreadsheetApp.getActiveSpreadsheet().toast(
-                `Cell ${a1Notation} value: ${cellValue}`,
-                'Cell Value',
-                10);
+            // Create a new JsonEditorController with the provided A1 notation
+            const jsonEditorController = new JsonEditorController(
+                SpreadsheetApp.getActiveSpreadsheet());
+
+            return jsonEditorController.createCard(a1Notation);
         }
     } catch (error) {
         const localization = AppManager.getLocalizationResources();
@@ -178,6 +188,8 @@ function onReportItemClick(e) {
                 localization.messages.error,
                 15);
     }
+
+    return;
 }
 
 function onReportClose(e) {
@@ -196,32 +208,6 @@ function onReportClose(e) {
                 localization.messages.error,
                 10);
     }
-}
 
-function onReportRefresh(e) {
-    try {
-        const userStore = new UserStore();
-        const jsonStudio = new JsonStudio(
-            SpreadsheetApp.getActiveSpreadsheet(), AppManager.getLocalizationResources(), userStore);
-
-        // Refresh the current range
-        /*const rangeReport = jsonStudio.refreshRange();
-        
-        // If there are results, create and return the report card
-        if (rangeReport?.getItems()?.length > 0) {
-            const reportCard = new ReportCard(rangeReport.items, AppManager.getLocalizationResources());
-            return reportCard.createReportCard().build();
-        }*/
-        return CardService.newActionResponseBuilder()
-            .setNavigation(CardService.newNavigation().popToRoot())
-            .build();
-    } catch (error) {
-        const localization = AppManager.getLocalizationResources();
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.messages.error,
-                15);
-    }
+    return;
 }

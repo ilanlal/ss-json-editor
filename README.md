@@ -1,4 +1,4 @@
-# ![Logo](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/logo24.png) Json Studio
+# ![Logo](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/logo24.png) Json Studio ```v9```
 
 [![GitHub repo size](https://img.shields.io/github/repo-size/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
 [![GitHub last commit](https://img.shields.io/github/last-commit/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
@@ -14,7 +14,14 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 - **Minify JSON**: Remove unnecessary whitespace and line breaks from JSON data.
 - **Select Indentation**: Choose the indentation level for prettified JSON data. (1, 2, 4, 6 or 8 spaces)
 
-## Screenshots
+### Release Notes ```v9```
+
+- **New Features**: Parse failures reporting, JSON validation, and improved error handling.
+- **Improvements**: Enhanced user interface, better performance, and more robust JSON parsing.
+- **Bug Fixes**: Fixed issues with the JSON editor and improved overall performance.
+- **Json Editor**: The JSON editor now supports multiline input and provides better error handling for invalid JSON data.
+
+## Screenshots ```v8```
 
 ![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/Screenshot%202025-07-22%20015159.jpg)
 

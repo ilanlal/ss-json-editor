@@ -16,8 +16,6 @@ function createAboutCard() {
     .addWidget(CardService.newTextParagraph()
       .setText('<b>JSON Studio</b> is a powerful tool for working with JSON data in Google Sheets.')));
   
-  // Add a footer with links to documentation and support
-  builder.setFixedFooter(createFixedFooter());
 
   return builder.build();
 }

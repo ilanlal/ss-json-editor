@@ -1,4 +1,4 @@
-// Apps Script QUnit Tests for Home View
+// Google Apps Script code for Google Workspace Add-ons
 class test_Home {
     constructor() {
         QUnit.module("Home view tests");
@@ -23,11 +23,6 @@ class test_Home {
             const homeCard = JSON.parse(homeController
                 .createHomeCard()
                 .printJson());
-
-            Logger.log({
-                message: "Home card created",
-                homeCard: JSON.stringify(homeCard)
-            });
             assert.ok(homeCard, "Home card should be created successfully");
             assert.strictEqual(
                 homeCard.header.title,

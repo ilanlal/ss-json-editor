@@ -6,6 +6,7 @@ class test_ReportController {
         QUnit.done(() => {
             //this.tearDown();
         });
+        
     }
 
     runTests() {
