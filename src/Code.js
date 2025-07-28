@@ -27,9 +27,11 @@ function onOpen(e) {
 function doGet(e) {
     try {
         // Call the QUnit runner to execute tests
-        return doGetQUnit(e);
+        return getQUnitHtmlResponse(e);
     } catch (error) {
-        Logger.log("Error in doGet: " + error);
+        // Handle any errors that occur during the execution
+        Logger.log("Error in doGet: " + error.message);
+        // Return an error message to the user
         return HtmlService.createHtmlOutput("Error: " + error.message);
     }
 }

@@ -18,14 +18,10 @@ class HomeCard {
         var builder = CardService.newCardBuilder();
 
         // Set the card header
-        builder.setHeader(
-            CardService.newCardHeader()
-                .setTitle(this.localization.cards.home.title)
-                .setSubtitle(this.localization.cards.home.subtitle)
-                .setImageStyle(CardService.ImageStyle.SQUARE)
-                .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
-                .setImageAltText(this.localization.cards.home.imageAltText));
+        builder.setHeader(this.createHeader());
 
+        // Add Tools section
+        builder.addSection(this.createToolsSection());
         // Add the advanced section
         builder.addSection(this.createAdvancedCardSection());
 
@@ -34,6 +30,39 @@ class HomeCard {
         // Add the footer to the card
         builder.setFixedFooter(this.createFixedFooter());
         return builder;
+    }
+
+    createHeader() {
+        return CardService.newCardHeader()
+            .setTitle(this.localization.cards.home.title)
+            .setSubtitle(this.localization.cards.home.subtitle)
+            .setImageStyle(CardService.ImageStyle.SQUARE)
+            .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
+            .setImageAltText(this.localization.cards.home.imageAltText);
+    }
+
+    createToolsSection() {
+        const section = CardService.newCardSection();
+        // Add tool buttons to the section
+        section.addWidget(
+            CardService.newTextButton()
+                .setText(this.localization.actions.format)
+                .setOnClickAction(
+                    CardService.newAction()
+                        .setFunctionName('onFormatRange')));
+        section.addWidget(
+            CardService.newTextButton()
+                .setText(this.localization.actions.minify)
+                .setOnClickAction(
+                    CardService.newAction()
+                        .setFunctionName('onMinifyRange')));
+        section.addWidget(
+            CardService.newTextButton()
+                .setText(this.localization.actions.edit)
+                .setOnClickAction(
+                    CardService.newAction()
+                        .setFunctionName('onEditCell')));
+        return section;
     }
 
     createTipSection() {

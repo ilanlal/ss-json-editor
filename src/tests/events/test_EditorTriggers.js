@@ -1,7 +1,7 @@
 // Google Apps Script code for Google Workspace Add-ons
-class test_EditorTriggers {
+class test_AddonTriggers {
     constructor() {
-        QUnit.module("Editor Triggers Tests");
+        QUnit.module("Addon Triggers Tests (e2e)");
         this.userStore = new UserStore();
         this.dummySheet = this.initializeTestSheet();
         this.runTests();

@@ -20,7 +20,7 @@ function onDefaultHomePageOpen(e) {
             .toast(
                 error.toString(),
                 localization.messages.error,
-                15);
+                7);
     }
 }
 
@@ -51,7 +51,7 @@ function onMinifyRange(e) {
             .toast(
                 error.toString(),
                 localization.messages.error,
-                15);
+                7);
     }
     // Return nothing if no results
     return;
@@ -82,7 +82,7 @@ function onFormatRange(e) {
             .toast(
                 error.toString(),
                 localization.messages.error,
-                15);
+                7);
     }
     // Return nothing if no results
     return;
@@ -116,9 +116,56 @@ function onIdentSpacesSelectorChange(e) {
             .toast(
                 error.toString(),
                 localization.messages.error,
-                15);
+                7);
     }
     // Return nothing as this is just a change event
+    return;
+}
+
+function onReportItemClick(e) {
+    try {
+        const a1Notation = e?.parameters?.a1Notation;
+        if (!a1Notation) {
+            throw new Error("Invalid A1 notation provided");
+        }
+        // Create a new JsonEditorController with the provided A1 notation
+        const jsonEditorController = new JsonEditorController(
+            SpreadsheetApp.getActiveSpreadsheet());
+
+        return jsonEditorController.createCard(a1Notation);
+    } catch (error) {
+        const localization = AppManager.getLocalizationResources();
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.messages.error,
+                7);
+    }
+
+    return;
+}
+
+function onReportClose(e) {
+
+    try {
+        // Close the report card
+        const card = CardService.newActionResponseBuilder()
+            .setNavigation(
+                CardService.newNavigation()
+                    .popToRoot())
+            .build();
+        return card;
+    } catch (error) {
+        const localization = AppManager.getLocalizationResources();
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.messages.error,
+                10);
+    }
+
     return;
 }
 
@@ -136,7 +183,8 @@ function onSaveEditor(e) {
         // Get the data input from the event object
         const dataInput = e?.commonEventObject?.formInputs?.dataInput?.stringInputs?.value[0] || '';
 
-        return jsonEditorController.onSaveEditor(a1Notation, dataInput);
+        return jsonEditorController.onSaveEditor(
+            a1Notation, dataInput);
     } catch (error) {
         const localization = AppManager.getLocalizationResources();
         SpreadsheetApp
@@ -144,7 +192,7 @@ function onSaveEditor(e) {
             .toast(
                 error.toString(),
                 localization.messages.error,
-                15);
+                7);
     }
 
     // Return nothing as this is just a save event
@@ -162,23 +210,29 @@ function onCancelEditor(e) {
             .toast(
                 error.toString(),
                 localization.messages.error,
-                15);
+                7);
     }
 
     // Return nothing as this is just a cancel event
     return;
 }
 
-function onReportItemClick(e) {
+function onEditCell(e) {
     try {
-        const a1Notation = e?.parameters?.a1Notation;
-        if (a1Notation) {
-            // Create a new JsonEditorController with the provided A1 notation
-            const jsonEditorController = new JsonEditorController(
-                SpreadsheetApp.getActiveSpreadsheet());
-
-            return jsonEditorController.createCard(a1Notation);
+        const range = SpreadsheetApp
+            .getActiveSpreadsheet()
+            .getActiveRange();
+        // Only 1 cell range is expected
+        if (range?.getNumRows() !== 1 || range?.getNumColumns() !== 1) {
+            throw new Error("Please select a single cell to edit.");
         }
+        
+        const a1Notation = range.getA1Notation();
+        // Create a new JsonEditorController with the provided A1 notation
+        const jsonEditorController = new JsonEditorController(
+            SpreadsheetApp.getActiveSpreadsheet());
+
+        return jsonEditorController.createCard(a1Notation);
     } catch (error) {
         const localization = AppManager.getLocalizationResources();
         SpreadsheetApp
@@ -186,27 +240,7 @@ function onReportItemClick(e) {
             .toast(
                 error.toString(),
                 localization.messages.error,
-                15);
-    }
-
-    return;
-}
-
-function onReportClose(e) {
-    try {
-        // Close the report card
-        const card = CardService.newActionResponseBuilder()
-            .setNavigation(CardService.newNavigation().popToRoot())
-            .build();
-        return card;
-    } catch (error) {
-        const localization = AppManager.getLocalizationResources();
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.messages.error,
-                10);
+                7);
     }
 
     return;

@@ -13,7 +13,7 @@
  * @see https://developers.google.com/apps-script/guides/html/overview
  */
 
-function doGetQUnit(e) {
+function getQUnitHtmlResponse(e) {
     QUnit.urlParams(e.parameter);
     QUnit.config({
         title: `${Global_Resources.appName}. my qunit 🚨`
@@ -31,13 +31,10 @@ function doGetQUnit(e) {
 
 function allTests() {
     test_types();
-    test_appModules();
-    test_mvw();
+    test_modules();
+    test_views();
+    test_controllers();
     test_e2eTriggers();
-}
-
-function test_app() {
-    //new test_Global_Resources();
 }
 function test_types() {
     new test_ReportItem();
@@ -45,19 +42,23 @@ function test_types() {
     new test_UserLicense();
 }
 
-function test_appModules() {
+function test_modules() {
     new test_AppManager();
     new test_JsonStudio();
     new test_UserStore();
 }
 
-function test_mvw() {
-    new test_Home();
-    new test_Report();
-    new test_ReportController();
-    new test_JsonEditor();
+function test_views() {
+    new test_HomeView();
+    new test_ReportView();
+    new test_JsonEditorView();
 }
 
+function test_controllers() {
+    new test_AccountController();
+}
+
+
 function test_e2eTriggers() {
-    new test_EditorTriggers();
+    new test_AddonTriggers();
 }

@@ -65,6 +65,7 @@ const Global_Resources = {
                 "showErrorsSwitch": "Show Errors",
                 "showErrorsToastFlagContent": "Enable this option to show errors prompt when JSON parsing fails.",
                 "failNoteFlag": "Fail Note Flag",
+                "tools": "Tools",
             },
             "editor": {
                 "title": "JSON Editor",
@@ -105,6 +106,12 @@ const Global_Resources = {
                     "subtitle": "About Json Studio",
                     "content": "Json Studio is a powerful tool for working with JSON data in Google Sheets. It allows you to format, minify, and edit JSON data easily."
                 }
+            },
+            "account": {
+                "title": "👤 Account",
+                "subtitle": "Manage your account settings",
+                "description": "Use this section to manage your account settings and preferences.",
+                "license": "License: {0}"
             }
         },
         "actions": {

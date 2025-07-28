@@ -1,5 +1,5 @@
 // Apps Script QUnit Tests for Report View
-class test_Report {
+class test_ReportView {
     constructor() {
         QUnit.module("Report view tests");
         this.runTests();
@@ -26,7 +26,9 @@ class test_Report {
             };
             const rangeReport = new RangeReport(mockRange.getA1Notation());
             // Create a ReportCard instance
-            const reportCard = new ReportCard(rangeReport, AppManager.getLocalizationResources());
+            const reportCard = new ReportCard(
+                rangeReport,
+                AppManager.getLocalizationResources());
             const card = reportCard.createReportCard();
             assert.ok(card, "Card should be created successfully");
         });
