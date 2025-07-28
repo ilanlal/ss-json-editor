@@ -29,7 +29,11 @@ class AccountCard {
             // Add a section for account description
             card.addSection(CardService.newCardSection()
                 .addWidget(CardService.newTextParagraph()
-                    .setText(localization.messages.premiumActivated)));
+                    .setText(localization.messages.premiumActivated))
+                .addWidget(CardService.newTextButton()
+                    .setText(localization.actions.revokeLicense)
+                    .setOnClickAction(CardService.newAction()
+                        .setFunctionName("onRevokeLicense"))));
         }
         else {
             // Add a section for account activation instructions with activate button

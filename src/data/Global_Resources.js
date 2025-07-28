@@ -145,6 +145,7 @@ const Global_Resources = {
             "reload": "Reload",
             "add": "Add",
             "activatePremium": "🏆 Premium",
+            "revokeLicense": "🏆 Revoke Premium",
             "premiumIcon": "🏆"
         },
     }

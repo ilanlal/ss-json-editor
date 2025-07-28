@@ -281,3 +281,22 @@ function onActivatePremium(e) {
     // Return nothing as this is just an activation event
     return;
 }
+
+function onRevokeLicense(e) {
+    try {
+        const controller = new AccountController();
+
+        return controller.revokeLicense();
+    } catch (error) {
+        const localization = AppManager.getLocalizationResources();
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.messages.error,
+                7);
+    }
+
+    // Return nothing as this is just a revocation event
+    return;
+}

@@ -36,4 +36,17 @@ class AccountController {
             .build();
         return card;
     }
+
+    revokeLicense() {
+        const userLicenseManager = new UserLicenseManager(this.userStore);
+        userLicenseManager.revokeLicense();
+
+        // navigate to root
+        const card = CardService.newActionResponseBuilder()
+            .setNavigation(
+                CardService.newNavigation()
+                    .popToRoot())
+            .build();
+        return card;
+    }
 }
