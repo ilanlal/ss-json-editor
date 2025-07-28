@@ -13,7 +13,7 @@
  * @see https://developers.google.com/apps-script/guides/html/overview
  */
 
-function doGet(e) {
+function doGetQUnit(e) {
     QUnit.urlParams(e.parameter);
     QUnit.config({
         title: `${Global_Resources.appName}. my qunit 🚨`
