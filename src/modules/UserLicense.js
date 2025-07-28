@@ -1,7 +1,5 @@
-// src/lib/UserLicense.js
-/**
- * Class representing a user license.
- */
+// Apps Script code for Google Workspace Add-ons
+// src/modules/UserLicense.js
 class UserLicense {
     /**
      * Create a user license.

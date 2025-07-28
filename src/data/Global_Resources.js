@@ -1,4 +1,4 @@
-// Global_Resources.gs
+// src/data/Global_Resources.js
 const Global_Resources = {
     "appName": "Json Studio",
     "module": "core-server",
@@ -30,9 +30,10 @@ const Global_Resources = {
             "cell": "Cell",
             "cellUpdated": "Cell updated successfully.",
             "cellCleared": "Cell cleared successfully.",
-            "totalCellsProcessed": "Total cells processed: {count}",
-            "totalCellsUpdated": "Total cells updated: {count}",
-            "totalCellFailed": "Total cells failed: {count}"
+            "totalCellsProcessed": "Total cells processed: {0}",
+            "totalCellsUpdated": "Total cells updated: {0}",
+            "totalCellFailed": "Total cells failed: {0}",
+            "authRequired": "Authentication is required to perform this operation.",
         },
         "menu": {
             "top": "Json studio",
@@ -66,14 +67,12 @@ const Global_Resources = {
                 "failNoteFlag": "Fail Note Flag",
             },
             "report": {
-                "title": "Error Report",
-                "subtitle": "Report for invalid JSON data",
-                "content": "This report contains details about the JSON data that could not be processed.",
+                "title": "⚠️ Problem Report",
+                "subtitle": "Total {0} issue(s) found.",
                 "imageAltText": "Json Studio Report Card",
-                "sectionHeader": "Report Details",
-                "itemButton": "View {a1Notation} Item",
-                "sectionFooter": "This report contains details about the JSON data that could not be processed.",
-                "noIssuesFound": "No issues found."
+                "sectionHeader": "Issues:",
+                "noIssuesFound": "No issues found.",
+                "summary": "Summary of issues"
             },
             "about": {
                 "title": "ℹ️ About",

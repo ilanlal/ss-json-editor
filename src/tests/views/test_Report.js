@@ -1,6 +1,7 @@
-class test_ReportCard {
+// Apps Script QUnit Tests for Report View
+class test_Report {
     constructor() {
-        QUnit.module("ReportCard Tests");
+        QUnit.module("Report view tests");
         this.runTests();
         QUnit.done(() => {
             //this.tearDown();

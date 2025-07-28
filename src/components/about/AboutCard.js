@@ -1,6 +1,4 @@
 // Apps Script code for Google Workspace Add-ons
-// src/cards/About.gs
-
 function createAboutCard() {
   var builder = CardService.newCardBuilder();
 

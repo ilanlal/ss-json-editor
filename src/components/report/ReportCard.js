@@ -1,5 +1,4 @@
 // Apps Script code for Google Workspace Add-ons
-// src/cards/Report.js
 class ReportCard {
   /**
    * Constructor for the ReportCard class.
@@ -29,7 +28,8 @@ class ReportCard {
     builder.setHeader(
       CardService.newCardHeader()
         .setTitle(this.localization.cards.report.title)
-        .setSubtitle(this.localization.cards.report.content)
+        .setSubtitle(this.localization.cards.report.subtitle
+          .replace('{0}', this.rangeReport.getItems().length.toString()))
         .setImageStyle(CardService.ImageStyle.SQUARE)
         .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
         .setImageAltText(this.localization.cards.report.imageAltText));
@@ -81,13 +81,13 @@ class ReportCard {
 
   createFixedFooter() {
     const footer = CardService.newFixedFooter()
-      .setPrimaryButton(
+      /*.setPrimaryButton(
         CardService.newTextButton()
           .setText(this.localization.actions.reload)
           .setOnClickAction(
             CardService.newAction()
-              .setFunctionName('onReportRefresh')))
-      .setSecondaryButton(
+              .setFunctionName('onReportRefresh')))*/
+      .setPrimaryButton(
         CardService.newTextButton()
           .setText(this.localization.actions.close)
           .setOnClickAction(

@@ -1,5 +1,5 @@
 // App Script code for Google Workspace Add-ons
-// src/Store.js
+// src/modules/UserStore.js
 class UserStore {
   constructor() {
     this.userProperties = PropertiesService.getUserProperties();

@@ -1,10 +1,4 @@
 // src/lib/ReportController.gs
-
-/**
- * ReportController class to manage reports for specific ranges in Google Sheets.
- * It allows adding items to the report and retrieving the report results.
- * @class
- */
 class ReportController {
     /**
      * Represents a report for a specific range in Google Sheets.

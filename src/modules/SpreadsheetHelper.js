@@ -1,3 +1,5 @@
+// Apps Script code for Google Workspace Add-ons
+// src/modules/SpreadsheetHelper.js
 class SpreadsheetHelper {
     /**
      * Returns the optimal range for the current sheet.

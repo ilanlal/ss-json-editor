@@ -1,4 +1,6 @@
 // Apps Script code for Google Workspace Add-ons
+// src/events/EditorTriggers.js
+
 /**
  * Callback for the add-on homepage.
  * This function is called when the user opens the add-on.
@@ -6,11 +8,16 @@
  * @see appsscript.json -->homepageTrigger
  */
 function onDefaultHomePageOpen(e) {
+    const localization = AppManager.getLocalizationResources();
+    // Check if the event is triggered by an add-on
     try {
+        const userStore = new UserStore();
+
         // Return the home card
-        return createHomeCard();
+        return new HomeController(localization, userStore)
+            .createHomeCard();
+
     } catch (error) {
-        const localization = AppManager.getLocalizationResources();
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
@@ -21,6 +28,7 @@ function onDefaultHomePageOpen(e) {
 }
 
 function onMinifyRange(e) {
+    // This function is called when the user selects "Minify" from the add-on menu    
     const localization = AppManager.getLocalizationResources();
     try {
         const userStore = new UserStore();
@@ -30,10 +38,11 @@ function onMinifyRange(e) {
 
         // minify the range
         const rangeReport = jsonStudio.minifyRange();
-
         const reportItems = rangeReport.getItems();
         // If there are results, create and return the report card
         if (reportItems?.length > 0) {
+            // and create the report card
+
             const reportCard = new ReportCard(rangeReport, localization);
             return reportCard
                 .createReportCard()
@@ -46,8 +55,9 @@ function onMinifyRange(e) {
                 error.toString(),
                 localization.messages.error,
                 15);
-        return;
     }
+    // Return nothing if no results
+    return;
 }
 
 function onFormatRange(e) {
@@ -77,6 +87,8 @@ function onFormatRange(e) {
                 localization.messages.error,
                 15);
     }
+    // Return nothing if no results
+    return;
 }
 
 function onShowAboutCard(e) {
@@ -168,6 +180,24 @@ function onReportItemClick(e) {
     }
 }
 
+function onReportClose(e) {
+    try {
+        // Close the report card
+        const card = CardService.newActionResponseBuilder()
+            .setNavigation(CardService.newNavigation().popToRoot())
+            .build();
+        return card;
+    } catch (error) {
+        const localization = AppManager.getLocalizationResources();
+        SpreadsheetApp
+            .getActiveSpreadsheet()
+            .toast(
+                error.toString(),
+                localization.messages.error,
+                10);
+    }
+}
+
 function onReportRefresh(e) {
     try {
         const userStore = new UserStore();
@@ -175,14 +205,16 @@ function onReportRefresh(e) {
             SpreadsheetApp.getActiveSpreadsheet(), AppManager.getLocalizationResources(), userStore);
 
         // Refresh the current range
-        const report = jsonStudio.refreshRange();
-        // Extract the results from the range report
-        const results = report.getResults();
+        /*const rangeReport = jsonStudio.refreshRange();
+        
         // If there are results, create and return the report card
-        if (results?.items?.length > 0) {
-            const reportCard = new ReportCard(results.items, AppManager.getLocalizationResources());
+        if (rangeReport?.getItems()?.length > 0) {
+            const reportCard = new ReportCard(rangeReport.items, AppManager.getLocalizationResources());
             return reportCard.createReportCard().build();
-        }
+        }*/
+        return CardService.newActionResponseBuilder()
+            .setNavigation(CardService.newNavigation().popToRoot())
+            .build();
     } catch (error) {
         const localization = AppManager.getLocalizationResources();
         SpreadsheetApp

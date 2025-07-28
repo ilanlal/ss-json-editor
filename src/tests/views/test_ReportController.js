@@ -1,6 +1,7 @@
+// Apps Script QUnit Tests for ReportController
 class test_ReportController {
     constructor() {
-        QUnit.module("ReportController Tests");
+        QUnit.module("Report controller Tests");
         this.runTests();
         QUnit.done(() => {
             //this.tearDown();

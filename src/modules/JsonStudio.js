@@ -1,4 +1,5 @@
-// src/lib/JsonStudio.js
+// Apps Script code for Google Workspace Add-ons
+// src/modules/JsonStudio.js
 class JsonStudio {
     /**
      * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - The sheet to get the optimal range for.
