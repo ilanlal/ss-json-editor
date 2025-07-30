@@ -8,7 +8,7 @@ const Static_Resources = {
     // build number. 
     // This is used to identify the version of the static resources.
     // It should be updated with each deployment 😉.
-    build: "20250730.060400",
+    build: "20250730.090500",
     // version of the Google Apps Script deployment (usually vnext)
     version: "9",
     // Google Marketplace URL for the add-on.
@@ -31,17 +31,18 @@ const Static_Resources = {
   dataInput: "dataInput",
   maxRangeSize: 1000, // Maximum number of cells in a range
   emojis: {
-    "success": "✅",
-    "error": "❌",
-    "info": "ℹ️",
-    "warning": "⚠️",
-    "loading": "⏳",
-    "tip": "💡",
-    "premium": "🏆",
-    "edit": "✏️",
-    "format": "📑",
-    "minify": "🔽",
-    "lock": "🔒",
-    "unlock": "🔓",
+    success: "✅",
+    error: "❌",
+    info: "ℹ️",
+    warning: "⚠️",
+    loading: "⏳",
+    tip: "💡",
+    premium: "🏆",
+    edit: "✏️",
+    format: "📑",
+    minify: "🔽",
+    lock: "🔒",
+    unlock: "🔓",
+    account: "👤",
   }
 };

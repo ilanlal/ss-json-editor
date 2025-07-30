@@ -1,100 +1,93 @@
 // Apps Script code for Google Workspace Add-ons
 class HomeCard {
-    static create(userLicense, localization, identSpaces = 2) {
-        const isPremium = userLicense?.isActive?.() || false;
-        const premiumIcon = !isPremium ? (localization.actions.premiumIcon + ' ') : '';
-
-        const builder = CardService.newCardBuilder();
-
-        // Set the card header
-        builder.setHeader(HomeCard.createHeader(localization, isPremium, premiumIcon));
-
-        // Add Tools section
-        builder.addSection(HomeCard.createToolsSection(localization, isPremium, premiumIcon));
-        // Add the advanced section
-        builder.addSection(HomeCard.createAdvancedCardSection(
-            localization, isPremium, premiumIcon, identSpaces));
-
-        // Add the subtitle section
-        builder.addSection(HomeCard.createTipSection(localization, isPremium, premiumIcon));
-        // Add the footer to the card
-        builder.setFixedFooter(HomeCard.createFixedFooter(localization, isPremium, premiumIcon));
-        return builder;
+    /**
+     * Constructor for the HomeCard class.
+     * @param {boolean} isPremium - Indicates if the user has a premium license.
+     * @param {number} indentationSpaces - The number of spaces to use for indentation.
+     * @param {Global_Resources["en"]} localization - The localization object for the card.
+     */
+    constructor(isPremium = false, indentationSpaces, localization) {
+        this.isPremium = isPremium;
+        this.indentationLevel = indentationSpaces;
+        this.localization = localization;
     }
 
-    static createHeader(localization, isPremium = false, premiumIcon = '') {
+    static create(userLicense, localization, indentationSpaces = 2) {
+        const isPremium = userLicense?.isActive?.() || false;
+        const thisCard = new HomeCard(
+            isPremium,
+            indentationSpaces,
+            localization
+        );
+        // Build the card using the builder pattern
+        return thisCard.newCardBuilder();
+    }
+
+    newCardBuilder() {
+        // Create a new card builder
+        const cardBuilder = CardService.newCardBuilder()
+            // Set the card header
+            .setHeader(this.getHeader())
+            // Add the format section
+            .addSection(this.getFormatSection())
+            // Add Tools section
+            .addSection(this.getToolsSection());
+
+        if (!this.isPremium) {
+            // Add the footer to the card
+            cardBuilder.setFixedFooter(this.getFixedFooter());
+        }
+
+        return cardBuilder;
+    }
+
+    getHeader() {
         return CardService.newCardHeader()
-            .setTitle(localization.cards.home.title)
-            .setSubtitle(localization.cards.home.subtitle)
+            .setTitle(this.localization.cards.home.title)
+            .setSubtitle(this.localization.cards.home.subtitle)
             .setImageStyle(CardService.ImageStyle.SQUARE)
             .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
-            .setImageAltText(localization.cards.home.imageAltText);
+            .setImageAltText(this.localization.cards.home.imageAltText);
     }
 
-    static createToolsSection(localization, isPremium = false, premiumIcon = '') {
+    getToolsSection() {
         const section = CardService.newCardSection();
-        // Add tool buttons to the section
+
         section.addWidget(
-            CardService.newTextButton()
-                .setText(localization.actions.format)
-                .setOnClickAction(
-                    CardService.newAction()
-                        .setFunctionName('onFormatRange')));
+            this.getMinifyDecoratedTextWidget());
+
         section.addWidget(
-            CardService.newTextButton()
-                // Enable for premium users
-                .setDisabled(!isPremium)
-                .setText(localization.actions.minify)
-                .setOnClickAction(
-                    CardService.newAction()
-                        .setFunctionName('onMinifyRange')));
-        section.addWidget(
-            CardService.newTextButton()
-                // Enable for premium users
-                .setDisabled(!isPremium)
-                .setText(`${premiumIcon}${localization.actions.edit}`)
-                .setOnClickAction(
-                    CardService.newAction()
-                        .setFunctionName('onEditCell')));
+            this.getEditDecoratedTextWidget());
+
         return section;
     }
 
-    static createTipSection(localization, isPremium = false, premiumIcon = '') {
+    getFormatSection() {
         // Create a card section with the decorated text
-        return CardService.newCardSection()
-            //.setHeader(localization.cards.home.title)
-            .addWidget(
-                CardService.newDecoratedText()
-                    .setText(localization.cards.home.tip)
-                    .setWrapText(true));
-    }
-
-    static createAdvancedCardSection(localization, isPremium = false, premiumIcon = '', identSpaces = 2) {
         const section = CardService.newCardSection()
-            .setHeader(localization.cards.home.advanced)
-            .setCollapsible(true);
+            .setCollapsible(true)
+            .setNumUncollapsibleWidgets(1);
+        section.addWidget(
+            this.getFormatDecoratedTextWidget());
 
-        // Add the decorated text to the card section identSpacesContent
-        const identSpacesText =
-            CardService.newDecoratedText()
-                .setText(localization.cards.home.identSpacesContent)
-                .setWrapText(true);
         // Add the ident spaces text to the card section
-        section.addWidget(identSpacesText);
+        section.addWidget(CardService.newDecoratedText()
+            .setText(`${this.getPremiumRequiredMessage()}`)
+            .setWrapText(true));
 
-        if (isPremium) {
+        if (this.isPremium) {
             // Create a selection input for indentation spaces
             const spaceSelectionDropdown =
                 CardService.newSelectionInput()
                     .setType(CardService.SelectionInputType.DROPDOWN)
                     // Enable for premium users
-                    .setTitle(premiumIcon + " " + localization.cards.home.identSpaces)
+                    .setTitle(this.localization.cards.home.indentSpaces)
                     .setFieldName(Static_Resources.identSpaces)
-                    .addItem('1 {.}', '1', identSpaces === "1")
-                    .addItem('2 {..}', '2', identSpaces === "2") // Default selected
-                    .addItem('4 {....}', '4', identSpaces === "4")
-                    .addItem('6 {......}', '6', identSpaces === "6")
-                    .addItem('8 {........}', '8', identSpaces === "8")
+                    .addItem('1 {.}', '1', this.indentationLevel === "1")
+                    .addItem('2 {..}', '2', this.indentationLevel === "2") // Default selected
+                    .addItem('4 {....}', '4', this.indentationLevel === "4")
+                    .addItem('6 {......}', '6', this.indentationLevel === "6")
+                    .addItem('8 {........}', '8', this.indentationLevel === "8")
                     .setOnChangeAction(
                         CardService
                             .newAction()
@@ -103,14 +96,12 @@ class HomeCard {
             section.addWidget(spaceSelectionDropdown);
         }
         else {
-            // Add disabled selection input for indentation spaces
-            section.addWidget(
-                CardService.newSelectionInput()
-                    .setType(CardService.SelectionInputType.DROPDOWN)
-                    .setTitle(premiumIcon + " " + localization.cards.home.identSpaces)
-                    .setFieldName(Static_Resources.identSpaces)
-                    .addItem('2 {..}', '2', true));
-
+            // Add disabled button for indentation spaces
+            /*section.addWidget(
+                CardService.newTextButton()
+                    .setText(`${Static_Resources.emojis.lock} ${this.localization.actions.change}`)
+                    .setDisabled(true)
+            );*/
         }
         // Add about indentation spaces image
         section.addWidget(
@@ -121,22 +112,63 @@ class HomeCard {
         return section;
     }
 
-    static createFixedFooter(localization, isPremium = false, premiumIcon = '') {
+    getFormatDecoratedTextWidget() {
+        return CardService.newDecoratedText()
+            .setText(this.localization.cards.home.formatAlt)
+            .setWrapText(true)
+            .setButton(
+                CardService.newTextButton()
+                    .setText(`${this.localization.actions.format}`)
+                    .setOnClickAction(
+                        CardService.newAction()
+                            .setFunctionName('onFormatRange')));
+    }
 
+    getMinifyDecoratedTextWidget() {
+        return CardService.newDecoratedText()
+            .setText(this.localization.cards.home.minifyAlt)
+            .setWrapText(true)
+            .setBottomLabel(`${this.getPremiumRequiredMessage()}`)
+            //.setTopLabel(`${this.isPremium ? '' : Static_Resources.emojis.lock}`)
+            .setButton(
+                CardService.newTextButton()
+                    .setDisabled(!this.isPremium)
+                    .setText(`${this.localization.actions.minify}`)
+                    .setOnClickAction(
+                        CardService.newAction()
+                            .setFunctionName('onMinifyRange')));
+    }
+
+    getEditDecoratedTextWidget() {
+        return CardService.newDecoratedText()
+            .setText(this.localization.cards.home.editAlt)
+            .setWrapText(true)
+            .setBottomLabel(`${this.getPremiumRequiredMessage()}`)
+            //.setTopLabel(`${this.isPremium ? '' : Static_Resources.emojis.lock}`)
+            .setButton(
+                CardService.newTextButton()
+                    .setDisabled(!this.isPremium)
+                    .setText(`${this.localization.actions.edit}`)
+                    .setOnClickAction(
+                        CardService.newAction()
+                            .setFunctionName('onEditRange')));
+    }
+
+    getFixedFooter() {
         // Create a fixed footer with a button to open the help dialog
         const footer = CardService.newFixedFooter()
             .setPrimaryButton(
                 CardService.newTextButton()
-                    .setText(localization.menu.format)
+                    .setText(this.localization.menu.format)
                     .setOnClickAction(
                         CardService.newAction()
                             .setFunctionName('onFormatRange')));
         // If the user is premium, add the minify button
-        if (!isPremium) {
+        if (!this.isPremium) {
             footer.setSecondaryButton(
                 CardService.newTextButton()
-                    .setDisabled(isPremium)
-                    .setText(localization.actions.activatePremium)
+                    .setDisabled(this.isPremium)
+                    .setText(this.localization.actions.activatePremium)
                     .setBackgroundColor('#FF9800')
                     .setOnClickAction(
                         CardService.newAction()
@@ -144,5 +176,10 @@ class HomeCard {
         }
 
         return footer;
+    }
+
+    getPremiumRequiredMessage() {
+        // Return the message indicating that the feature requires a premium license
+        return `${!this.isPremium ? (Static_Resources.emojis.lock + ' ' + this.localization.messages.premiumRequired) : ''}`;
     }
 }

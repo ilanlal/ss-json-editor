@@ -217,7 +217,7 @@ function onCancelEditor(e) {
     return;
 }
 
-function onEditCell(e) {
+function onEditRange(e) {
     try {
         const range = SpreadsheetApp
             .getActiveSpreadsheet()
