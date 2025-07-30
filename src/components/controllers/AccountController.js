@@ -33,6 +33,15 @@ class AccountController {
             .setNavigation(
                 CardService.newNavigation()
                     .popToRoot())
+            .setNavigation(
+                CardService.newNavigation()
+                    .updateCard(
+                        HomeCard.create(
+                            userLicenseManager.getLicense(),
+                            this.localization,
+                            this.userStore.getIdentSpaces())
+                            .build()
+                    ))
             .build();
         return card;
     }
@@ -42,10 +51,18 @@ class AccountController {
         userLicenseManager.revokeLicense();
 
         // navigate to root
-        const card = CardService.newActionResponseBuilder()
+        const card = CardService
+            .newActionResponseBuilder()
             .setNavigation(
                 CardService.newNavigation()
-                    .popToRoot())
+                    .popToRoot()
+                    .updateCard(
+                        HomeCard.create(
+                            this.userLicenseManager.getLicense(),
+                            this.localization,
+                            this.userStore.getIdentSpaces())
+                            .build()
+                    ))
             .build();
         return card;
     }
