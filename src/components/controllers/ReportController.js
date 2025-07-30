@@ -19,6 +19,13 @@ class ReportController {
         this.rangeReport = rangeReport;
     }
 
+    home() {
+        const reportCard = new ReportCard(
+            this.rangeReport, 
+            AppManager.getLocalizationResources());
+        return reportCard.createReportCard().build();
+    }
+
     /**
      * Add a new item to the report.
      * @param {string} a1Notation - A1 notation of the cell

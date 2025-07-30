@@ -41,24 +41,20 @@
       "useLocaleFromApp": true,
       "universalActions": [
         {
-          "label": "🏆 Account",
+          "label": "Account & Settings",
           "runFunction": "onOpenAccountCard"
         },
         {
-          "label": "💡 About Json Studio",
+          "label": "About",
           "runFunction": "onShowAboutCard"
         },
         {
-          "label": "🚨 Help & Support",
+          "label": "Help & Support",
           "openLink": "https://github.com/ilanlal/ss-json-editor#readme"
         },
         {
-          "label": "⚠️ Report an issue",
+          "label": "Report an issue",
           "openLink": "https://github.com/ilanlal/ss-json-editor/issues"
-        },
-        {
-          "label": "🌐 Easy ADM",
-          "openLink": "https://www.easyadm.com/add-ons/json-studio"
         }
       ]
     },
