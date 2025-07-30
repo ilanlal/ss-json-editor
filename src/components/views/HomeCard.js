@@ -156,16 +156,8 @@ class HomeCard {
 
     getFixedFooter() {
         // Create a fixed footer with a button to open the help dialog
-        const footer = CardService.newFixedFooter()
+        return CardService.newFixedFooter()
             .setPrimaryButton(
-                CardService.newTextButton()
-                    .setText(this.localization.menu.format)
-                    .setOnClickAction(
-                        CardService.newAction()
-                            .setFunctionName('onFormatRange')));
-        // If the user is premium, add the minify button
-        if (!this.isPremium) {
-            footer.setSecondaryButton(
                 CardService.newTextButton()
                     .setDisabled(this.isPremium)
                     .setText(this.localization.actions.activatePremium)
@@ -173,9 +165,6 @@ class HomeCard {
                     .setOnClickAction(
                         CardService.newAction()
                             .setFunctionName('onOpenAccountCard')));
-        }
-
-        return footer;
     }
 
     getPremiumRequiredMessage() {
