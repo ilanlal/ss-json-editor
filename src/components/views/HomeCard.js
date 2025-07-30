@@ -6,16 +6,17 @@ class HomeCard {
      * @param {number} indentationSpaces - The number of spaces to use for indentation.
      * @param {Global_Resources["en"]} localization - The localization object for the card.
      */
-    constructor(isPremium = false, indentationSpaces, localization) {
-        this.isPremium = isPremium;
+    constructor(userLicense, indentationSpaces, localization) {
+        this.userLicense = userLicense;
+        this.isPremium = userLicense?.isActive?.() || false;
+        // Set the indentation level based on the provided spaces
         this.indentationLevel = indentationSpaces;
         this.localization = localization;
     }
 
     static create(userLicense, localization, indentationSpaces = 2) {
-        const isPremium = userLicense?.isActive?.() || false;
         const thisCard = new HomeCard(
-            isPremium,
+            userLicense,
             indentationSpaces,
             localization
         );
