@@ -2,7 +2,7 @@
 class test_AppManager {
     constructor() {
         // Initialize QUnit for testing
-        QUnit.module("AppManager Tests");
+        QUnit.module("AppManager (helpers)");
         this.localization = AppManager.getLocalizationResources();
         this.runTests();
 

@@ -8,7 +8,7 @@ const Static_Resources = {
     // build number. 
     // This is used to identify the version of the static resources.
     // It should be updated with each deployment 😉.
-    build: "20250730.130100",
+    build: "20250730.133500",
     // version of the Google Apps Script deployment (usually vnext)
     version: "9",
     // Google Marketplace URL for the add-on.
@@ -24,9 +24,12 @@ const Static_Resources = {
     hidepassed: true, // Hide passed tests by default
     title: "Json Studio QUnit Tests",
   },
-  identSpaces: "identSpaces",
-  failNoteFlag: "failNoteFlag",
-  showErrorsFlag: "showErrorsFlag",
+  resources: {
+    indentSpaces: "indentSpaces",
+  },
+  parameters: {
+    maxRangeSize: 1000, // Maximum number of cells in a range
+  },
   userLicense: "userLicense",
   dataInput: "dataInput",
   maxRangeSize: 1000, // Maximum number of cells in a range

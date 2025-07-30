@@ -1,35 +1,43 @@
 // Google Apps Script code for Google Workspace Add-ons
 class test_UserStore {
     constructor() {
-        QUnit.module("UserStore Tests");
+        QUnit.module("UserStore (modules)");
         this.runTests();
     }
 
     runTests() {
         const tests = [
-            "test_localization",
-            "test_identSpaces",
-            "test_userLicenseCRUD"
+            this.test_localization.bind(this),
+            this.test_indentSpaces.bind(this),
+            this.test_userLicenseCRUD.bind(this)
         ];
-        tests.forEach(test => this[test]());
+        tests.forEach(test => {
+            try {
+                test();
+                console.log(`Test passed: ${test.name}`);
+            } catch (error) {
+                console.error(`Test failed: ${test.name}`);
+                console.error(error);
+            }
+        });
     }
 
-    test_identSpaces() {
-        QUnit.test("identSpaces", (assert) => {
+    test_indentSpaces() {
+        QUnit.test("indentSpaces", (assert) => {
             const userStore = new UserStore();
-            userStore.setIdentSpaces(4);
-            const identSpaces = userStore.getIdentSpaces();
-            assert.equal(identSpaces, 4, "identSpaces should return the correct identSpaces");
+            userStore.setIndentSpaces(4);
+            const indentSpaces = userStore.getIndentSpaces();
+            assert.equal(indentSpaces, 4, "indentSpaces should return the correct indentSpaces");
 
-            // check if identSpaces is set to a different value
-            userStore.setIdentSpaces("6");
-            const newIdentSpaces = userStore.getIdentSpaces();
-            assert.equal(newIdentSpaces, "6", "identSpaces should return the correct identSpaces");
+            // check if indentSpaces is set to a different value
+            userStore.setIndentSpaces("6");
+            const newIndentSpaces = userStore.getIndentSpaces();
+            assert.equal(newIndentSpaces, "6", "indentSpaces should return the correct indentSpaces");
 
             // Check for default value if no input is provided
-            userStore.setIdentSpaces(""); // Reset to empty to check default
-            const defaultIdentSpaces = userStore.getIdentSpaces();
-            assert.equal(defaultIdentSpaces, "2", "identSpaces should default to 2 if not set");
+            userStore.setIndentSpaces(""); // Reset to empty to check default
+            const defaultIndentSpaces = userStore.getIndentSpaces();
+            assert.equal(defaultIndentSpaces, "2", "indentSpaces should default to 2 if not set");
         });
     }
 
@@ -59,7 +67,7 @@ class test_UserStore {
             // Ysterday's date for createdOn
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
-            
+
 
             // Expires in one year
             const expiresInOneYear = new Date();

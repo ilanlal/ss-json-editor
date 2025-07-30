@@ -61,7 +61,7 @@ class HomeCard {
         section.addWidget(
             this.getFormatDecoratedTextWidget());
 
-        // Add the ident spaces text to the card section
+        // Add the indentation spaces text to the card section
         section.addWidget(CardService.newDecoratedText()
             .setText(`${this.getPremiumRequiredMessage()}`)
             .setWrapText(true));
@@ -73,7 +73,7 @@ class HomeCard {
                     .setType(CardService.SelectionInputType.DROPDOWN)
                     // Enable for premium users
                     .setTitle(this.localization.cards.home.indentSpaces)
-                    .setFieldName(Static_Resources.identSpaces)
+                    .setFieldName(Static_Resources.resources.indentSpaces)
                     .addItem('1 {.}', '1', this.indentationLevel === "1")
                     .addItem('2 {..}', '2', this.indentationLevel === "2") // Default selected
                     .addItem('4 {....}', '4', this.indentationLevel === "4")
@@ -82,18 +82,11 @@ class HomeCard {
                     .setOnChangeAction(
                         CardService
                             .newAction()
-                            .setFunctionName('onIdentSpacesSelectorChange'));
+                            .setFunctionName('onIndentSpacesSelectorChange'));
             // Add the selection input to the card section
             section.addWidget(spaceSelectionDropdown);
         }
-        else {
-            // Add disabled button for indentation spaces
-            /*section.addWidget(
-                CardService.newTextButton()
-                    .setText(`${Static_Resources.emojis.lock} ${this.localization.actions.change}`)
-                    .setDisabled(true)
-            );*/
-        }
+        
         // Add about indentation spaces image
         section.addWidget(
             CardService.newImage()

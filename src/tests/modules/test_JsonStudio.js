@@ -1,7 +1,7 @@
 // Google Apps Script code for Google Workspace Add-ons
 class test_JsonStudio {
     constructor() {
-        QUnit.module("Json Studio Tests");
+        QUnit.module("Json Studio (mudules)");
         this.localization = AppManager.getLocalizationResources();
         this.userStore = new UserStore();
         this.dummySheet = this.initializeTestSheet();

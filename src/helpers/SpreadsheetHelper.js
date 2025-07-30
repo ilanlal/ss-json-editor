@@ -54,11 +54,18 @@ class SpreadsheetHelper {
     }
 
     static isRangeWithinLimits(range) {
+        // Check if the range is valid and does not exceed the maximum allowed size
+        if (!range || !range.getNumRows || !range.getNumColumns) {
+            return true; // If range is not valid, consider it within limits
+        }
+
+        // if not selected range, return true
+        if (range.getA1Notation() === 'A1') {
+            return true;
+        }
+
         // Check if the range is within the limits of the maximum allowed size
-        const maxRangeSize = Static_Resources.maxRangeSize || 1; // Default
-        const numRows = range.getNumRows();
-        const numColumns = range.getNumColumns();
-        const totalCells = numRows * numColumns;
-        return totalCells <= maxRangeSize;
+        return range.getNumRows() * range.getNumColumns()            
+            <= Static_Resources.parameters.maxRangeSize;
     }
 }

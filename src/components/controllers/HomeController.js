@@ -7,9 +7,9 @@ class HomeController {
     }
 
     home() {
-        const identSpaces = this.userStore.getIdentSpaces() || "2";
+        const indentSpaces = this.userStore.getIndentSpaces() || "2";
         const userLicense = this.userLicenseManager.getLicense();
-        return HomeCard.create(userLicense, this.localization, identSpaces)
+        return HomeCard.create(userLicense, this.localization, indentSpaces)
             .build();
     }
 }

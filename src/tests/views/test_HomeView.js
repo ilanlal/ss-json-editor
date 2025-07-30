@@ -1,7 +1,7 @@
 // Google Apps Script code for Google Workspace Add-ons
 class test_HomeView {
     constructor() {
-        QUnit.module("Home view tests");
+        QUnit.module("HomeCard (views)");
         this.runTests();
         QUnit.done(() => {
             //this.tearDown();
@@ -18,7 +18,7 @@ class test_HomeView {
     test_create() {
         QUnit.test("create", (assert) => {
             const localization = AppManager.getLocalizationResources();
-            const identSpaces = "2";
+            const indentationSpaces = "2";
             const planId = "free trial"; // Default plan ID
             // Default user ID
             const userId = "me"; // Default user ID
@@ -29,7 +29,7 @@ class test_HomeView {
             const userLicense = new UserLicense(
                 userId, planId, createdOn, utcExpirationDate, 0);
 
-            const obj = HomeCard.create(userLicense, localization, identSpaces);
+            const obj = HomeCard.create(userLicense, localization, indentationSpaces);
             assert.ok(obj, "HomeCard object should be created successfully");
             const build = obj.build();
             assert.ok(build, "HomeCard build should be created successfully");
@@ -41,7 +41,7 @@ class test_HomeView {
             );
 
             // Check with undefined userLicense
-            const objWithUndefinedLicense = HomeCard.create(undefined, localization, identSpaces);
+            const objWithUndefinedLicense = HomeCard.create(undefined, localization, indentationSpaces);
             assert.ok(objWithUndefinedLicense, "HomeCard object should be created successfully with undefined userLicense");
             const buildWithUndefinedLicense = objWithUndefinedLicense.build();
             assert.ok(buildWithUndefinedLicense, "HomeCard build should be created successfully with undefined userLicense");

@@ -104,11 +104,11 @@ function onShowAboutCard(e) {
     }
 }
 
-function onIdentSpacesSelectorChange(e) {
+function onIndentSpacesSelectorChange(e) {
     try {
         const userStore = new UserStore();
-        const selectedSpaces = e?.commonEventObject?.formInputs?.[Static_Resources.identSpaces]?.stringInputs?.value[0] || "2";
-        userStore.setIdentSpaces(selectedSpaces); // Store the selected spaces in user properties
+        const selectedSpaces = e?.commonEventObject?.formInputs?.[Static_Resources.resources.indentSpaces]?.stringInputs?.value[0] || "2";
+        userStore.setIndentSpaces(selectedSpaces); // Store the selected spaces in user properties
     } catch (error) {
         const localization = AppManager.getLocalizationResources();
         SpreadsheetApp

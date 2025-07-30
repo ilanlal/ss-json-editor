@@ -27,18 +27,18 @@ class UserStore {
    * Gets the number of spaces for indentation.
    * @return {string} The number of spaces for indentation, defaulting to "2".
    */
-  getIdentSpaces() {
+  getIndentSpaces() {
     return this.userProperties.getProperty(
-      Static_Resources.identSpaces) || "2"; // Default to 2 spaces
+      Static_Resources.resources.indentSpaces) || "2"; // Default to 2 spaces
   }
 
   /**
    * Sets the number of spaces for indentation.
    * @param {string} value The number of spaces for indentation, default is "2".
    */
-  setIdentSpaces(value = "2") {
+  setIndentSpaces (value = "2") {
     this.userProperties.setProperty(
-      Static_Resources.identSpaces,
+      Static_Resources.resources.indentSpaces,
       value);
   }
 

@@ -1,29 +1,37 @@
 // Google Apps Script code for Google Workspace Add-ons
 class test_AddonTriggers {
     constructor() {
-        QUnit.module("Addon Triggers Tests (e2e)");
+        QUnit.module("Addon Triggers (e2e)");
         this.userStore = new UserStore();
         this.dummySheet = this.initializeTestSheet();
         this.runTests();
     }
     runTests() {
         const tests = [
-            "test_onIdentSpacesSelectorChange",
-            "test_onFormatRange",
-            "test_onMinifyRange",
+            this.test_onIndentSpacesSelectorChange.bind(this),
+            this.test_onFormatRange.bind(this),
+            this.test_onMinifyRange.bind(this),
             // Add more test methods here as needed
         ];
-        tests.forEach(test => this[test]());
+        tests.forEach(test => {
+            try {
+                test();
+                console.log(`Test passed: ${test.name}`);
+            } catch (error) {
+                console.error(`Test failed: ${test.name}`);
+                console.error(error);
+            }
+        });
     }
 
-    test_onIdentSpacesSelectorChange() {
+    test_onIndentSpacesSelectorChange() {
         let that = this;
-        QUnit.test("Test onIdentSpacesSelectorChange", function (assert) {
+        QUnit.test("onIndentSpacesSelectorChange", function (assert) {
             // Mock event object
             const e = {
                 commonEventObject: {
                     formInputs: {
-                        "identSpaces": {
+                        "indentSpaces": {
                             stringInputs: {
                                 value: ["4"]
                             }
@@ -33,18 +41,18 @@ class test_AddonTriggers {
             };
 
 
-            onIdentSpacesSelectorChange(e);
-            assert.equal(that.userStore.getIdentSpaces(), "4", "Ident spaces should be set to 4");
-            // Check if identSpaces is set to a different value
-            e.commonEventObject.formInputs.identSpaces.stringInputs.value[0] = "6";
-            onIdentSpacesSelectorChange(e);
-            assert.equal(that.userStore.getIdentSpaces(), "6", "Ident spaces should be set to 6");
+            onIndentSpacesSelectorChange(e);
+            assert.equal(that.userStore.getIndentSpaces(), "4", "Indent spaces should be set to 4");
+            // Check if indentSpaces is set to a different value
+            e.commonEventObject.formInputs.indentSpaces.stringInputs.value[0] = "6";
+            onIndentSpacesSelectorChange(e);
+            assert.equal(that.userStore.getIndentSpaces(), "6", "Indent spaces should be set to 6");
             // Check for default value if no input is provided
             const eDefault = {
                 commonEventObject: undefined
             };
-            onIdentSpacesSelectorChange(eDefault);
-            assert.equal(that.userStore.getIdentSpaces(), "2", "Ident spaces should default to 2");
+            onIndentSpacesSelectorChange(eDefault);
+            assert.equal(that.userStore.getIndentSpaces(), "2", "Indent spaces should default to 2");
         });
     }
 

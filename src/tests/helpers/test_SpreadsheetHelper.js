@@ -1,7 +1,7 @@
 class test_SpreadsheetHelper {
     constructor() {
         // Initialize QUnit for testing
-        QUnit.module("SpreadsheetHelper Tests");
+        QUnit.module("SpreadsheetHelper (helpers)");
         this.runTests();
 
         QUnit.done(() => {

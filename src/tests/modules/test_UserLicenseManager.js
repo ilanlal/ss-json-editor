@@ -2,7 +2,7 @@
 class test_UserLicenseManager {
     constructor() {
         this.userLicenseManager = new UserLicenseManager();
-        QUnit.module("UserLicenseManager");
+        QUnit.module("UserLicenseManager (modules)");
         this.runTests();
 
         QUnit.done(() => {

@@ -39,7 +39,7 @@ class AccountController {
                         HomeCard.create(
                             userLicenseManager.getLicense(),
                             this.localization,
-                            this.userStore.getIdentSpaces())
+                            this.userStore.getIndentSpaces())
                             .build()
                     ))
             .build();
@@ -60,7 +60,7 @@ class AccountController {
                         HomeCard.create(
                             this.userLicenseManager.getLicense(),
                             this.localization,
-                            this.userStore.getIdentSpaces())
+                            this.userStore.getIndentSpaces())
                             .build()
                     ))
             .build();

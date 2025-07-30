@@ -1,6 +1,6 @@
 class test_ReportItem {
     constructor() {
-        QUnit.module("Report Item Tests");
+        QUnit.module("Report Item (models)");
         this.runTests();
     }
 

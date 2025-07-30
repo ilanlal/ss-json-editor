@@ -1,7 +1,7 @@
 // Google Apps Script code for Google Workspace Add-ons
 class test_JsonEditorView {
     constructor() {
-        QUnit.module("JsonEditor View Tests");
+        QUnit.module("JsonEditorCard (views)");
         this.runTests();
         QUnit.done(() => {
             // Cleanup or finalization if needed

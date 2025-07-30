@@ -9,8 +9,7 @@ class JsonStudio {
         this.sheet = sheet;
         this.localization = localization || AppManager.getLocalizationResources();
         this.userStore = userStore || new UserStore();
-        this.maxCellSize = Static_Resources.maxRangeSize || 1;
-        this.identSpaces = this.userStore.getIdentSpaces();
+        this.indentSpaces = this.userStore.getIndentSpaces();
         this.rangeReport = new RangeReport(sheet.getActiveRange());
     }
 
@@ -51,7 +50,7 @@ class JsonStudio {
                 // replacer
                 null,
                 // space
-                this.identSpaces * 1);
+                this.indentSpaces * 1);
             return formatted; // Return the formatted JSON string
         } catch (error) {
             // If parsing fails, handle the error
@@ -141,15 +140,6 @@ class JsonStudio {
      */
     static isRangeWithinLimits(range) {
         // Check if the range is valid and does not exceed the maximum allowed size
-        if (!range || !range.getNumRows || !range.getNumColumns) {
-            return true; // If range is not valid, consider it within limits
-        }
-
-        // if not selected range, return true
-        if (range.getA1Notation() === 'A1') {
-            return true;
-        }
-        // Check if the range is valid
-        return range.getNumRows() * range.getNumColumns() <= Static_Resources.maxRangeSize;
+        return SpreadsheetHelper.isRangeWithinLimits(range);
     }
 }

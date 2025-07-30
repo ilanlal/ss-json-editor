@@ -1,7 +1,7 @@
 // Google Apps Script code for Google Workspace Add-ons
 class test_RangeReport {
     constructor() {
-        QUnit.module("RangeReport Tests");
+        QUnit.module("RangeReport (models)");
         this.runTests();
         QUnit.done(() => {
             //this.tearDown();
