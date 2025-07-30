@@ -14,9 +14,17 @@ function onOpen(e) {
     if (e && e.authMode !== ScriptApp.AuthMode.NONE) {
         SpreadsheetApp
             .getUi()
-            .createAddonMenu()
+            .createMenu(Static_Resources.menuTitle)
             .addItem('Format', 'onMenuFormatRange')
             .addItem('Minify', 'onMenuMinifyRange')
+            .addToUi();
+    }
+    else {
+        SpreadsheetApp
+            .getUi()
+            .createAddonMenu()
+            .addItem('Format', 'onMenuFormatRange')
+            //.addItem('Minify', 'onMenuMinifyRange')
             .addToUi();
     }
 }

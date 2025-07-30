@@ -2,6 +2,7 @@
 // This file contains static resources used across the application.
 const Static_Resources = {
   appName: "Json Studio",
+  menuTitle: "Json studio",
   module: "core-server",
   // This is the static resources for the deployment.
   package: {
