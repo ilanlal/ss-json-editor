@@ -9,7 +9,7 @@ class JsonStudio {
         this.sheet = sheet;
         this.localization = localization || AppManager.getLocalizationResources();
         this.userStore = userStore || new UserStore();
-        this.maxCellSize = Static_Resources.limits.maxCellSize;
+        this.maxCellSize = Static_Resources.maxRangeSize || 1;
         this.identSpaces = this.userStore.getIdentSpaces();
         this.rangeReport = new RangeReport(sheet.getActiveRange());
     }
@@ -150,6 +150,6 @@ class JsonStudio {
             return true;
         }
         // Check if the range is valid
-        return range.getNumRows() * range.getNumColumns() <= Static_Resources.limits.maxCellSize;
+        return range.getNumRows() * range.getNumColumns() <= Static_Resources.maxRangeSize;
     }
 }

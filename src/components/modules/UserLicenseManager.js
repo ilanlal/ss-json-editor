@@ -4,10 +4,17 @@ class UserLicenseManager {
         this.userStore = userStore;
     }
 
+    /**
+     * Sets the user's license information.
+     * 
+     * @returns {UserLicense} The newly set UserLicense object.
+     */
     setLicense(userId, planId, createdOn, utcExpirationDate = null, amount = 0) {
         const license = new UserLicense(
             userId, planId, createdOn, utcExpirationDate, amount);
         this.userStore.setUserLicense(license);
+
+        return license;
     }
     /**
      * Retrieves the user's license information.

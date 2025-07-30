@@ -29,7 +29,7 @@ class UserStore {
    */
   getIdentSpaces() {
     return this.userProperties.getProperty(
-      Static_Resources.keys.identSpaces) || "2"; // Default to 2 spaces
+      Static_Resources.identSpaces) || "2"; // Default to 2 spaces
   }
 
   /**
@@ -38,7 +38,7 @@ class UserStore {
    */
   setIdentSpaces(value = "2") {
     this.userProperties.setProperty(
-      Static_Resources.keys.identSpaces,
+      Static_Resources.identSpaces,
       value);
   }
 
@@ -51,7 +51,7 @@ class UserStore {
    */
   getUserLicense() {
     const data = this.userProperties
-      .getProperty(Static_Resources.keys.userLicense);
+      .getProperty(Static_Resources.userLicense);
 
     if (!data) {
       return undefined; // Return undefined if no license is set
@@ -84,7 +84,7 @@ class UserStore {
 
     return this.userProperties
       .setProperty(
-        Static_Resources.keys.userLicense,
+        Static_Resources.userLicense,
         licenseJson
       );
   }
@@ -93,6 +93,6 @@ class UserStore {
    * Clears the user's license information.
    */
   clearUserLicense() {
-    this.userProperties.deleteProperty(Static_Resources.keys.userLicense);
+    this.userProperties.deleteProperty(Static_Resources.userLicense);
   }
 }

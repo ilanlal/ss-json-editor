@@ -1,65 +1,67 @@
 // Google Apps Script code for Google Workspace Add-ons
 // Apps Script QUnit Runner
+class QUnitRunner {
 
-/*
- * This file is the entry point for running QUnit tests in Google Apps Script.
- * It sets up the QUnit environment and runs all tests defined in the project.
- * The tests are organized into different categories such as types, app objects, MVW (Model-View-Whatever), and end-to-end triggers.
- * The results of the tests can be viewed in the QUnit HTML report.
- * To run the tests, deploy the script as a web app and access the URL provided in the deployment settings.
- * The QUnit tests will be executed, and the results will be displayed in the browser.
- * Make sure to include the QUnit library in your project for this to work.
- * @see https://qunitjs.com/api/
- * @see https://developers.google.com/apps-script/guides/html/overview
- */
+    constructor(e) {
+        // Initialize QUnit for testing
+        QUnit.urlParams(e.parameter);
+        QUnit.config({
+            title: `${JsonStudio_qUnit_Resources.title}.`
+                + ` | version: ${Static_Resources.package.version}`
+                + ` | build: ${Static_Resources.package.build}`,
+            // hide passed tests as default
+            // https://qunitjs.com/api/config/
+            hidepassed: JsonStudio_qUnit_Resources.hidepassed
+        });
 
-function getQUnitHtmlResponse(e) {
-    QUnit.urlParams(e.parameter);
-    QUnit.config({
-        title: `${Global_Resources.appName}. my qunit 🚨`
-            + ` | version: ${Global_Resources.version}`,
-        // hide passed tests as default
-        // https://qunitjs.com/api/config/
-        hidepassed: true,
+        //QUnit.config.hidepassed = true;
+        QUnit.load(this.allTests.bind(this));
+    }
 
-    });
+    getHtml() {
+        return QUnit.getHtml();
+    }
 
-    //QUnit.config.hidepassed = true;
-    QUnit.load(allTests);
-    return QUnit.getHtml();
-}
+    allTests() {
+        // Run all tests
+        this.test_types();
+        this.test_helpers();
+        // Run modules, views, controllers, and end-to-end tests
+        this.test_modules();
+        this.test_views();
+        this.test_controllers();
+        this.test_e2eTriggers();
+    }
 
-function allTests() {
-    test_types();
-    test_modules();
-    test_views();
-    test_controllers();
-    test_e2eTriggers();
-}
-function test_types() {
-    new test_ReportItem();
-    new test_RangeReport();
-    new test_UserLicense();
-}
+    test_types() {
+        new test_ReportItem();
+        new test_RangeReport();
+        new test_UserLicense();
+    }
 
-function test_modules() {
-    new test_AppManager();
-    new test_JsonStudio();
-    new test_UserStore();
-    new test_UserLicenseManager();
-}
+    test_helpers() {
+        new test_SpreadsheetHelper();
+        new test_AppManager();
+    }
 
-function test_views() {
-    new test_HomeView();
-    new test_ReportView();
-    new test_JsonEditorView();
-}
+    test_modules() {
+        new test_JsonStudio();
+        new test_UserStore();
+        new test_UserLicenseManager();
+    }
 
-function test_controllers() {
-    new test_AccountController();
-}
+    test_views() {
+        new test_HomeView();
+        new test_ReportView();
+        new test_JsonEditorView();
+    }
+
+    test_controllers() {
+        new test_AccountController();
+    }
 
 
-function test_e2eTriggers() {
-    new test_AddonTriggers();
+    test_e2eTriggers() {
+        new test_AddonTriggers();
+    }
 }

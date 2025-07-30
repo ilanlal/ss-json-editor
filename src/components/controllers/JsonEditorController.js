@@ -43,7 +43,7 @@ class JsonEditorController {
     }
 
     onCancelEditor() {
-        // Todo: navigate to previous card
+        // navigate to previous card
         return CardService.newActionResponseBuilder()
             .setNavigation(
                 CardService.newNavigation()

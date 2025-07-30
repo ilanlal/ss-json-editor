@@ -27,7 +27,8 @@ function onOpen(e) {
 function doGet(e) {
     try {
         // Call the QUnit runner to execute tests
-        return getQUnitHtmlResponse(e);
+        const runner = new QUnitRunner(e);
+        return runner.getHtml();
     } catch (error) {
         // Handle any errors that occur during the execution
         Logger.log("Error in doGet: " + error.message);

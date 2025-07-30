@@ -52,4 +52,13 @@ class SpreadsheetHelper {
     static saveValuToCell(a1n, value) {
         throw new Error("Not implemented");
     }
+
+    static isRangeWithinLimits(range) {
+        // Check if the range is within the limits of the maximum allowed size
+        const maxRangeSize = Static_Resources.maxRangeSize || 1; // Default
+        const numRows = range.getNumRows();
+        const numColumns = range.getNumColumns();
+        const totalCells = numRows * numColumns;
+        return totalCells <= maxRangeSize;
+    }
 }

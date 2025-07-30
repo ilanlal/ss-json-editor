@@ -107,7 +107,7 @@ function onShowAboutCard(e) {
 function onIdentSpacesSelectorChange(e) {
     try {
         const userStore = new UserStore();
-        const selectedSpaces = e?.commonEventObject?.formInputs?.[Static_Resources.keys.identSpaces]?.stringInputs?.value[0] || "2";
+        const selectedSpaces = e?.commonEventObject?.formInputs?.[Static_Resources.identSpaces]?.stringInputs?.value[0] || "2";
         userStore.setIdentSpaces(selectedSpaces); // Store the selected spaces in user properties
     } catch (error) {
         const localization = AppManager.getLocalizationResources();
