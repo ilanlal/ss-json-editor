@@ -16,7 +16,8 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 
 ### Release Notes ```v9```
 
-- **New Features**: Parse failures reporting, JSON validation, and improved error handling.
+- **Validation**: Parse failures reporting, JSON validation, and improved error handling.
+- **Membership**: Introduced membership plans for premium features.
 - **Improvements**: Enhanced user interface, better performance, and more robust JSON parsing.
 - **Bug Fixes**: Fixed issues with the JSON editor and improved overall performance.
 - **Json Editor**: The JSON editor now supports multiline input and provides better error handling for invalid JSON data.
