@@ -31,8 +31,10 @@ class HomeCard {
             .setHeader(this.getHeader())
             // Add the format section
             .addSection(this.getFormatSection())
-            // Add Tools section
-            .addSection(this.getToolsSection());
+            // Add Minify section
+            .addSection(this.getMinifySection())
+            // Add Edit section
+            .addSection(this.getEditSection());
 
         if (!this.isPremium) {
             // Add the footer to the card
@@ -49,18 +51,6 @@ class HomeCard {
             .setImageStyle(CardService.ImageStyle.SQUARE)
             .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
             .setImageAltText(this.localization.cards.home.imageAltText);
-    }
-
-    getToolsSection() {
-        const section = CardService.newCardSection();
-
-        section.addWidget(
-            this.getMinifyDecoratedTextWidget());
-
-        section.addWidget(
-            this.getEditDecoratedTextWidget());
-
-        return section;
     }
 
     getFormatSection() {
@@ -117,6 +107,7 @@ class HomeCard {
         return CardService.newDecoratedText()
             .setText(this.localization.cards.home.formatAlt)
             .setWrapText(true)
+            .setBottomLabel(`${this.localization.cards.home.formatTip}`)
             .setButton(
                 CardService.newTextButton()
                     .setText(`${this.localization.actions.format}`)
@@ -125,12 +116,23 @@ class HomeCard {
                             .setFunctionName('onFormatRange')));
     }
 
+    getMinifySection() {
+        // Create a section for the minify action
+        const section = CardService.newCardSection()
+            .setCollapsible(false);
+
+        section.addWidget(
+            this.getMinifyDecoratedTextWidget());
+
+        return section;
+    }
+
     getMinifyDecoratedTextWidget() {
         return CardService.newDecoratedText()
             .setText(this.localization.cards.home.minifyAlt)
             .setWrapText(true)
-            .setBottomLabel(`${this.getPremiumRequiredMessage()}`)
-            //.setTopLabel(`${this.isPremium ? '' : Static_Resources.emojis.lock}`)
+            .setBottomLabel(`${this.localization.cards.home.minifyTip}`)
+            .setTopLabel(`${this.getPremiumRequiredMessage()}`)
             .setButton(
                 CardService.newTextButton()
                     .setDisabled(!this.isPremium)
@@ -140,12 +142,23 @@ class HomeCard {
                             .setFunctionName('onMinifyRange')));
     }
 
+    getEditSection() {
+        // Create a section for the edit action
+        const section = CardService.newCardSection()
+            .setCollapsible(false);
+
+        section.addWidget(
+            this.getEditDecoratedTextWidget());
+
+        return section;
+    }
+
     getEditDecoratedTextWidget() {
         return CardService.newDecoratedText()
             .setText(this.localization.cards.home.editAlt)
             .setWrapText(true)
-            .setBottomLabel(`${this.getPremiumRequiredMessage()}`)
-            //.setTopLabel(`${this.isPremium ? '' : Static_Resources.emojis.lock}`)
+            .setBottomLabel(`${this.localization.cards.home.editTip}`)
+            .setTopLabel(`${this.getPremiumRequiredMessage()}`)
             .setButton(
                 CardService.newTextButton()
                     .setDisabled(!this.isPremium)
