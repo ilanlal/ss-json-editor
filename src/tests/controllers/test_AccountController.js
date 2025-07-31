@@ -12,7 +12,8 @@ class test_AccountController {
     runTests() {
         const tests = [
             "test_home",
-            "test_activatePremium"
+            "test_activatePremium",
+            "test_revokePremium"
         ];
         tests.forEach(test => this[test]());
     }
@@ -40,6 +41,18 @@ class test_AccountController {
             const card = JSON.parse(
                 controller
                     .activatePremium()
+                    .printJson());
+
+            assert.ok(card, "Card should be created");
+        });
+    }
+
+    test_revokePremium() {
+        QUnit.test("Test revokePremium action", (assert) => {
+            const controller = new AccountController();
+            const card = JSON.parse(
+                controller
+                    .revokePremium()
                     .printJson());
 
             assert.ok(card, "Card should be created");

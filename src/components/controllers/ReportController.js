@@ -4,7 +4,7 @@ class ReportController {
      * Represents a report for a specific range in Google Sheets.
      * @param {RangeReport} rangeReport - The report for the range.
      */
-    constructor(rangeReport) {
+    constructor(rangeReport, userStore = new UserStore(), localization) {
         // Google Sheets range object
         if (!rangeReport || !rangeReport.getA1Notation) {
             throw new Error("Invalid range report object");
@@ -17,33 +17,16 @@ class ReportController {
         // Initialize the range report
         /** @type {RangeReport} */
         this.rangeReport = rangeReport;
+
+        this.localization = localization;
+        this.userStore = userStore;
+        this.userLicenseManager = new UserLicenseManager(userStore);
     }
 
     home() {
-        const reportCard = new ReportCard(
-            this.rangeReport, 
-            AppManager.getLocalizationResources());
-        return reportCard.createReportCard().build();
-    }
-
-    /**
-     * Add a new item to the report.
-     * @param {string} a1Notation - A1 notation of the cell
-     * @param {string} message - Error message, if any
-     * @param {ReportItem.Status} status - Status of the report item
-     */
-    addItem(a1Notation, message, status = ReportItem.Status.VALID) {
-        // Create a new ReportItem and add it to the items array
-        const item = new ReportItem(a1Notation, message, status);
-        this.rangeReport.addItem(item);
-    }
-
-    /**
-     * Get the report as an array of ReportItem objects.
-     * @returns {RangeReport} - The range report containing all items.
-     */
-    getResults() {
-        // Return the array of ReportItem objects
-        return this.rangeReport;
+        const userLicense = this.userLicenseManager.getLicense();
+        return ReportCard
+            .create(userLicense, this.rangeReport, this.localization)
+            .build();
     }
 }

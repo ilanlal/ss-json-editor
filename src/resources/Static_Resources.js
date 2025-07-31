@@ -9,7 +9,7 @@ const Static_Resources = {
     // build number. 
     // This is used to identify the version of the static resources.
     // It should be updated with each deployment 😉.
-    build: "20250730.133500",
+    build: "20250731.063300",
     // version of the Google Apps Script deployment (usually vnext)
     version: "9",
     // Google Marketplace URL for the add-on.
@@ -27,6 +27,10 @@ const Static_Resources = {
   },
   resources: {
     indentSpaces: "indentSpaces",
+    reportCardName: "reportCard",
+    homeCardName: "homeCard",
+    accountCardName: "accountCard",
+    jsonEditorCardName: "jsonEditorCard",
   },
   parameters: {
     maxRangeSize: 1000, // Maximum number of cells in a range

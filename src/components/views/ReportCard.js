@@ -2,18 +2,25 @@
 class ReportCard {
   /**
    * Constructor for the ReportCard class.
+   * @param {UserLicense} userLicense - The user license information.
    * @param {RangeReport} rangeReport - The report for the range.
    * @param {Global_Resources["en"]} localization - Localization resources.
    */
-  constructor(rangeReport, localization) {
+  constructor(userLicense, rangeReport, localization) {
     if (!rangeReport || !rangeReport.getA1Notation) {
       throw new Error("Invalid range provided. Must be a Google Sheets Range object.");
     }
     // Initialize the range report
     /** @type {RangeReport} */
     this.rangeReport = rangeReport;
-    this.reportController = new ReportController(rangeReport);
     this.localization = localization || AppManager.getLocalizationResources();
+    this.userLicense = userLicense;
+    this.isPremium = userLicense?.isActive?.() || false;
+  }
+
+  static create(userLicense, rangeReport, localization) {
+    const card = new ReportCard(userLicense, rangeReport, localization);
+    return card.newCardBuilder();
   }
 
   /**
@@ -21,57 +28,59 @@ class ReportCard {
    * @returns {CardService.CardBuilder} - The card containing the report.
    * @throws {Error} - Throws an error if the report is empty or invalid.
    */
-  createReportCard() {
-    const builder = CardService.newCardBuilder();
+  newCardBuilder() {
+    const builder = CardService.newCardBuilder()
+      // Set the card name for identification
+      .setName(Static_Resources.resources.homeCardName)
+      // Set the card header
+      .setHeader(this.getHeader())
+      // Set the fixed footer
+      .setFixedFooter(this.getFixedFooter());
+      
 
-    // Set the card header
-    builder.setHeader(
-      CardService.newCardHeader()
-        .setTitle(this.localization.cards.report.title)
-        .setSubtitle(this.localization.cards.report.subtitle
-          .replace('{0}', this.rangeReport.getItems().length.toString()))
-        .setImageStyle(CardService.ImageStyle.SQUARE)
-        .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
-        .setImageAltText(this.localization.cards.report.imageAltText));
+    // Check if the user has a premium license
+    if (!this.isPremium) {
+      builder.addSection(this.getPremiumRequiredSection());
+    }
+    // If the range report has no items, show a message
+    if (this.rangeReport.getItems().length === 0) {
+      builder.addSection(this.getNoIssuesFoundSection());
+    } else {
+      // Add the report section
+      builder.addSection(this.getReportSection());
+    }
 
-    // Create the report section
-    const reportSection = this.createReportSection();
-    builder.addSection(reportSection);
-    // Create the fixed footer with a close button
-    const footer = this.createFixedFooter();
-    builder.setFixedFooter(footer);
     return builder;
   }
 
-  createReportSection() {
+  getHeader() {
+    return CardService.newCardHeader()
+      .setTitle(this.localization.cards.report.title)
+      .setSubtitle(this.localization.cards.report.subtitle
+        .replace('{0}', this.rangeReport.getItems().length.toString()))
+      .setImageStyle(CardService.ImageStyle.SQUARE)
+      .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
+      .setImageAltText(this.localization.cards.report.imageAltText);
+  }
+
+  getReportSection() {
     const section = CardService.newCardSection()
-      .setHeader(this.localization.cards.report.sectionHeader);
+      .setCollapsible(true)
+      .setNumUncollapsibleWidgets((4 * 2)-1) // 4 columns, 3 divider widgets;
     // @see https://developers.google.com/apps-script/reference/card-service/grid
 
     // Iterate over the report items and add them to section
-    this.reportController
-      .getResults()
-      .getItems()
+    this.rangeReport.getItems()
       .forEach((item) => {
         // Create a text paragraph widget for each report item
-        let itemWidget = CardService.newDecoratedText()
-          .setText(`${item.message}`)
-          .setWrapText(true)
-          .setTopLabel(`${item.icon} ${item.a1Notation}`)
-          //.setBottomLabel(`${item.status}`)
-          .setButton(
-            CardService.newTextButton()
-              .setText(`${item.a1Notation}`)
-              .setOnClickAction(
-                CardService.newAction()
-                  .setFunctionName('onReportItemClick')
-                  .setParameters({ a1Notation: item.a1Notation })));
-
-        // Add the item widget to the section
-        section.addWidget(itemWidget);
+        section
+          .addWidget(
+            this.getReportItemDecoratedTextWidget(item))
+          // add divider for better readability
+          .addWidget(CardService.newDivider());
       });
     // If there are no items, add a message indicating no issues found
-    if (this.reportController.getResults().getItems().length === 0) {
+    if (this.rangeReport.getItems().length === 0) {
       section.addWidget(CardService.newTextParagraph()
         .setText(this.localization.cards.report.noIssuesFound));
     }
@@ -79,7 +88,41 @@ class ReportCard {
     return section;
   }
 
-  createFixedFooter() {
+  getReportItemDecoratedTextWidget(item) {
+    return CardService.newDecoratedText()
+      .setText(`${item.a1Notation}`)
+      .setWrapText(true)
+      .setBottomLabel(`${Static_Resources.emojis.warning} ${item.message}`)
+      .setButton(
+        CardService.newTextButton()
+          .setDisabled(!this.isPremium)
+          .setText(`${!this.isPremium ? (Static_Resources.emojis.lock + ' ') : ''}${this.localization.actions.edit}`)
+          .setOnClickAction(
+            CardService.newAction()
+              .setFunctionName('onReportItemClick')
+              .setParameters({ a1Notation: item.a1Notation })));
+  }
+
+  getPremiumRequiredSection() {
+    // Create a section to display the premium required message
+    return CardService.newCardSection()
+      .addWidget(CardService.newTextParagraph()
+        .setText(this.getPremiumRequiredMessage()));
+  }
+
+  getNoIssuesFoundSection() {
+    // Create a section to display the no issues found message
+    return CardService.newCardSection()
+      .addWidget(CardService.newTextParagraph()
+        .setText(this.localization.cards.report.noIssuesFound));
+  }
+
+  getFixedFooter() {
+    if (!this.isPremium) {
+      // Create a fixed footer with a button to format the range
+      return this.getPremiumRequiredFixedFooter();
+    }
+    
     const footer = CardService.newFixedFooter()
       /*.setPrimaryButton(
         CardService.newTextButton()
@@ -95,5 +138,22 @@ class ReportCard {
               .setFunctionName('onReportClose')));
 
     return footer;
+  }
+
+  getPremiumRequiredFixedFooter() {
+    // Create a fixed footer with a button to activate premium
+    return CardService.newFixedFooter()
+      .setPrimaryButton(
+        CardService.newTextButton()
+          .setText(this.localization.actions.activatePremium)
+          .setBackgroundColor('#FF9800')
+          .setOnClickAction(
+            CardService.newAction()
+              .setFunctionName('onOpenAccountCard')));
+  }
+
+  getPremiumRequiredMessage() {
+    // Return the message indicating that the feature requires a premium license
+    return `${!this.isPremium ? (Static_Resources.emojis.lock + ' ' + this.localization.messages.premiumRequired) : ''}`;
   }
 }

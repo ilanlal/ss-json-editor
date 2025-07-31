@@ -17,7 +17,7 @@ class test_SpreadsheetHelper {
         tests.forEach(test => {
             try {
                 test();
-                console.log(`Test passed: ${test.name}`);
+                //console.log(`Test passed: ${test.name}`);
             } catch (error) {
                 console.error(`Test failed: ${test.name}`);
                 console.error(error);

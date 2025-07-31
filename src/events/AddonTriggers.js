@@ -29,6 +29,7 @@ function onMinifyRange(e) {
     const localization = AppManager.getLocalizationResources();
     try {
         const userStore = new UserStore();
+        const userLicenseManager = new UserLicenseManager(userStore);
         const jsonStudio = new JsonStudio(
             SpreadsheetApp
                 .getActiveSpreadsheet(), localization, userStore);
@@ -36,13 +37,12 @@ function onMinifyRange(e) {
         // minify the range
         const rangeReport = jsonStudio.minifyRange();
         const reportItems = rangeReport.getItems();
+        const userLicense = userLicenseManager.getLicense();
         // If there are results, create and return the report card
         if (reportItems?.length > 0) {
             // and create the report card
-
-            const reportCard = new ReportCard(rangeReport, localization);
-            return reportCard
-                .createReportCard()
+            return ReportCard
+                .create(userLicense, rangeReport, localization)
                 .build();
         }
     } catch (error) {
@@ -62,6 +62,8 @@ function onFormatRange(e) {
 
     try {
         const userStore = new UserStore();
+        const userLicenseManager = new UserLicenseManager(userStore);
+        const userLicense = userLicenseManager.getLicense();
         const jsonStudio = new JsonStudio(
             SpreadsheetApp
                 .getActiveSpreadsheet(),
@@ -73,8 +75,10 @@ function onFormatRange(e) {
         const reportItems = rangeReport.getItems();
         // If there are results, create and return the report card
         if (reportItems?.length > 0) {
-            const reportCard = new ReportCard(rangeReport, localization);
-            return reportCard.createReportCard().build();
+            return ReportCard
+                .create(
+                    userLicense, rangeReport, localization)
+                .build();
         }
     } catch (error) {
         SpreadsheetApp
@@ -286,7 +290,7 @@ function onRevokeLicense(e) {
     try {
         const controller = new AccountController();
 
-        return controller.revokeLicense();
+        return controller.revokePremium();
     } catch (error) {
         const localization = AppManager.getLocalizationResources();
         SpreadsheetApp

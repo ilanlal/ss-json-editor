@@ -9,13 +9,14 @@ class test_ReportView {
     }
     runTests() {
         const tests = [
-            "test_createReportCard"
+            "test_create"
         ];
         tests.forEach(test => this[test]());
     }
 
-    test_createReportCard() {
-        QUnit.test("Test createReportCard", (assert) => {
+    test_create() {
+        QUnit.test("Test create report card", (assert) => {
+            const localization = AppManager.getLocalizationResources();
             // Mock a range report
             const mockRange = {
                 getA1Notation: () => "A1:B2",
@@ -25,19 +26,24 @@ class test_ReportView {
                 ]
             };
             const rangeReport = new RangeReport(mockRange.getA1Notation());
+            const userLicense = new UserLicense(
+                'user@example.com',
+                'premium',
+                '2023-01-01',
+                '2024-01-01'
+            );
             // Create a ReportCard instance
-            const reportCard = new ReportCard(
+            const cardBuilder = ReportCard.create(
+                userLicense,
                 rangeReport,
-                AppManager.getLocalizationResources());
-            const card = reportCard.createReportCard();
+                localization);
+            assert.ok(cardBuilder, "Card builder should be created successfully");
+            // Check if the card is created correctly
+            const card = cardBuilder.build()
+                .printJson();
             assert.ok(card, "Card should be created successfully");
-        });
-    }
-
-    tearDown() {
-        // Clean up after tests
-        QUnit.moduleDone(() => {
-            // Reset any global state or variables if needed
+            const cardJson = JSON.parse(card);
+            assert.ok(cardJson, "Card JSON should be created successfully");
         });
     }
 }

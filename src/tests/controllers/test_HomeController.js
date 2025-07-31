@@ -1,7 +1,7 @@
 // Google Apps Script code for Google Workspace Add-ons
 class test_HomeController {
     constructor() {
-        QUnit.module("Home Controller Tests");
+        QUnit.module("Home (controllers)");
         this.runTests();
         QUnit.done(() => {
             //this.tearDown();
@@ -16,7 +16,7 @@ class test_HomeController {
     }
 
     test_createHomeCard() {
-        QUnit.test("Test createHomeCard", (assert) => {
+        QUnit.test("Test home action", (assert) => {
             const localization = AppManager.getLocalizationResources();
             const userStore = new UserStore();
             const homeController = new HomeController(localization, userStore);

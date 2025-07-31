@@ -46,7 +46,7 @@ class AccountController {
         return card;
     }
 
-    revokeLicense() {
+    revokePremium() {
         const userLicenseManager = new UserLicenseManager(this.userStore);
         userLicenseManager.revokeLicense();
 

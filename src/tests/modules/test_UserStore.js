@@ -14,9 +14,8 @@ class test_UserStore {
         tests.forEach(test => {
             try {
                 test();
-                console.log(`Test passed: ${test.name}`);
             } catch (error) {
-                console.error(`Test failed: ${test.name}`);
+                console.error(`Test failed: ${test.name} at UserStore (modules)`);
                 console.error(error);
             }
         });

@@ -27,10 +27,16 @@ class HomeCard {
     newCardBuilder() {
         // Create a new card builder
         const cardBuilder = CardService.newCardBuilder()
+            .setName(Static_Resources.resources.homeCardName)
             // Set the card header
-            .setHeader(this.getHeader())
-            // Add the format section
-            .addSection(this.getFormatSection())
+            .setHeader(this.getHeader());
+        if (!this.isPremium) {
+            // Add the premium required section if the user is not premium
+            cardBuilder.addSection(this.getPremiumRequiredSection());
+        }
+
+        // Add the format section
+        cardBuilder.addSection(this.getFormatSection())
             // Add Minify section
             .addSection(this.getMinifySection())
             // Add Edit section
@@ -86,7 +92,7 @@ class HomeCard {
             // Add the selection input to the card section
             section.addWidget(spaceSelectionDropdown);
         }
-        
+
         // Add about indentation spaces image
         section.addWidget(
             CardService.newImage()
@@ -125,11 +131,11 @@ class HomeCard {
             .setText(this.localization.cards.home.minifyAlt)
             .setWrapText(true)
             .setBottomLabel(`${this.localization.cards.home.minifyTip}`)
-            .setTopLabel(`${this.getPremiumRequiredMessage()}`)
+            //.setTopLabel(`${this.getPremiumRequiredMessage()}`)
             .setButton(
                 CardService.newTextButton()
                     .setDisabled(!this.isPremium)
-                    .setText(`${this.localization.actions.minify}`)
+                    .setText(`${this.getPremiumLockedEmoji()}${this.localization.actions.minify}`)
                     .setOnClickAction(
                         CardService.newAction()
                             .setFunctionName('onMinifyRange')));
@@ -151,16 +157,22 @@ class HomeCard {
             .setText(this.localization.cards.home.editAlt)
             .setWrapText(true)
             .setBottomLabel(`${this.localization.cards.home.editTip}`)
-            .setTopLabel(`${this.getPremiumRequiredMessage()}`)
+            //.setTopLabel(`${this.getPremiumRequiredMessage()}`)
             .setButton(
                 CardService.newTextButton()
                     .setDisabled(!this.isPremium)
-                    .setText(`${this.localization.actions.edit}`)
+                    .setText(`${this.getPremiumLockedEmoji()}${this.localization.actions.edit}`)
                     .setOnClickAction(
                         CardService.newAction()
                             .setFunctionName('onEditRange')));
     }
 
+    getPremiumRequiredSection() {
+        // Create a section to display the premium required message
+        return CardService.newCardSection()
+            .addWidget(CardService.newTextParagraph()
+                .setText(this.getPremiumRequiredMessage()));
+    }
     getFixedFooter() {
         // Create a fixed footer with a button to open the help dialog
         return CardService.newFixedFooter()
@@ -177,5 +189,15 @@ class HomeCard {
     getPremiumRequiredMessage() {
         // Return the message indicating that the feature requires a premium license
         return `${!this.isPremium ? (Static_Resources.emojis.lock + ' ' + this.localization.messages.premiumRequired) : ''}`;
+    }
+
+    getPremiumLockedEmoji() {
+        if (this.isPremium) {
+            // Return an empty string if the user has a premium license
+            return '';
+        }
+
+        // Return the emoji indicating that the feature is locked for non-premium users
+        return Static_Resources.emojis.lock + ' ';
     }
 }

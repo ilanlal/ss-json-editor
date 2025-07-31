@@ -1,8 +1,10 @@
 // Google Apps Script code for Google Workspace Add-ons
 // Apps Script QUnit Runner
 class QUnitRunner {
-
     constructor(e) {
+        console.log("QUnitRunner initialized - event:", e);
+        console.log("version:", Static_Resources.package.version);
+        console.log("build:", Static_Resources.package.build);
         // Initialize QUnit for testing
         QUnit.urlParams(e.parameter);
         QUnit.config({
