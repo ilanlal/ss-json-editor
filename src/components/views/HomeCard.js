@@ -63,7 +63,7 @@ class HomeCard {
         // Create a card section with the decorated text
         const section = CardService.newCardSection()
             .setCollapsible(true)
-            .setNumUncollapsibleWidgets(this.isPremium ? 2 : 1);
+            .setNumUncollapsibleWidgets(1);
         section.addWidget(
             this.getFormatDecoratedTextWidget());
 

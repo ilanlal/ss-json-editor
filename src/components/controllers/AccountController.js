@@ -32,9 +32,7 @@ class AccountController {
         const card = CardService.newActionResponseBuilder()
             .setNavigation(
                 CardService.newNavigation()
-                    .popToRoot())
-            .setNavigation(
-                CardService.newNavigation()
+                    .popToRoot()
                     .updateCard(
                         HomeCard.create(
                             userLicenseManager.getLicense(),

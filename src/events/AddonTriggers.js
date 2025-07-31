@@ -62,24 +62,8 @@ function onFormatRange(e) {
 
     try {
         const userStore = new UserStore();
-        const userLicenseManager = new UserLicenseManager(userStore);
-        const userLicense = userLicenseManager.getLicense();
-        const jsonStudio = new JsonStudio(
-            SpreadsheetApp
-                .getActiveSpreadsheet(),
-            localization,
-            userStore);
-
-        // Call the formatRange method of JsonStudio
-        const rangeReport = jsonStudio.formatRange();
-        const reportItems = rangeReport.getItems();
-        // If there are results, create and return the report card
-        if (reportItems?.length > 0) {
-            return ReportCard
-                .create(
-                    userLicense, rangeReport, localization)
-                .build();
-        }
+        const homeController = new HomeController(localization, userStore);
+        return homeController.prettyJsonFormat();
     } catch (error) {
         SpreadsheetApp
             .getActiveSpreadsheet()
