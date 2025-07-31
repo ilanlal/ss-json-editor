@@ -63,14 +63,9 @@ class HomeCard {
         // Create a card section with the decorated text
         const section = CardService.newCardSection()
             .setCollapsible(true)
-            .setNumUncollapsibleWidgets(1);
+            .setNumUncollapsibleWidgets(this.isPremium ? 2 : 1);
         section.addWidget(
             this.getFormatDecoratedTextWidget());
-
-        // Add the indentation spaces text to the card section
-        section.addWidget(CardService.newDecoratedText()
-            .setText(`${this.getPremiumRequiredMessage()}`)
-            .setWrapText(true));
 
         if (this.isPremium) {
             // Create a selection input for indentation spaces
@@ -92,13 +87,19 @@ class HomeCard {
             // Add the selection input to the card section
             section.addWidget(spaceSelectionDropdown);
         }
+        else {
+            section.addWidget(
+                CardService.newDecoratedText()
+                    .setText(`${this.getPremiumRequiredMessage()}`)
+                    .setWrapText(true));
 
-        // Add about indentation spaces image
-        section.addWidget(
-            CardService.newImage()
-                .setImageUrl('https://lh3.googleusercontent.com/-yqc8J311VzE/aIgb2MpVceI/AAAAAAABSe4/P_6FxFzt0M4S922HkZqt6UKZKyq7AcKzACNcBGAsYHQ/Screenshot%2B1280x800-v0005.png')
-                .setAltText('Upgrade to premium for more features')
-        );
+            // Add about indentation spaces image
+            section.addWidget(
+                CardService.newImage()
+                    .setImageUrl('https://lh3.googleusercontent.com/-yqc8J311VzE/aIgb2MpVceI/AAAAAAABSe4/P_6FxFzt0M4S922HkZqt6UKZKyq7AcKzACNcBGAsYHQ/Screenshot%2B1280x800-v0005.png')
+                    .setAltText('Upgrade to premium for more features')
+            );
+        }
         return section;
     }
 
@@ -180,7 +181,6 @@ class HomeCard {
                 CardService.newTextButton()
                     .setDisabled(this.isPremium)
                     .setText(this.localization.actions.activatePremium)
-                    .setBackgroundColor('#FF9800')
                     .setOnClickAction(
                         CardService.newAction()
                             .setFunctionName('onOpenAccountCard')));

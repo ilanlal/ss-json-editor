@@ -146,7 +146,6 @@ class ReportCard {
       .setPrimaryButton(
         CardService.newTextButton()
           .setText(this.localization.actions.activatePremium)
-          .setBackgroundColor('#FF9800')
           .setOnClickAction(
             CardService.newAction()
               .setFunctionName('onOpenAccountCard')));
