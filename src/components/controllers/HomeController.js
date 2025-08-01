@@ -35,16 +35,8 @@ class HomeController {
         const reportItems = rangeReport.getItems();
         // If there are results, create and return the report card
         if (reportItems?.length > 0) {
-            return CardService
-                .newActionResponseBuilder()
-                .setNavigation(
-                    CardService.newNavigation()
-                        .pushCard(ReportCard
-                            .create(
-                                this.userLicense,
-                                rangeReport,
-                                this.localization)
-                            .build()))
+            return new ReportController(this.userStore, this.localization)
+                .home(rangeReport)
                 .setStateChanged(true);
         }
 
@@ -68,16 +60,8 @@ class HomeController {
 
         // If there are results, create and return the report card
         if (reportItems?.length > 0) {
-            return CardService
-                .newActionResponseBuilder()
-                .setNavigation(
-                    CardService.newNavigation()
-                        .pushCard(ReportCard
-                            .create(
-                                this.userLicense,
-                                rangeReport,
-                                this.localization)
-                            .build()))
+            return new ReportController(this.userStore, this.localization)
+                .home(rangeReport)
                 .setStateChanged(true);
         }
 

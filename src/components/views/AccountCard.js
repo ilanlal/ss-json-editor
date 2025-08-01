@@ -62,10 +62,15 @@ class AccountCard {
                     .setOnClickAction(CardService.newAction()
                         .setFunctionName("onRevokeLicense")));
         } else {
-            section.addWidget(CardService.newTextParagraph()
-                .setText(this.localization.cards.account.activationInstructions))
+            section
+                .addWidget(
+                    CardService.newTextParagraph()
+                        .setText(this.localization.cards.account.activationInstructions))
+                .addWidget(CardService.newTextParagraph()
+                    .setText(this.localization.messages.claimPremium.replace('{0}', '90')))
                 .addWidget(CardService.newTextButton()
-                    .setText(this.localization.actions.activatePremium)
+                    .setText(this.localization.actions.activate)
+                    .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
                     .setOnClickAction(CardService.newAction()
                         .setFunctionName("onActivatePremium")
                         .setParameters({

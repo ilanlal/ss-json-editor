@@ -31,11 +31,14 @@ class test_ReportController {
             // Create a ReportController instance
             const reportController =
                 new ReportController(
-                    rangeReport,
                     userStore,
                     localization
                 );
-            const actionResponse = reportController.home().build().printJson();
+            
+            const actionResponse = reportController
+                .home(rangeReport)
+                .build()
+                .printJson();
             assert.ok(actionResponse, "Action response should be created successfully");
             const card = JSON.parse(actionResponse).renderActions.action.navigations[0].pushCard;
             assert.ok(card, "Card should be created successfully");

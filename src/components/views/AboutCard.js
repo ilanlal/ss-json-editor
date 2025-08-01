@@ -5,17 +5,16 @@ function createAboutCard() {
   // Set the card header
   builder.setHeader(
     CardService.newCardHeader()
-      .setTitle('About JSON Studio')
-      .setSubtitle('Learn more about this add-on')
+      .setTitle(this.localization.cards.about.title)
+      .setSubtitle(this.localization.cards.about.subtitle)
       .setImageStyle(CardService.ImageStyle.SQUARE)
       .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
-      .setImageAltText('JSON Studio for Google Sheets™️'));
+      .setImageAltText(this.localization.appDescription));
 
   // Add a section with information about the add-on
   builder.addSection(CardService.newCardSection()
     .addWidget(CardService.newTextParagraph()
-      .setText('<b>JSON Studio</b> is a powerful tool for working with JSON data in Google Sheets.')));
-  
+      .setText(this.localization.cards.about.content)));
 
   return builder.build();
 }
