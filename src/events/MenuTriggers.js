@@ -19,7 +19,7 @@ function onMenuFormatRange(e) {
                 .toast(
                     localization.messages.totalCellFailed.replace('{0}', reportItems.length),
                     localization.messages.failure,
-                    15);
+                    7);
         }
     } catch (error) {
         SpreadsheetApp
@@ -62,7 +62,7 @@ function onMenuMinifyRange() {
             .toast(
                 error.toString(),
                 localization.messages.error,
-                15);
+                7);
     }
     // Return nothing to indicate the operation is complete
     // This is important for the add-on to function correctly

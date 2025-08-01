@@ -35,8 +35,15 @@ class test_ReportController {
                     userStore,
                     localization
                 );
-            const card = reportController.home();
+            const actionResponse = reportController.home().build().printJson();
+            assert.ok(actionResponse, "Action response should be created successfully");
+            const card = JSON.parse(actionResponse).renderActions.action.navigations[0].pushCard;
             assert.ok(card, "Card should be created successfully");
+            assert.strictEqual(
+                card.header.title,
+                AppManager.getLocalizationResources().cards.report.title,
+                "Card title should match localization"
+            );
         });
     }
 }

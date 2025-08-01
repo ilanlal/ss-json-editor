@@ -20,15 +20,18 @@ class test_HomeController {
             const localization = AppManager.getLocalizationResources();
             const userStore = new UserStore();
             const homeController = new HomeController(localization, userStore);
-            const card = JSON.parse(
+            const actionResponse = JSON.parse(
                 homeController
                     .home()
+                    .build()
                     .printJson());
-            assert.ok(card, "Home card should be created successfully");
+            assert.ok(actionResponse, "Home card should be created successfully");
+            const card = actionResponse.renderActions.action.navigations[0].pushCard;
+            assert.ok(card, "Card should be created successfully");
             assert.strictEqual(
                 card.header.title,
                 localization.cards.home.title,
-                "Home card title should match localization"
+                "Card title should match localization"
             );
         });
     }

@@ -31,6 +31,7 @@ const Global_Resources = {
             totalCellFailed: "Total cells failed: {0}",
             authRequired: "Authentication is required to perform this operation.",
             premiumRequired: "Premium membership required.",
+            upgradeRequired: "Upgrade required to access this feature.",
             premiumFeature: "This is a premium feature. Please activate your premium license to use it.",
             premiumActivated: "Premium Activated",
         },

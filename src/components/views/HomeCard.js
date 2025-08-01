@@ -88,17 +88,15 @@ class HomeCard {
             section.addWidget(spaceSelectionDropdown);
         }
         else {
-            section.addWidget(
-                CardService.newDecoratedText()
-                    .setText(`${this.getPremiumRequiredMessage()}`)
-                    .setWrapText(true));
-
-            // Add about indentation spaces image
-            section.addWidget(
-                CardService.newImage()
-                    .setImageUrl('https://lh3.googleusercontent.com/-yqc8J311VzE/aIgb2MpVceI/AAAAAAABSe4/P_6FxFzt0M4S922HkZqt6UKZKyq7AcKzACNcBGAsYHQ/Screenshot%2B1280x800-v0005.png')
-                    .setAltText('Upgrade to premium for more features')
-            );
+            section
+                .addWidget(
+                    CardService.newDecoratedText()
+                        .setText(`${this.getPremiumRequiredMessage()}`)
+                        .setWrapText(true))
+                .addWidget(
+                    CardService.newImage()
+                        .setImageUrl('https://lh3.googleusercontent.com/-yqc8J311VzE/aIgb2MpVceI/AAAAAAABSe4/P_6FxFzt0M4S922HkZqt6UKZKyq7AcKzACNcBGAsYHQ/Screenshot%2B1280x800-v0005.png')
+                        .setAltText(this.localization.messages.upgradeRequired));
         }
         return section;
     }

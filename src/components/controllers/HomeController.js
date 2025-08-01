@@ -4,18 +4,26 @@ class HomeController {
         this.localization = localization;
         this.userStore = userStore;
         this.userLicenseManager = new UserLicenseManager(userStore);
+        this.userLicense = this.userLicenseManager.getLicense();
     }
 
     home() {
         const indentSpaces = this.userStore.getIndentSpaces() || "2";
         const userLicense = this.userLicenseManager.getLicense();
-        return HomeCard.create(userLicense, this.localization, indentSpaces)
-            .build();
+        return CardService
+            .newActionResponseBuilder()
+            .setNavigation(
+                CardService.newNavigation()
+                    .pushCard(HomeCard
+                        .create(userLicense, this.localization, indentSpaces)
+                        .build()));
     }
 
+    /**
+     * Formats the JSON in the active range.
+     * @returns {CardService.ActionResponse}
+     */
     prettyJsonFormat() {
-        const userLicense = this.userLicenseManager.getLicense();
-        
         const jsonStudio =
             new JsonStudio(
                 SpreadsheetApp.getActiveSpreadsheet(),
@@ -27,14 +35,58 @@ class HomeController {
         const reportItems = rangeReport.getItems();
         // If there are results, create and return the report card
         if (reportItems?.length > 0) {
-            return ReportCard
-                .create(userLicense, rangeReport, this.localization)
-                .build();
+            return CardService
+                .newActionResponseBuilder()
+                .setNavigation(
+                    CardService.newNavigation()
+                        .pushCard(ReportCard
+                            .create(
+                                this.userLicense,
+                                rangeReport,
+                                this.localization)
+                            .build()))
+                .setStateChanged(true);
         }
+
+
+        return CardService.newActionResponseBuilder()
+            .setNotification(
+                CardService.newNotification()
+                    .setText(
+                        this.localization.messages.success))
+            .setStateChanged(true);
     }
 
     minifyJsonFormat() {
-        // Implement the logic for minifying JSON format
-        // This method should return a card with the minified JSON format
+        const jsonStudio = new JsonStudio(
+            SpreadsheetApp
+                .getActiveSpreadsheet(), this.localization, this.userStore);
+
+        // minify the range
+        const rangeReport = jsonStudio.minifyRange();
+        const reportItems = rangeReport.getItems();
+
+        // If there are results, create and return the report card
+        if (reportItems?.length > 0) {
+            return CardService
+                .newActionResponseBuilder()
+                .setNavigation(
+                    CardService.newNavigation()
+                        .pushCard(ReportCard
+                            .create(
+                                this.userLicense,
+                                rangeReport,
+                                this.localization)
+                            .build()))
+                .setStateChanged(true);
+        }
+
+
+        return CardService.newActionResponseBuilder()
+            .setNotification(
+                CardService.newNotification()
+                    .setText(
+                        this.localization.messages.success))
+            .setStateChanged(true);
     }
 }

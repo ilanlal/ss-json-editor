@@ -21,12 +21,24 @@ class ReportController {
         this.localization = localization;
         this.userStore = userStore;
         this.userLicenseManager = new UserLicenseManager(userStore);
+        this.userLicense = this.userLicenseManager.getLicense();
     }
 
     home() {
-        const userLicense = this.userLicenseManager.getLicense();
-        return ReportCard
-            .create(userLicense, this.rangeReport, this.localization)
+        return CardService
+            .newActionResponseBuilder()
+            .setNavigation(
+                CardService.newNavigation()
+                    .pushCard(ReportCard
+            .create(this.userLicense, this.rangeReport, this.localization)
+            .build()));
+    }
+
+    close() {
+        return CardService.newActionResponseBuilder()
+            .setNavigation(
+                CardService.newNavigation()
+                    .popToRoot())
             .build();
     }
 }

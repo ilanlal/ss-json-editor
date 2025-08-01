@@ -12,7 +12,8 @@ function onDefaultHomePageOpen(e) {
 
         // Return the home card
         return new HomeController(localization, userStore)
-            .home();
+            .home()
+            .build();
 
     } catch (error) {
         SpreadsheetApp
@@ -26,54 +27,36 @@ function onDefaultHomePageOpen(e) {
 
 function onMinifyRange(e) {
     // This function is called when the user selects "Minify" from the add-on menu    
-    const localization = AppManager.getLocalizationResources();
+    console.log("onMinifyRange called with event:", e);
     try {
+        const localization = AppManager.getLocalizationResources();
         const userStore = new UserStore();
-        const userLicenseManager = new UserLicenseManager(userStore);
-        const jsonStudio = new JsonStudio(
-            SpreadsheetApp
-                .getActiveSpreadsheet(), localization, userStore);
-
-        // minify the range
-        const rangeReport = jsonStudio.minifyRange();
-        const reportItems = rangeReport.getItems();
-        const userLicense = userLicenseManager.getLicense();
-        // If there are results, create and return the report card
-        if (reportItems?.length > 0) {
-            // and create the report card
-            return ReportCard
-                .create(userLicense, rangeReport, localization)
-                .build();
-        }
+        return new HomeController(localization, userStore)
+            .minifyJsonFormat()
+            .build();
     } catch (error) {
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.messages.error,
-                7);
+        return CardService.newActionResponseBuilder()
+            .setNotification(CardService.newNotification()
+                .setText(error.toString()))
+            .build();
     }
-    // Return nothing if no results
-    return;
 }
 
 function onFormatRange(e) {
-    const localization = AppManager.getLocalizationResources();
-
+    console.log("onFormatRange called with event:", e);
+    
     try {
+        const localization = AppManager.getLocalizationResources();
         const userStore = new UserStore();
-        const homeController = new HomeController(localization, userStore);
-        return homeController.prettyJsonFormat();
+        return new HomeController(localization, userStore)
+            .prettyJsonFormat()
+            .build();
     } catch (error) {
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.messages.error,
-                7);
+        return CardService.newActionResponseBuilder()
+            .setNotification(CardService.newNotification()
+                .setText(error.toString()))
+            .build();
     }
-    // Return nothing if no results
-    return;
 }
 
 function onShowAboutCard(e) {
@@ -236,55 +219,46 @@ function onEditRange(e) {
 
 function onOpenAccountCard(e) {
     try {
-        const controller = new AccountController();
-        return controller.home();
-    } catch (error) {
-        const localization = AppManager.getLocalizationResources();
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.messages.error,
-                7);
-    }
+        return new AccountController()
+            .home()
+            .build();
 
-    return;
+    } catch (error) {
+        return CardService.newActionResponseBuilder()
+            .setNotification(
+                CardService.newNotification()
+                    .setText(
+                        error.toString()))
+            .build();
+    }
 }
 
 function onActivatePremium(e) {
     try {
-        const controller = new AccountController();
-
-        return controller.activatePremium();
+        return new AccountController()
+            .activatePremium()
+            .build();
     } catch (error) {
-        const localization = AppManager.getLocalizationResources();
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.messages.error,
-                7);
+        return CardService.newActionResponseBuilder()
+            .setNotification(
+                CardService.newNotification()
+                    .setText(
+                        error.toString()))
+            .build();
     }
-
-    // Return nothing as this is just an activation event
-    return;
 }
 
 function onRevokeLicense(e) {
     try {
-        const controller = new AccountController();
-
-        return controller.revokePremium();
+        return new AccountController()
+            .revokePremium()
+            .build();
     } catch (error) {
-        const localization = AppManager.getLocalizationResources();
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.messages.error,
-                7);
+        return CardService.newActionResponseBuilder()
+            .setNotification(
+                CardService.newNotification()
+                    .setText(
+                        error.toString()))
+            .build();
     }
-
-    // Return nothing as this is just a revocation event
-    return;
 }

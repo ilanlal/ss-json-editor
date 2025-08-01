@@ -12,8 +12,10 @@ class AccountController {
      * @returns {CardService.Card} - The card for account management.
      */
     home() {
-        const card = AccountCard.create(this.userLicense, this.localization);
-        return card.build();
+        return CardService.newActionResponseBuilder()
+            .setNavigation(CardService.newNavigation().pushCard(
+                AccountCard.create(this.userLicense, this.localization)
+                    .build()));
     }
 
     activatePremium() {
@@ -29,7 +31,7 @@ class AccountController {
             userId, planId, createdOn, utcExpirationDate, amount);
 
         // navigate to root
-        const card = CardService.newActionResponseBuilder()
+        return CardService.newActionResponseBuilder()
             .setNavigation(
                 CardService.newNavigation()
                     .popToRoot()
@@ -39,9 +41,7 @@ class AccountController {
                             this.localization,
                             this.userStore.getIndentSpaces())
                             .build()
-                    ))
-            .build();
-        return card;
+                    ));
     }
 
     revokePremium() {
@@ -49,7 +49,7 @@ class AccountController {
         userLicenseManager.revokeLicense();
 
         // navigate to root
-        const card = CardService
+        return CardService
             .newActionResponseBuilder()
             .setNavigation(
                 CardService.newNavigation()
@@ -60,8 +60,7 @@ class AccountController {
                             this.localization,
                             this.userStore.getIndentSpaces())
                             .build()
-                    ))
-            .build();
-        return card;
+                    ));
+
     }
 }
