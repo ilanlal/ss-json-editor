@@ -12,7 +12,7 @@ class AccountCard {
      * Creates a card for the account information.
      * @param {UserLicense} userLicense - The user license information.
      * @param {Global_Resources['en']} localization - The localization resources.
-     * @returns {Card} - The card containing account information.
+     * @returns {CardService.CardBuilder} - The card builder for the account card.
      */
     static create(userLicense, localization) {
         const thisCard = new AccountCard(userLicense, localization);

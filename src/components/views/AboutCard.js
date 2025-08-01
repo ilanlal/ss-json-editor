@@ -1,20 +1,34 @@
 // Google Apps Script code for Google Workspace Add-ons
-function createAboutCard() {
-  var builder = CardService.newCardBuilder();
+class AboutCard {
+  constructor(localization) {
+    this.localization = localization;
+  }
 
-  // Set the card header
-  builder.setHeader(
-    CardService.newCardHeader()
-      .setTitle(this.localization.cards.about.title)
-      .setSubtitle(this.localization.cards.about.subtitle)
-      .setImageStyle(CardService.ImageStyle.SQUARE)
-      .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
-      .setImageAltText(this.localization.appDescription));
+  /**
+   * @returns {CardService.CardBuilder}
+   */
+  static create(localization) {
+    const aboutCard = new AboutCard(localization);
+    return aboutCard.newCardBuilder();
+  }
 
-  // Add a section with information about the add-on
-  builder.addSection(CardService.newCardSection()
-    .addWidget(CardService.newTextParagraph()
-      .setText(this.localization.cards.about.content)));
+  newCardBuilder() {
+    var builder = CardService.newCardBuilder();
 
-  return builder.build();
+    // Set the card header
+    builder.setHeader(
+      CardService.newCardHeader()
+        .setTitle(this.localization.cards.about.title)
+        .setSubtitle(this.localization.cards.about.subtitle)
+        .setImageStyle(CardService.ImageStyle.SQUARE)
+        .setImageUrl('https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo120.png')
+        .setImageAltText(this.localization.appDescription));
+
+    // Add a section with information about the add-on
+    builder.addSection(CardService.newCardSection()
+      .addWidget(CardService.newTextParagraph()
+        .setText(this.localization.cards.about.content)));
+
+    return builder;
+  }
 }

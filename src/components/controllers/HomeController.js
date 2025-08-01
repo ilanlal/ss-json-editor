@@ -7,6 +7,9 @@ class HomeController {
         this.userLicense = this.userLicenseManager.getLicense();
     }
 
+    /**
+     * @returns {CardService.ActionResponse}
+     */
     home() {
         const indentSpaces = this.userStore.getIndentSpaces() || "2";
         const userLicense = this.userLicenseManager.getLicense();
@@ -20,7 +23,6 @@ class HomeController {
     }
 
     /**
-     * Formats the JSON in the active range.
      * @returns {CardService.ActionResponse}
      */
     prettyJsonFormat() {

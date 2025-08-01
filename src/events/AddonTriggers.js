@@ -44,7 +44,7 @@ function onMinifyRange(e) {
 
 function onFormatRange(e) {
     console.log("onFormatRange called with event:", e);
-    
+
     try {
         const localization = AppManager.getLocalizationResources();
         const userStore = new UserStore();
@@ -61,17 +61,15 @@ function onFormatRange(e) {
 
 function onShowAboutCard(e) {
     try {
-        const card = createAboutCard(e);
-        // Return the card to be displayed in the sidebar
-        return card;
-    } catch (error) {
         const localization = AppManager.getLocalizationResources();
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.messages.error,
-                10);
+        return new AboutController(localization)
+            .home()
+            .build();
+    } catch (error) {
+        return CardService.newActionResponseBuilder()
+            .setNotification(CardService.newNotification()
+                .setText(error.toString()))
+            .build();
     }
 }
 

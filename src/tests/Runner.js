@@ -53,13 +53,15 @@ class QUnitRunner {
     }
 
     test_views() {
+        new test_AboutView();
         new test_HomeView();
-        //new test_AccountView();
+        new test_AccountView();
         new test_ReportView();
         new test_JsonEditorView();
     }
 
     test_controllers() {
+        new test_AboutController();
         new test_HomeController();
         new test_AccountController();
         new test_ReportController();
