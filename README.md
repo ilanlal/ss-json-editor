@@ -4,9 +4,9 @@
 [![GitHub last commit](https://img.shields.io/github/last-commit/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
 [![GitHub issues](https://img.shields.io/github/issues/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor/issues)
 
-This Google Sheets™️ add-on that allows users to format JSON data directly within their spreadsheets. It provides a user-friendly interface for working with JSON data, making it easier to manage and manipulate structured data.
+This Google Sheets™ add-on that allows users to format JSON data directly within their spreadsheets. It provides a user-friendly interface for working with JSON data, making it easier to manage and manipulate structured data.
 
-If you are looking for a **simple way to prettify or minify JSON data** in your Google Sheets™️ cell, this add-on is for you! 😉
+If you are looking for a **simple way to prettify or minify JSON data** in your Google Sheets™ cell, this add-on is for you! 😉
 
 ## Features
 

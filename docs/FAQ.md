@@ -1,6 +1,6 @@
 # FAQ - Frequently Asked Questions
 
-This document contains frequently asked questions about this Google Sheets™️ add-on.
+This document contains frequently asked questions about this Google Sheets™ add-on.
 
 ## How to report a bug?
 

@@ -13,7 +13,7 @@
 
 - [Google Workspace Add-ons](https://developers.google.com/workspace/add-ons)
 - [Google Apps Script](https://developers.google.com/apps-script)
-- [Google Sheets™️](https://www.google.com/sheets/about/)
+- [Google Sheets™](https://www.google.com/sheets/about/)
 
 ## Best Practices
 
