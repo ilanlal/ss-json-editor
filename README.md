@@ -19,7 +19,6 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 - **Validation**: Parse failures reporting, JSON validation, and improved error handling.
 - **Membership**: Introduced membership plans for premium features.
 - **Improvements**: Enhanced user interface, better performance, and more robust JSON parsing.
-- **Json Editor**: The JSON editor now supports multiline input and provides better error handling for invalid JSON data.
 
 ## Screenshots ```v8```
 
