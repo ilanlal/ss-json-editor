@@ -1,12 +1,12 @@
-# ![Logo](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/logo24.png) Json Studio
+# ![Logo](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/logo24.png) Json Studio ```v9```
 
 [![GitHub repo size](https://img.shields.io/github/repo-size/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
 [![GitHub last commit](https://img.shields.io/github/last-commit/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
 [![GitHub issues](https://img.shields.io/github/issues/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor/issues)
 
-This Google Sheets™️ add-on that allows users to format JSON data directly within their spreadsheets. It provides a user-friendly interface for working with JSON data, making it easier to manage and manipulate structured data.
+This Google Sheets™ add-on that allows users to format JSON data directly within their spreadsheets. It provides a user-friendly interface for working with JSON data, making it easier to manage and manipulate structured data.
 
-If you are looking for a **simple way to prettify or minify JSON data** in your Google Sheets™️ cell, this add-on is for you! 😉
+If you are looking for a **simple way to prettify or minify JSON data** in your Google Sheets™ cell, this add-on is for you! 😉
 
 ## Features
 
@@ -14,9 +14,15 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 - **Minify JSON**: Remove unnecessary whitespace and line breaks from JSON data.
 - **Select Indentation**: Choose the indentation level for prettified JSON data. (1, 2, 4, 6 or 8 spaces)
 
+### Release Notes ```v9```
+
+- **Validation**: Parse failures reporting, JSON validation, and improved error handling.
+- **Membership**: Introduced membership plans for premium features.
+- **Improvements**: Enhanced user interface, better performance, and more robust JSON parsing.
+
 ## Screenshots
 
-![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/Screenshot%202025-07-22%20015159.jpg)
+![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/vnext/assets/Screenshot-1280x800-v9001.png)
 
 ## References
 

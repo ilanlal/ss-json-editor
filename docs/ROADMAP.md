@@ -1,6 +1,6 @@
 # JSON Studio - Roadmap
 
-This document outlines the roadmap for the JSON Studio add-on for Google Sheets™️, detailing the steps required to develop, test, and publish the add-on to the Google Workspace Marketplace.
+This document outlines the roadmap for the JSON Studio add-on for Google Sheets™, detailing the steps required to develop, test, and publish the add-on to the Google Workspace Marketplace.
 
 ## Roadmap for the Add-on
 
