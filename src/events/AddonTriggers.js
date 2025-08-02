@@ -6,6 +6,7 @@
  * @see appsscript.json -->homepageTrigger
  */
 function onDefaultHomePageOpen(e) {
+    console.log("onDefaultHomePageOpen called with event:", e);
     const localization = AppManager.getLocalizationResources();
     try {
         const userStore = new UserStore();
@@ -60,6 +61,7 @@ function onFormatRange(e) {
 }
 
 function onShowAboutCard(e) {
+    console.log("onShowAboutCard called with event:", e);
     try {
         const localization = AppManager.getLocalizationResources();
         return new AboutController(localization)
@@ -74,6 +76,7 @@ function onShowAboutCard(e) {
 }
 
 function onIndentSpacesSelectorChange(e) {
+    console.log("onIndentSpacesSelectorChange called with event:", e);
     try {
         const userStore = new UserStore();
         const selectedSpaces = e?.commonEventObject?.formInputs?.[Static_Resources.resources.indentSpaces]?.stringInputs?.value[0] || "2";
@@ -92,53 +95,37 @@ function onIndentSpacesSelectorChange(e) {
 }
 
 function onReportItemClick(e) {
+    console.log("onReportItemClick called with event:", e);
     try {
-        const a1Notation = e?.parameters?.a1Notation;
-        if (!a1Notation) {
-            throw new Error("Invalid A1 notation provided");
-        }
-        // Create a new JsonEditorController with the provided A1 notation
-        const jsonEditorController = new JsonEditorController(
-            SpreadsheetApp.getActiveSpreadsheet());
-
-        return jsonEditorController.createCard(a1Notation);
-    } catch (error) {
         const localization = AppManager.getLocalizationResources();
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.messages.error,
-                7);
+        const userStore = new UserStore();
+        return new ReportController(userStore, localization)
+            .reportItemClick(e)
+            .build();
+    } catch (error) {
+        return CardService.newActionResponseBuilder()
+            .setNotification(CardService.newNotification()
+                .setText(error.toString()))
+            .build();
     }
-
-    return;
 }
 
 function onReportClose(e) {
-
+    console.log("onReportClose called with event:", e);
     try {
-        // Close the report card
-        const card = CardService.newActionResponseBuilder()
-            .setNavigation(
-                CardService.newNavigation()
-                    .popToRoot())
+        return new ReportController()
+            .close(e)
             .build();
-        return card;
     } catch (error) {
-        const localization = AppManager.getLocalizationResources();
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.messages.error,
-                10);
+        return CardService.newActionResponseBuilder()
+            .setNotification(CardService.newNotification()
+                .setText(error.toString()))
+            .build();
     }
-
-    return;
 }
 
 function onSaveEditor(e) {
+    console.log("onSaveEditor called with event:", e);
     try {
         const a1Notation = e?.parameters?.a1Notation;
 
@@ -187,6 +174,7 @@ function onCancelEditor(e) {
 }
 
 function onEditRange(e) {
+    console.log("onEditRange called with event:", e);
     try {
         const range = SpreadsheetApp
             .getActiveSpreadsheet()
@@ -216,6 +204,7 @@ function onEditRange(e) {
 }
 
 function onOpenAccountCard(e) {
+    console.log("onOpenAccountCard called with event:", e);
     try {
         return new AccountController()
             .home()
@@ -232,6 +221,7 @@ function onOpenAccountCard(e) {
 }
 
 function onActivatePremium(e) {
+    console.log("onActivatePremium called with event:", e);
     try {
         return new AccountController()
             .activatePremium()
@@ -247,6 +237,7 @@ function onActivatePremium(e) {
 }
 
 function onRevokeLicense(e) {
+    console.log("onRevokeLicense called with event:", e);
     try {
         return new AccountController()
             .revokePremium()

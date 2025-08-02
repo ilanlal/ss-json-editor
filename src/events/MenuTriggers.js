@@ -1,5 +1,6 @@
 // Google Apps Script code for Google Workspace Add-ons
 function onMenuFormatRange(e) {
+    console.log("onMenuFormatRange called with event:", e);
     // Code to format the selected range
     const localization = AppManager.getLocalizationResources();
     try {
@@ -34,8 +35,9 @@ function onMenuFormatRange(e) {
     return;
 }
 
-function onMenuMinifyRange() {
-    // This function is called when the user selects "Minify" from the add-on menu    
+function onMenuMinifyRange(e) {
+    console.log("onMenuMinifyRange called with event:", e);
+    // This function is called when the user selects "Minify" from the add-on menu
     const localization = AppManager.getLocalizationResources();
     try {
         const userStore = new UserStore();

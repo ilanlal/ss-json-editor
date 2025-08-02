@@ -38,9 +38,9 @@ class HomeCard {
         // Add the format section
         cardBuilder.addSection(this.getFormatSection())
             // Add Minify section
-            .addSection(this.getMinifySection())
+            .addSection(this.getMinifySection());
             // Add Edit section
-            .addSection(this.getEditSection());
+            //.addSection(this.getEditSection());
 
         if (!this.isPremium) {
             // Add the footer to the card

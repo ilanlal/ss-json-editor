@@ -20,7 +20,8 @@ class SpreadsheetHelper {
     }
 
     static focusCell(a1n) {
-        const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+        const sheet = SpreadsheetApp.getActiveSpreadsheet()
+            .getActiveSheet();
         const range = sheet.getRange(a1n);
         range.activateAsCurrentCell();
     }
@@ -65,7 +66,7 @@ class SpreadsheetHelper {
         }
 
         // Check if the range is within the limits of the maximum allowed size
-        return range.getNumRows() * range.getNumColumns()            
+        return range.getNumRows() * range.getNumColumns()
             <= Static_Resources.parameters.maxRangeSize;
     }
 }

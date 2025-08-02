@@ -1,7 +1,6 @@
 class AccountController {
     constructor(sheet = SpreadsheetApp.getActiveSpreadsheet()) {
-        this.sheet = sheet;
-        this.localization = AppManager.getLocalizationResources(sheet);
+        this.localization = AppManager.getLocalizationResources();
         this.userStore = new UserStore();
         this.userLicenseManager = new UserLicenseManager(this.userStore);
         this.userLicense = this.userLicenseManager.getLicense();
@@ -13,9 +12,12 @@ class AccountController {
      */
     home() {
         return CardService.newActionResponseBuilder()
-            .setNavigation(CardService.newNavigation().pushCard(
-                AccountCard.create(this.userLicense, this.localization)
-                    .build()));
+            .setNavigation(
+                CardService.newNavigation()
+                    .pushCard(
+                        AccountCard
+                            .create(this.userLicense, this.localization)
+                            .build()));
     }
 
     activatePremium() {

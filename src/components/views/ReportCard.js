@@ -96,7 +96,7 @@ class ReportCard {
       .setButton(
         CardService.newTextButton()
           .setDisabled(!this.isPremium)
-          .setText(`${!this.isPremium ? (Static_Resources.emojis.lock + ' ') : ''}${this.localization.actions.edit}`)
+          .setText(`${!this.isPremium ? (Static_Resources.emojis.lock + ' ') : ''}${this.localization.actions.focus.replace('{0}', item.a1Notation)}`)
           .setOnClickAction(
             CardService.newAction()
               .setFunctionName('onReportItemClick')

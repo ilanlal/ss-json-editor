@@ -35,6 +35,7 @@ const Global_Resources = {
             premiumFeature: "This is a premium feature. Please activate your premium license to use it.",
             premiumActivated: "Premium Activated",
             claimPremium: "Claim your free {0} days premium membership now!",
+            focusedOnCell: "Focused on cell: {0}",
         },
         menu: {
             top: "Json studio",
@@ -139,6 +140,7 @@ const Global_Resources = {
             freeIcon: "🆓",
             change: "Change",
             indentSpaces: "Indentation Spaces",
+            focus: "👁️ {0}",
         }
     }
 }
