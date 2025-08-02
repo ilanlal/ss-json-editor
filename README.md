@@ -20,9 +20,9 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 - **Membership**: Introduced membership plans for premium features.
 - **Improvements**: Enhanced user interface, better performance, and more robust JSON parsing.
 
-## Screenshots ```v8```
+## Screenshots
 
-![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/Screenshot%202025-07-22%20015159.jpg)
+![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/vnext/assets/Screenshot-1280x800-v9001.png)
 
 ## References
 
