@@ -8,21 +8,30 @@ This Google Sheets™ add-on that allows users to format JSON data directly with
 
 If you are looking for a **simple way to prettify or minify JSON data** in your Google Sheets™ cell, this add-on is for you! 😉
 
-## Features
+## Free Features
 
 - **Prettify JSON**: Format JSON data to make it more readable.
+
+## Premium Features
+
 - **Minify JSON**: Remove unnecessary whitespace and line breaks from JSON data.
 - **Select Indentation**: Choose the indentation level for prettified JSON data. (1, 2, 4, 6 or 8 spaces)
+
+> Note: Until the add-on will support billing, the premium features are available for free.
 
 ### Release Notes ```v9```
 
 - **Validation**: Parse failures reporting, JSON validation, and improved error handling.
-- **Membership**: Introduced membership plans for premium features.
+- **Membership**: Introduced membership plans for premium features. The membership can be activated for free via the add-on's interface.
 - **Improvements**: Enhanced user interface, better performance, and more robust JSON parsing.
 
 ## Screenshots
 
-![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/vnext/assets/Screenshot-1280x800-v9001.png)
+| Free membership | Premium membership |
+| --- | --- |
+| <img width="320" alt="image" src="https://github.com/user-attachments/assets/eb457ab0-74a5-4172-aee1-a865bdedbba3" /> | <img width="320" alt="image" src="https://github.com/user-attachments/assets/43f892ea-37e6-4a22-9c55-81037512685e" /> |
+
+<img width="640" alt="image" src="https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/vnext/assets/Screenshot-1280x800-v9001.png" />
 
 ## References
 
