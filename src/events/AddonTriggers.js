@@ -7,12 +7,9 @@
  */
 function onDefaultHomePageOpen(e) {
     console.log("onDefaultHomePageOpen called with event:", e);
-    const localization = AppManager.getLocalizationResources();
     try {
-        const userStore = new UserStore();
-
         // Return the home card
-        return new HomeController(localization, userStore)
+        return ControllerBuilder.newHomeController()
             .home()
             .build();
 
@@ -21,7 +18,7 @@ function onDefaultHomePageOpen(e) {
             .getActiveSpreadsheet()
             .toast(
                 error.message || error.toString(),
-                localization.messages.error,
+                "Error",
                 7);
     }
 }
@@ -30,10 +27,10 @@ function onMinifyRange(e) {
     // This function is called when the user selects "Minify" from the add-on menu    
     console.log("onMinifyRange called with event:", e);
     try {
-        const localization = AppManager.getLocalizationResources();
-        const userStore = new UserStore();
-        return new HomeController(localization, userStore)
-            .minifyJsonFormat()
+        const range = SpreadsheetApp.getActiveSpreadsheet().getActiveRange();
+        return ControllerBuilder.newJsonStudioController()
+            .validateRange(range)
+            .minifyRange(range)
             .build();
     } catch (error) {
         return CardService.newActionResponseBuilder()
@@ -47,10 +44,12 @@ function onFormatRange(e) {
     console.log("onFormatRange called with event:", e);
 
     try {
-        const localization = AppManager.getLocalizationResources();
+        const range = SpreadsheetApp.getActiveSpreadsheet().getActiveRange();
         const userStore = new UserStore();
-        return new HomeController(localization, userStore)
-            .prettyJsonFormat()
+        const indentSpaces = e?.commonEventObject?.formInputs?.[Static_Resources.resources.indentSpaces]?.stringInputs?.value[0] || userStore.getIndentSpaces() || "2";
+        return ControllerBuilder.newJsonStudioController()
+            .validateRange(range)
+            .prettifyRange(range, indentSpaces * 1)
             .build();
     } catch (error) {
         return CardService.newActionResponseBuilder()
@@ -78,20 +77,15 @@ function onShowAboutCard(e) {
 function onIndentSpacesSelectorChange(e) {
     console.log("onIndentSpacesSelectorChange called with event:", e);
     try {
-        const userStore = new UserStore();
-        const selectedSpaces = e?.commonEventObject?.formInputs?.[Static_Resources.resources.indentSpaces]?.stringInputs?.value[0] || "2";
-        userStore.setIndentSpaces(selectedSpaces); // Store the selected spaces in user properties
+        return ControllerBuilder.newAccountController()
+            .indentSpacesChange(e)
+            .build();
     } catch (error) {
-        const localization = AppManager.getLocalizationResources();
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.messages.error,
-                7);
+        return CardService.newActionResponseBuilder()
+            .setNotification(CardService.newNotification()
+                .setText(error.toString()))
+            .build();
     }
-    // Return nothing as this is just a change event
-    return;
 }
 
 function onReportItemClick(e) {

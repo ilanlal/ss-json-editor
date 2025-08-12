@@ -4,11 +4,15 @@ class ReportController {
      * Represents a report for a specific range in Google Sheets.
      * @param {RangeReport} rangeReport - The report for the range.
      */
-    constructor(userStore = new UserStore(), localization = AppManager.getLocalizationResources()) {
+    constructor(localization, userStore) {
         this.localization = localization;
         this.userStore = userStore;
         this.userLicenseManager = new UserLicenseManager(userStore);
         this.userLicense = this.userLicenseManager.getLicense();
+    }
+
+    static newController(localization, userStore) {
+        return new ReportController(localization, userStore);
     }
 
     home(rangeReport) {
@@ -21,9 +25,10 @@ class ReportController {
             .newActionResponseBuilder()
             .setNavigation(
                 CardService.newNavigation()
-                    .pushCard(ReportCard
-                        .create(this.userLicense, rangeReport, this.localization)
-                        .build()));
+                    .pushCard(
+                        ReportCard
+                            .create(this.userLicense, rangeReport, this.localization)
+                            .build()));
     }
 
     close(e) {

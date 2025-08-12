@@ -5,74 +5,31 @@ class HomeController {
         this.userStore = userStore;
         this.userLicenseManager = new UserLicenseManager(userStore);
         this.userLicense = this.userLicenseManager.getLicense();
+        this.indentSpaces = this.userStore.getIndentSpaces() || "2";
     }
 
+    
     /**
      * @returns {CardService.ActionResponse}
      */
     home() {
-        const indentSpaces = this.userStore.getIndentSpaces() || "2";
-        const userLicense = this.userLicenseManager.getLicense();
         return CardService
             .newActionResponseBuilder()
             .setNavigation(
                 CardService.newNavigation()
-                    .pushCard(HomeCard
-                        .create(userLicense, this.localization, indentSpaces)
-                        .build()));
+                    .pushCard(
+                        HomeCard.create(
+                            this.userLicense, this.localization, this.indentSpaces)
+                            .build()));
     }
 
     /**
-     * @returns {CardService.ActionResponse}
+     * Creates a new instance of HomeController with the necessary dependencies.
+     * @returns {HomeController}
      */
-    prettyJsonFormat() {
-        const jsonStudio =
-            new JsonStudio(
-                SpreadsheetApp.getActiveSpreadsheet(),
-                this.localization,
-                this.userStore);
-
-        // Call the formatRange method of JsonStudio
-        const rangeReport = jsonStudio.formatRange();
-        const reportItems = rangeReport.getItems();
-        // If there are results, create and return the report card
-        if (reportItems?.length > 0) {
-            return new ReportController(this.userStore, this.localization)
-                .home(rangeReport)
-                .setStateChanged(true);
-        }
-
-
-        return CardService.newActionResponseBuilder()
-            .setNotification(
-                CardService.newNotification()
-                    .setText(
-                        this.localization.messages.success))
-            .setStateChanged(true);
+    static newController(localization, userStore) {
+        return new HomeController(localization, userStore);
     }
 
-    minifyJsonFormat() {
-        const jsonStudio = new JsonStudio(
-            SpreadsheetApp
-                .getActiveSpreadsheet(), this.localization, this.userStore);
 
-        // minify the range
-        const rangeReport = jsonStudio.minifyRange();
-        const reportItems = rangeReport.getItems();
-
-        // If there are results, create and return the report card
-        if (reportItems?.length > 0) {
-            return new ReportController(this.userStore, this.localization)
-                .home(rangeReport)
-                .setStateChanged(true);
-        }
-
-
-        return CardService.newActionResponseBuilder()
-            .setNotification(
-                CardService.newNotification()
-                    .setText(
-                        this.localization.messages.success))
-            .setStateChanged(true);
-    }
 }

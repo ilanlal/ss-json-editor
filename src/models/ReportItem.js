@@ -1,10 +1,10 @@
 // Google Apps Script code for Google Workspace Add-ons
 class ReportItem {
-    /**
-     * @param {string} a1Notation - A1 notation of the cell
-     * @param {string} message - Error message, if any
-     * @param {string} status - Status of the report item
-     */
+  /**
+   * @param {string} a1Notation - A1 notation of the cell
+   * @param {string} message - Error message, if any
+   * @param {string} status - Status of the report item
+   */
   constructor(a1Notation, message, status = ReportItem.Status.VALID) {
     this.a1Notation = a1Notation; // A1 notation of the cell
     this.message = message; // Error message, if any
@@ -13,17 +13,30 @@ class ReportItem {
     /** @type {string} */
     this.icon = ReportItem.Icons[status] || ReportItem.Icons.VALID; // Icon representing the status
   }
+
+  static create(a1Notation, message, status) {
+    return new ReportItem(a1Notation, message, status);
+  }
+
+  static createInvalid(a1Notation, message) {
+    return new ReportItem(a1Notation, message, ReportItem.Status.INVALID);
+  }
+
+  static createError(a1Notation, message) {
+    return new ReportItem(a1Notation, message, ReportItem.Status.ERROR);
+  }
 };
 
 // create enum for ReportItem status
 ReportItem.Status = {
-    VALID: 'VALID',
-    INVALID: 'INVALID',
-    ERROR: 'ERROR'
+  VALID: 'VALID',
+  INVALID: 'INVALID',
+  ERROR: 'ERROR'
 };
+
 // create enum for ReportItem Icons
 ReportItem.Icons = {
-    VALID: '💫',
-    INVALID: '⚠️',
-    ERROR: '‼️'
+  VALID: '💫',
+  INVALID: '⚠️',
+  ERROR: '‼️'
 };
