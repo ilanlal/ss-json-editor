@@ -1,7 +1,7 @@
 // Google Apps Script code for Google Workspace Add-ons
 class test_ReportController {
     constructor() {
-        QUnit.module("Report (controllers)");
+        QUnit.module("ReportController (controllers)");
         this.runTests();
         QUnit.done(() => {
             //this.tearDown();
@@ -16,16 +16,19 @@ class test_ReportController {
         tests.forEach(test => this[test]());
     }
     test_home() {
-        QUnit.test("Test home action", (assert) => {
+        QUnit.test("Test core actions", (assert) => {
             // Mock a range report
-            const mockRange = {
-                getA1Notation: () => "A1:B2",
-                getValues: () => [
+            const mockRange = MockRangeBuilder.newMockRange()
+                .withA1Notation("A1:B2")
+                .withValues([
                     ["Header 1", "Header 2"],
                     ["Value 1", "Value 2"]
-                ]
-            };
-            const rangeReport = ModuleBuilder.newRangeReport().setRange(mockRange);
+                ]);
+            const rangeReport = ModuleBuilder.newRangeReport()
+                .setRange(mockRange)
+                .addItem(ReportItem.createInvalid("A1", "Invalid JSON in cell A1"))
+                .addItem(ReportItem.createInvalid("B2", "Invalid JSON in cell B2"));
+
             const userStore = ModuleBuilder.newUserStore();
             const localization = AppManager.getLocalizationResources();
             // Create a ReportController instance

@@ -88,7 +88,7 @@ class JsonStudioController {
      * @returns {CardService.ActionResponse}
      */
     handleInvalidJsonReport(rangeReport) {
-        return new ReportController(this.userStore, this.localization)
+        return ControllerBuilder.newReportController(this.localization, this.userStore)
             .home(rangeReport)
             .setStateChanged(true);
     }
