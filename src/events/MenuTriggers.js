@@ -4,13 +4,11 @@ function onMenuFormatRange(e) {
     // Code to format the selected range
     const localization = AppManager.getLocalizationResources();
     try {
-        const userStore = new UserStore();
-        const jsonStudio = new JsonStudio(
-            SpreadsheetApp
-                .getActiveSpreadsheet(), localization, userStore);
+        const rangeReport = ServiceBuilder.newJsonStudio()
+            .formatRange(SpreadsheetApp
+                .getActiveSpreadsheet()
+                .getActiveRange());
 
-        // format the range
-        const rangeReport = jsonStudio.formatRange();
         const reportItems = rangeReport.getItems();
         // If there are results, toast the user with the number of failed cells
         if (reportItems?.length > 0) {
@@ -40,13 +38,11 @@ function onMenuMinifyRange(e) {
     // This function is called when the user selects "Minify" from the add-on menu
     const localization = AppManager.getLocalizationResources();
     try {
-        const userStore = new UserStore();
-        const jsonStudio = new JsonStudio(
-            SpreadsheetApp
-                .getActiveSpreadsheet(), localization, userStore);
+        const rangeReport = ServiceBuilder.newJsonStudio()
+            .minifyRange(SpreadsheetApp
+                .getActiveSpreadsheet()
+                .getActiveRange());
 
-        // minify the range
-        const rangeReport = jsonStudio.minifyRange();
         const reportItems = rangeReport.getItems();
         // If there are results, toast the user with the number of failed cells
         if (reportItems?.length > 0) {
@@ -69,4 +65,14 @@ function onMenuMinifyRange(e) {
     // Return nothing to indicate the operation is complete
     // This is important for the add-on to function correctly
     return;
+}
+
+function onMenuOpenSidebarHome(e) {
+    console.log("onMenuOpenSidebarHome called with event:", e);
+    // This function is called when the user selects "Home" from the add-on menu
+
+    // Open the Home view of the Home controller
+    return ControllerBuilder.newHomeController()
+        .home()
+        .build();
 }

@@ -19,14 +19,6 @@ function onOpen(e) {
             .addItem('Minify', 'onMenuMinifyRange')
             .addToUi();
     }
-    else {
-        SpreadsheetApp
-            .getUi()
-            .createAddonMenu()
-            .addItem('Format', 'onMenuFormatRange')
-            //.addItem('Minify', 'onMenuMinifyRange')
-            .addToUi();
-    }
 }
 
 /**
