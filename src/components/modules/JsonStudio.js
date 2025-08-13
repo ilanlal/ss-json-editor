@@ -2,7 +2,12 @@
 class JsonStudio {
     constructor() {
     }
-
+    
+    /**
+     * @param {*} range 
+     * @param {number} indentSpaces
+     * @returns RangeReport
+     */
     prettifyRange(range, indentSpaces = 2) {
         const report = ModuleBuilder.newRangeReport().setRange(range);
         const values = range.getValues();
@@ -42,6 +47,10 @@ class JsonStudio {
         return report;
     }
 
+    /**
+     * @param {*} range 
+     * @returns RangeReport
+     */
     minifyRange(range) {
         const report = ModuleBuilder.newRangeReport().setRange(range);
         const values = range.getValues();
@@ -82,5 +91,9 @@ class JsonStudio {
 
         // Trim whitespace from the cell value
         return value?.toString()?.replace(/[\n\r]/g, '')?.trim();
+    }
+
+    static newInstance() {
+        return new JsonStudio();
     }
 }

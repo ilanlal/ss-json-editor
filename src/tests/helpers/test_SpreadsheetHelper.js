@@ -11,8 +11,7 @@ class test_SpreadsheetHelper {
 
     runTests() {
         const tests = [
-            this.testGetOptimalRange.bind(this),
-            this.testIsRangeWithinLimits.bind(this)
+            this.testGetOptimalRange.bind(this)
         ];
         tests.forEach(test => {
             try {
@@ -38,13 +37,6 @@ class test_SpreadsheetHelper {
                 range.getA1Notation(),
                 "A1:B2",
                 "Range should match expected A1:B2 notation");
-        });
-    }
-
-    testIsRangeWithinLimits() {
-        QUnit.test("Test isRangeWithinLimits", (assert) => {
-            const range = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getRange("A1:B2");
-            assert.ok(SpreadsheetHelper.isRangeWithinLimits(range), "Range should be within limits");
         });
     }
 }

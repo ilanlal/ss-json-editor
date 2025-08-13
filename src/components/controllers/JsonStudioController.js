@@ -3,8 +3,7 @@ class JsonStudioController {
     constructor(localization, userStore) {
         this.localization = localization;
         this.userStore = userStore;
-        this.userLicenseManager = new UserLicenseManager(userStore);
-        this.userLicense = this.userLicenseManager.getLicense();
+        this.userLicense = this.userStore.getUserLicense();
         this.indentSpaces = this.userStore.getIndentSpaces() || "2";
     }
 
@@ -12,7 +11,7 @@ class JsonStudioController {
      * Creates a new instance of JsonStudioController with the necessary dependencies.
      * @returns {JsonStudioController}
      */
-    static newController(localization, userStore) {
+    static newJsonStudioController(localization, userStore) {
         return new JsonStudioController(localization, userStore);
     }
 

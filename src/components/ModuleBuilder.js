@@ -1,17 +1,13 @@
 class ModuleBuilder {
     static newJsonStudio() {
-        return new JsonStudio();
+        return JsonStudio.newInstance();
     }
 
     static newRangeReport() {
-        return RangeReport.create();
+        return RangeReport.newInstance();
     }
 
     static newUserStore() {
-        return new UserStore();
-    }
-
-    static newUserLicenseManager(userStore = ModuleBuilder.newUserStore()) {
-        return new UserLicenseManager(userStore);
+        return UserStore.newInstance();
     }
 }

@@ -7,11 +7,6 @@ class RangeReport {
         this.effectedCells = 0; // Number of cells affected by the report
     }
 
-    static create() {
-        const report = new RangeReport();
-        return report;
-    }
-
     /**
      * Add an item to the report.
      * @param {ReportItem} item - The report item to add.
@@ -22,6 +17,7 @@ class RangeReport {
             throw new Error("Item must be an instance of ReportItem");
         }
         this.items.push(item);
+        return this;
     }
 
     getItems() {
@@ -38,6 +34,7 @@ class RangeReport {
 
     setRange(range) {
         this.range = range;
+        return this;
     }
 
     getEffectedCells() {
@@ -46,13 +43,20 @@ class RangeReport {
 
     setEffectedCells(count) {
         this.effectedCells = count;
+        return this;
     }
 
     incrementEffectedCells() {
         this.effectedCells++;
+        return this;
     }
 
     hasItems() {
         return this.items.length > 0;
+    }
+
+    static newInstance() {
+        const report = new RangeReport();
+        return report;
     }
 }

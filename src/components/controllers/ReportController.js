@@ -7,11 +7,10 @@ class ReportController {
     constructor(localization, userStore) {
         this.localization = localization;
         this.userStore = userStore;
-        this.userLicenseManager = new UserLicenseManager(userStore);
-        this.userLicense = this.userLicenseManager.getLicense();
+        this.userLicense = this.userStore.getUserLicense();
     }
 
-    static newController(localization, userStore) {
+    static newReportController(localization, userStore) {
         return new ReportController(localization, userStore);
     }
 

@@ -2,11 +2,10 @@ class AccountController {
     constructor(localization, userStore) {
         this.localization = localization;
         this.userStore = userStore;
-        this.userLicenseManager = new UserLicenseManager(this.userStore);
-        this.userLicense = this.userLicenseManager.getLicense();
+        this.userLicense = this.userStore.getUserLicense();
     }
 
-    static newController(localization, userStore) {
+    static newAccountController(localization, userStore) {
         return new AccountController(localization, userStore);
     }
 

@@ -2,7 +2,27 @@
 class test_UserStore {
     constructor() {
         QUnit.module("UserStore (modules)");
+        // Clean up after tests
+        QUnit.done(() => {
+            // Any necessary cleanup can be done here
+            // For example, resetting the user license to its original state
+            ModuleBuilder.newUserStore().setUserLicense(this.originalUserLicense);
+            ModuleBuilder.newUserStore().setLocalizationCode(this.originalLocalizationCode);
+            ModuleBuilder.newUserStore().setIndentSpaces(this.originalIndentSpaces);
+        });
         this.runTests();
+    }
+
+    setOriginalUserLicense(userLicense) {
+        this.originalUserLicense = userLicense;
+    }
+
+    setOriginalLocalizationCode(localizationCode) {
+        this.originalLocalizationCode = localizationCode;
+    }
+
+    setOriginalIndentSpaces(indentSpaces) {
+        this.originalIndentSpaces = indentSpaces;
     }
 
     runTests() {
@@ -23,39 +43,47 @@ class test_UserStore {
 
     test_indentSpaces() {
         QUnit.test("indentSpaces", (assert) => {
-            const userStore = new UserStore();
-            userStore.setIndentSpaces(4);
-            const indentSpaces = userStore.getIndentSpaces();
+            // Set up initial indentSpaces
+            this.setOriginalIndentSpaces(ModuleBuilder.newUserStore().getIndentSpaces());
+            assert.ok(this.originalIndentSpaces, "Original indentSpaces should be defined");
+
+            ModuleBuilder.newUserStore().setIndentSpaces(4);
+            const indentSpaces = ModuleBuilder.newUserStore().getIndentSpaces();
             assert.equal(indentSpaces, 4, "indentSpaces should return the correct indentSpaces");
 
             // check if indentSpaces is set to a different value
-            userStore.setIndentSpaces("6");
-            const newIndentSpaces = userStore.getIndentSpaces();
-            assert.equal(newIndentSpaces, "6", "indentSpaces should return the correct indentSpaces");
+            ModuleBuilder.newUserStore().setIndentSpaces("6");
+            const newIndentSpaces = ModuleBuilder.newUserStore().getIndentSpaces();
+            assert.equal(newIndentSpaces, 6, "indentSpaces should return the correct indentSpaces");
 
             // Check for default value if no input is provided
-            userStore.setIndentSpaces(""); // Reset to empty to check default
-            const defaultIndentSpaces = userStore.getIndentSpaces();
-            assert.equal(defaultIndentSpaces, "2", "indentSpaces should default to 2 if not set");
+            ModuleBuilder.newUserStore().setIndentSpaces(""); // Reset to empty to check default
+            const defaultIndentSpaces = ModuleBuilder.newUserStore().getIndentSpaces();
+            assert.equal(defaultIndentSpaces, UserStore.Constants.DEFAULT_INDENT_SPACES, "indentSpaces should default if not set");
         });
     }
 
     test_localization() {
         QUnit.test("localization", (assert) => {
-            const userStore = new UserStore();
-            userStore.setLocalization("fr");
-            const localization = userStore.getLocalization();
+            this.setOriginalLocalizationCode(ModuleBuilder.newUserStore().getLocalizationCode());
+            assert.ok(this.originalLocalizationCode, "Original localizationCode should be defined");
+
+            ModuleBuilder.newUserStore().setLocalizationCode("fr");
+            const localization = ModuleBuilder.newUserStore().getLocalizationCode();
             assert.equal(localization, "fr", "localization should return the correct localization");
 
             // Check for default value if no input is provided
-            userStore.setLocalization(""); // Reset to empty to check default
-            const defaultLocalization = userStore.getLocalization();
+            ModuleBuilder.newUserStore().setLocalization(""); // Reset to empty to check default
+            const defaultLocalization = ModuleBuilder.newUserStore().getLocalizationCode();
             assert.equal(defaultLocalization, "en", "localization should default to 'en' if not set");
         });
     }
 
     test_userLicenseCRUD() {
         QUnit.test("User License CRUD Operations", (assert) => {
+            this.setOriginalUserLicense(ModuleBuilder.newUserStore().getUserLicense());
+            assert.ok(this.originalUserLicense, "Original user license should be defined");
+
             // Set up unique user license for testing
             // Randomly generated unique IDs for userid and planid
             const randomUserId = () => Math.random().toString(36).substring(2, 15);
@@ -74,31 +102,27 @@ class test_UserStore {
 
             const randomAmount = Math.floor(Math.random() * 1000) + 1; // Random amount between 1 and 1000
 
-            const userLicense = new UserLicense(
-                userId,
-                planId,
-                yesterday.toISOString(),
-                expiresInOneYear.toISOString(),
-                randomAmount
-            );
+            const userLicense = UserLicense.newUserLicense()
+                .setAmount(randomAmount)
+                .setUserId(userId)
+                .setPlanId(planId)
+                .setCreatedOn(yesterday.toISOString())
+                .setExpirationDate(expiresInOneYear.toISOString());
 
-            // Assuming UserStore has already been initialized
-            const userStore = new UserStore();
-            const license = userStore.setUserLicense(userLicense);
-            assert.ok(license, "User license should be set successfully");
+            ModuleBuilder.newUserStore().setUserLicense(userLicense);
 
             // Retrieve the license
-            const retrievedLicense = userStore.getUserLicense();
+            const retrievedLicense = ModuleBuilder.newUserStore().getUserLicense();
             assert.ok(retrievedLicense, "User license should be retrieved successfully");
             assert.strictEqual(retrievedLicense.userId, userId, "User ID should match");
             assert.strictEqual(retrievedLicense.planId, planId, "Plan ID should match");
             assert.strictEqual(retrievedLicense.createdOn, yesterday.toISOString(), "CreatedOn date should match");
-            assert.strictEqual(retrievedLicense.utcExpirationDate, expiresInOneYear.toISOString(), "Expiration date should match");
+            assert.strictEqual(retrievedLicense.expirationDate, expiresInOneYear.toISOString(), "Expiration date should match");
             assert.strictEqual(retrievedLicense.amount, randomAmount, "Amount should match");
 
             // Clean up
-            userStore.clearUserLicense();
-            const clearedLicense = userStore.getUserLicense();
+            ModuleBuilder.newUserStore().clearUserLicense();
+            const clearedLicense = ModuleBuilder.newUserStore().getUserLicense();
             assert.strictEqual(clearedLicense, undefined, "User license should be cleared successfully");
         });
     }

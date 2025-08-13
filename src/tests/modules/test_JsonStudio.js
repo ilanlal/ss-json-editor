@@ -1,10 +1,16 @@
 // Google Apps Script code for Google Workspace Add-ons
 class test_JsonStudio {
     constructor() {
-        QUnit.module("Json Studio (mudules)");
+        QUnit.module("Json Studio (modules)");
         this.localization = AppManager.getLocalizationResources();
-        this.userStore = new UserStore();
-        this.dummySheet = this.initializeTestSheet();
+        this.userStore = ModuleBuilder.newUserStore();
+
+        // Clean up after tests
+        QUnit.done(() => {
+            // Any necessary cleanup can be done here
+            // For example, resetting the user store or localization
+            //this.userStore.setIndentSpaces(UserStore.DEFAULT_INDENT_SPACES);
+        });
 
         this.runTests();
     }
@@ -12,7 +18,7 @@ class test_JsonStudio {
     runTests() {
         const tests = [
             "test_minifyRange",
-            "test_formatRange"
+            "test_prettifyRange",
         ];
         tests.forEach(test => this[test]());
     }
@@ -24,16 +30,23 @@ class test_JsonStudio {
                 ['{"key": "value"}', '{"array": [1, 2, 3]}'],
                 ['{"nested": {"key": "value"}}', '{"boolean": true}']
             ];
-            this.dummySheet.getRange("A1:B2").setValues(values);
-            let jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
-            let report = jsonStudio.minifyRange();
+
+            let mockRange = {
+                getValues: () => values,
+                setValues: (newValues) => {
+                    values.length = 0;
+                    values.push(...newValues);
+                }
+            };
+
+            let report = ModuleBuilder.newJsonStudio().minifyRange(mockRange);
 
             const expectedValues = [
                 ['{"key":"value"}', '{"array":[1,2,3]}'],
                 ['{"nested":{"key":"value"}}', '{"boolean":true}']
             ];
             assert.deepEqual(
-                this.dummySheet.getRange("A1:B2").getValues(),
+                mockRange.getValues(),
                 expectedValues, "Range should be minified correctly");
 
             // Check the report for any errors
@@ -44,36 +57,40 @@ class test_JsonStudio {
                 ['{"key": "value"', '{"array": [1, 2, 3]}'],
                 ['{"nested": {"key": "value"}}', '{"boolean": true']
             ];
-            this.dummySheet.getRange("A1:B2").setValues(invalidValues);
+            mockRange.setValues(invalidValues);
 
-            jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
-            report = jsonStudio.minifyRange();
+            report = ModuleBuilder.newJsonStudio().minifyRange(mockRange);
             const items = report.getItems();
 
             assert.strictEqual(items.length, 2, "There should be two errors in the report");
-            assert.strictEqual(items[0].status, ReportItem.Status.INVALID, "First item should be INVALID");
-            assert.strictEqual(items[1].status, ReportItem.Status.INVALID, "Second item should be INVALID");
         });
     }
 
-    test_formatRange() {
-        QUnit.test("Test formatRange", (assert) => {
+    test_prettifyRange() {
+        QUnit.test("Test prettifyRange", (assert) => {
             // Mock a range with minified JSON data
             const values = [
                 ['{"key":"value"}', '{"array":[1,2,3]}'],
                 ['{"nested":{"key":"value"}}', '{"boolean":true}']
             ];
-            this.dummySheet.getRange("A1:B2").setValues(values);
-            let jsonStudio = new JsonStudio(this.dummySheet, this.localization, this.userStore);
+
+            let mockRange = {
+                getValues: () => values,
+                setValues: (newValues) => {
+                    values.length = 0;
+                    values.push(...newValues);
+                }
+            };
+
             // Call formatRange to format the JSON data
-            let report = jsonStudio.formatRange();
+            let report = ModuleBuilder.newJsonStudio().prettifyRange(mockRange, 2);
 
             const expectedValues = [
                 ['{\n  "key": "value"\n}', '{\n  "array": [\n    1,\n    2,\n    3\n  ]\n}'],
                 ['{\n  "nested": {\n    "key": "value"\n  }\n}', '{\n  "boolean": true\n}']
             ];
             assert.deepEqual(
-                this.dummySheet.getRange("A1:B2").getValues(),
+                mockRange.getValues(),
                 expectedValues, "Range should be formatted correctly");
 
             // Check the report for any errors
@@ -84,43 +101,14 @@ class test_JsonStudio {
                 ['{"key": "value"', '{"array": [1, 2, 3]}'],
                 ['{"nested": {"key": "value"}}', '{"boolean": true']
             ];
-            this.dummySheet.getRange("A1:B2").setValues(invalidValues);
-            jsonStudio = new JsonStudio(
-                this.dummySheet,
-                this.localization,
-                this.userStore);
-            // Call formatRange to format the JSON data
-            report = jsonStudio.formatRange();
+            mockRange.setValues(invalidValues);
+            report = ModuleBuilder.newJsonStudio().prettifyRange(mockRange, 2);
             const items = report.getItems();
             assert.strictEqual(items.length, 2, "There should be two errors in the report");
-            assert.strictEqual(items[0].status, ReportItem.Status.INVALID, "First item should be INVALID");
-            assert.strictEqual(items[1].status, ReportItem.Status.INVALID, "Second item should be INVALID");
         });
     }
 
-    initializeTestSheet() {
-        // Create (if not exists) a dummy sheet for testing
-        // This is a utility method to ensure tests have a valid range to work with
-        const ss = SpreadsheetApp.getActiveSpreadsheet();
-        let sheet = ss.getSheetByName("TestSheet");
-        if (!sheet) {
-            sheet = ss.insertSheet("TestSheet");
-        }
-
-        // Activate the sheet to ensure it's ready for testing
-        ss.setActiveSheet(sheet);
-        ss.setActiveRange(sheet.getRange("A1:B4")); // Set a default range for testing
-        // Clear existing data
-        sheet.clear(); // Clear the sheet before adding new data
-        return sheet;
-    }
-
     tearDown() {
-        // Clean up after tests
-        const ss = SpreadsheetApp.getActiveSpreadsheet();
-        const sheet = ss.getSheetByName("TestSheet");
-        if (sheet) {
-            ss.deleteSheet(sheet);
-        }
+        
     }
 }

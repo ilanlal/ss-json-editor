@@ -8,10 +8,10 @@ class AboutController {
     */
     home() {
         return CardService.newActionResponseBuilder()
-            .setNavigation(
-                CardService.newNavigation()
-                    .pushCard(
-                        AboutCard.create(this.localization)
-                            .build()));
+            .setNavigation(CardService
+                .newNavigation()
+                .pushCard(
+                    AboutCard.create(this.localization)
+                        .build()));
     }
 }

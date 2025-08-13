@@ -1,7 +1,11 @@
 // Google Apps Script code for Google Workspace Add-ons
 class UserStore {
-  constructor() {
-    this.userProperties = PropertiesService.getUserProperties();
+  /**
+   * use UserStore.newUserPropertiesStore() to create an instance of UserStore using user properties (Apps Script PropertiesService)
+   * @param {*} userDataStore 
+   */
+  constructor(userDataStore) {
+    this.userDataStorage = userDataStore;
   }
 
   /**
@@ -10,36 +14,41 @@ class UserStore {
    * If no localization is set, it defaults to "en" (English).
    * @return {string} The user's localization setting, defaulting to "en".
    */
-  getLocalization() {
-    return this.userProperties
-      .getProperty('localization') || "en"; // Default to English
+  getLocalizationCode() {
+    return this.userDataStorage
+      .getProperty(UserStore.Constants.LOCALIZATION_KEY) || UserStore.Constants.DEFAULT_LOCALIZATION;
   }
 
   /**
    * Sets the localization for the user.
    * @param {string} locale The locale to set, default is "en".
    */
-  setLocalization(locale = "en") {
-    this.userProperties.setProperty('localization', locale);
+  setLocalizationCode(locale = UserStore.Constants.DEFAULT_LOCALIZATION) {
+    this.userDataStorage.setProperty(UserStore.Constants.LOCALIZATION_KEY, locale);
+    return this;
   }
 
   /**
    * Gets the number of spaces for indentation.
-   * @return {string} The number of spaces for indentation, defaulting to "2".
+   * @return {number} The number of spaces for indentation, defaulting to DEFAULT_INDENT_SPACES.
    */
   getIndentSpaces() {
-    return this.userProperties.getProperty(
-      Static_Resources.resources.indentSpaces) || "2"; // Default to 2 spaces
+    const spaces = this.userDataStorage.getProperty(UserStore.Constants.INDENT_SPACES_KEY);
+
+    if (isNaN(spaces) || spaces === null || spaces === undefined) {
+      return UserStore.Constants.DEFAULT_INDENT_SPACES; // Return default if not set or invalid
+    }
+
+    return parseInt(spaces);
   }
 
   /**
    * Sets the number of spaces for indentation.
-   * @param {string} value The number of spaces for indentation, default is "2".
+   * @param {number} value The number of spaces for indentation, default is DEFAULT_INDENT_SPACES=2 constant.
    */
-  setIndentSpaces (value = "2") {
-    this.userProperties.setProperty(
-      Static_Resources.resources.indentSpaces,
-      value);
+  setIndentSpaces(value = UserStore.Constants.DEFAULT_INDENT_SPACES) {
+    this.userDataStorage.setProperty(UserStore.Constants.INDENT_SPACES_KEY, value);
+    return this;
   }
 
   /**
@@ -50,26 +59,17 @@ class UserStore {
    * @see UserLicense
    */
   getUserLicense() {
-    const data = this.userProperties
-      .getProperty(Static_Resources.userLicense);
+    const data = this.userDataStorage
+      .getProperty(UserStore.Constants.USER_LICENSE_KEY);
 
-    if (!data) {
+    if (!data
+      || data === "undefined"
+      || data === "null"
+      || data === "") {
       return undefined; // Return undefined if no license is set
     }
-    // Parse the JSON string into a UserLicense object
-    try {
-      const licenseData = JSON.parse(data);
-      return new UserLicense(
-        licenseData.userId,
-        licenseData.planId,
-        licenseData.createdOn,
-        licenseData.utcExpirationDate,
-        licenseData.amount
-      );
-    } catch (error) {
-      Logger.log(`UserStore.getUserLicense: error=${error}`);
-      return undefined;
-    }
+
+    return UserLicense.fromJSON(data);
   }
 
   /**
@@ -77,22 +77,37 @@ class UserStore {
    * @param {UserLicense} license The license information to set.
    */
   setUserLicense(license) {
-    if (!(license instanceof UserLicense)) {
-      throw new Error("Invalid license data");
+    if (!(license instanceof UserLicense) && !(license === undefined)) {
+      throw new Error("Invalid license object provided. Must be an instance of UserLicense or undefined.");
     }
-    const licenseJson = JSON.stringify(license);
 
-    return this.userProperties
-      .setProperty(
-        Static_Resources.userLicense,
-        licenseJson
-      );
+    if(license === undefined) {
+      return this.clearUserLicense();
+    }
+    
+    const licenseJson = UserLicense.toJSON(license);
+
+    this.userDataStorage.setProperty(UserStore.Constants.USER_LICENSE_KEY, licenseJson);
+    return this;
   }
 
   /**
    * Clears the user's license information.
    */
   clearUserLicense() {
-    this.userProperties.deleteProperty(Static_Resources.userLicense);
+    this.userDataStorage.deleteProperty(UserStore.Constants.USER_LICENSE_KEY);
+    return this;
+  }
+
+  static newInstance() {
+    return new UserStore(PropertiesService.getUserProperties());
   }
 }
+
+UserStore.Constants = {
+  INDENT_SPACES_KEY: () => 'indentSpaces',
+  USER_LICENSE_KEY: () => 'userLicense',
+  LOCALIZATION_KEY: () => 'localization',
+  DEFAULT_LOCALIZATION: () => 'en',
+  DEFAULT_INDENT_SPACES: () => 2
+};

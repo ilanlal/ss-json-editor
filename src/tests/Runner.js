@@ -37,7 +37,6 @@ class QUnitRunner {
 
     test_types() {
         new test_ReportItem();
-        new test_RangeReport();
         new test_UserLicense();
     }
 
@@ -47,9 +46,9 @@ class QUnitRunner {
     }
 
     test_modules() {
+        new test_RangeReport();
         new test_JsonStudio();
         new test_UserStore();
-        new test_UserLicenseManager();
     }
 
     test_views() {

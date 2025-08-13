@@ -45,8 +45,8 @@ function onFormatRange(e) {
 
     try {
         const range = SpreadsheetApp.getActiveSpreadsheet().getActiveRange();
-        const userStore = new UserStore();
-        const indentSpaces = e?.commonEventObject?.formInputs?.[Static_Resources.resources.indentSpaces]?.stringInputs?.value[0] || userStore.getIndentSpaces() || "2";
+        const indentSpaces =  ModuleBuilder.newUserStore().getIndentSpaces();
+        
         return ControllerBuilder.newJsonStudioController()
             .validateRange(range)
             .prettifyRange(range, indentSpaces * 1)
@@ -200,7 +200,7 @@ function onEditRange(e) {
 function onOpenAccountCard(e) {
     console.log("onOpenAccountCard called with event:", e);
     try {
-        return new AccountController()
+        return ControllerBuilder.newAccountController()
             .home()
             .build();
 
@@ -217,7 +217,7 @@ function onOpenAccountCard(e) {
 function onActivatePremium(e) {
     console.log("onActivatePremium called with event:", e);
     try {
-        return new AccountController()
+        return ControllerBuilder.newAccountController()
             .activatePremium()
             .build();
     } catch (error) {
@@ -233,7 +233,7 @@ function onActivatePremium(e) {
 function onRevokeLicense(e) {
     console.log("onRevokeLicense called with event:", e);
     try {
-        return new AccountController()
+        return ControllerBuilder.newAccountController()
             .revokePremium()
             .build();
     } catch (error) {
