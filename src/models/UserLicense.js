@@ -89,7 +89,7 @@ class UserLicense {
         );
     }
 
-    static toJSON(license) {
+    static toJsonString(license) {
         return JSON.stringify({
             userId: license.userId,
             planId: license.planId,

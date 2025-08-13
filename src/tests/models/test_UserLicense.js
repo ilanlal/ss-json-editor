@@ -22,13 +22,14 @@ class test_UserLicense {
             const createdOn = new Date("2023-01-01T00:00:00Z");
             const expirationDate = new Date("2024-01-01T00:00:00Z");
             const amount = 100;
-            const userLicense = UserLicense.fromJSON({
-                userId,
-                planId,
-                createdOn: createdOn.toISOString(),
-                expirationDate: expirationDate.toISOString(),
-                amount
-            });
+            const userLicense = UserLicense.fromJSON(JSON.stringify({
+                "userId": userId,
+                "planId": planId,
+                "createdOn": createdOn.toISOString(),
+                "expirationDate": expirationDate.toISOString(),
+                "amount": amount
+            }));
+
             assert.ok(userLicense, "UserLicense instance should be created from JSON");
             assert.strictEqual(userLicense.userId, userId, "User ID should match");
             assert.strictEqual(userLicense.planId, planId, "Plan ID should match");
@@ -48,9 +49,13 @@ class test_UserLicense {
             userLicense.setExpirationDate(tomorrow.toISOString());
             assert.strictEqual(userLicense.isActive(), true, "UserLicense should be active when not expired");
 
-            // check toJSON
-            const json = userLicense.toJSON();
-            assert.ok(json, "toJSON should return a valid JSON object");
+            // check toJsonString
+            const jsonText = UserLicense.toJsonString(userLicense);
+            assert.ok(jsonText, "toJsonString should return a valid JSON string");
+
+            const json = JSON.parse(jsonText);
+            assert.ok(json, "Parsed JSON should be defined");
+            
             assert.strictEqual(json.userId, userId, "User ID should match");
             assert.strictEqual(json.planId, planId, "Plan ID should match");
             assert.strictEqual(new Date(json.createdOn).getTime(), createdOn.getTime(), "CreatedOn date should match");

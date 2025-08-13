@@ -35,7 +35,7 @@ class UserStore {
   getIndentSpaces() {
     const spaces = this.userDataStorage.getProperty(UserStore.Constants.INDENT_SPACES_KEY);
 
-    if (isNaN(spaces) || spaces === null || spaces === undefined) {
+    if (!spaces) {
       return UserStore.Constants.DEFAULT_INDENT_SPACES; // Return default if not set or invalid
     }
 
@@ -85,7 +85,7 @@ class UserStore {
       return this.clearUserLicense();
     }
     
-    const licenseJson = UserLicense.toJSON(license);
+    const licenseJson = UserLicense.toJsonString(license);
 
     this.userDataStorage.setProperty(UserStore.Constants.USER_LICENSE_KEY, licenseJson);
     return this;
@@ -105,9 +105,9 @@ class UserStore {
 }
 
 UserStore.Constants = {
-  INDENT_SPACES_KEY: () => 'indentSpaces',
-  USER_LICENSE_KEY: () => 'userLicense',
-  LOCALIZATION_KEY: () => 'localization',
-  DEFAULT_LOCALIZATION: () => 'en',
-  DEFAULT_INDENT_SPACES: () => 2
+  INDENT_SPACES_KEY: 'indentSpaces',
+  USER_LICENSE_KEY: 'userLicense',
+  LOCALIZATION_KEY: 'localization',
+  DEFAULT_LOCALIZATION: 'en',
+  DEFAULT_INDENT_SPACES: 2
 };

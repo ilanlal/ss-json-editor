@@ -75,11 +75,11 @@ class HomeCard {
                     // Enable for premium users
                     .setTitle(this.localization.cards.home.indentSpaces)
                     .setFieldName(Static_Resources.resources.indentSpaces)
-                    .addItem('1 {.}', '1', this.indentationLevel === "1")
-                    .addItem('2 {..}', '2', this.indentationLevel === "2") // Default selected
-                    .addItem('4 {....}', '4', this.indentationLevel === "4")
-                    .addItem('6 {......}', '6', this.indentationLevel === "6")
-                    .addItem('8 {........}', '8', this.indentationLevel === "8")
+                    .addItem('1 {.} small', '1', this.indentationLevel === 1)
+                    .addItem('2 {..} default', '2', this.indentationLevel === 2) // Default selected
+                    .addItem('4 {....} large', '4', this.indentationLevel === 4)
+                    .addItem('6 {......} extra large', '6', this.indentationLevel === 6)
+                    .addItem('8 {........} huge', '8', this.indentationLevel === 8)
                     .setOnChangeAction(
                         CardService
                             .newAction()

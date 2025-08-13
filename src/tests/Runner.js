@@ -64,7 +64,7 @@ class QUnitRunner {
         new test_HomeController();
         new test_AccountController();
         new test_ReportController();
-        new test_JsonEditorController();
+        new test_JsonStudioController();
     }
 
 

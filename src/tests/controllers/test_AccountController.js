@@ -1,7 +1,7 @@
 // Google Apps Script code for Google Workspace Add-ons
 class test_AccountController {
     constructor() {
-        QUnit.module("Account (controllers)");
+        QUnit.module("AccountController (controllers)");
         this.runTests();
         QUnit.done(() => {
             //this.tearDown();
@@ -20,15 +20,15 @@ class test_AccountController {
 
     test_home() {
         QUnit.test("Test home action", (assert) => {
-            const controller = new AccountController();
-            const actionResponse = JSON.parse(
-                controller
-                    .home()
-                    .build()
-                    .printJson());
+            const action = ControllerBuilder.newAccountController()
+                .home()
+                .build()
+                .printJson();
+
+            const actionResponse = JSON.parse(action);
 
             assert.ok(actionResponse, "Action response should be created successfully");
-            const card = 
+            const card =
                 actionResponse.renderActions.action.navigations[0].pushCard;
             assert.ok(card, "Card should be created successfully");
             assert.strictEqual(
@@ -41,12 +41,11 @@ class test_AccountController {
 
     test_activatePremium() {
         QUnit.test("Test activatePremium action", (assert) => {
-            const controller = new AccountController();
-            const actionResponse = JSON.parse(
-                controller
-                    .activatePremium()
-                    .build()
-                    .printJson());
+            const action = ControllerBuilder.newAccountController()
+                .activatePremium()
+                .build()
+                .printJson();
+            const actionResponse = JSON.parse(action);
 
             assert.ok(actionResponse, "Action response should be created successfully");
         });
@@ -54,12 +53,11 @@ class test_AccountController {
 
     test_revokePremium() {
         QUnit.test("Test revokePremium action", (assert) => {
-            const controller = new AccountController();
-            const actionResponse = JSON.parse(
-                controller
-                    .revokePremium()
-                    .build()
-                    .printJson());
+            const action = ControllerBuilder.newAccountController()
+                .revokePremium()
+                .build()
+                .printJson();
+            const actionResponse = JSON.parse(action);
 
             assert.ok(actionResponse, "Action response should be created successfully");
         });

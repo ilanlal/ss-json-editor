@@ -28,12 +28,16 @@ class AccountController {
         const userId = 'me'; // Assuming 'me' refers to the current user
         const planId = 'premium'; // Example plan ID
         const createdOn = new Date();
-        const utcExpirationDate = new Date(
-            createdOn.getTime() + 14 * 24 * 60 * 60 * 1000); // 14 days from now
+        const ticks = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
+        const expirDate = new Date(createdOn.getTime() + ticks); // 14 days from now
         const amount = 0; // Assuming no cost for the trial
+        const newUserLicense = UserLicense.newUserLicense()
+            .setUserId(userId)
+            .setPlanId(planId)
+            .setExpirationDate(expirDate)
+            .setAmount(amount);
 
-        this.userLicenseManager.setLicense(
-            userId, planId, createdOn, utcExpirationDate, amount);
+        this.userStore.setUserLicense(newUserLicense);
 
         // navigate to root
         return CardService.newActionResponseBuilder()
@@ -42,7 +46,7 @@ class AccountController {
                     .popToRoot()
                     .updateCard(
                         HomeCard.create(
-                            userLicenseManager.getLicense(),
+                            newUserLicense,
                             this.localization,
                             this.userStore.getIndentSpaces())
                             .build()
@@ -50,7 +54,7 @@ class AccountController {
     }
 
     revokePremium(e) {
-        this.userLicenseManager.revokeLicense();
+        this.userStore.clearUserLicense();
 
         // navigate to root
         return CardService
@@ -60,7 +64,7 @@ class AccountController {
                     .popToRoot()
                     .updateCard(
                         HomeCard.create(
-                            this.userLicenseManager.getLicense(),
+                            this.userStore.getUserLicense(),
                             this.localization,
                             this.userStore.getIndentSpaces())
                             .build()

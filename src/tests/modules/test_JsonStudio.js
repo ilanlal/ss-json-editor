@@ -36,7 +36,14 @@ class test_JsonStudio {
                 setValues: (newValues) => {
                     values.length = 0;
                     values.push(...newValues);
-                }
+                },
+                getCell: (row, col) => ({
+                    getValue: () => values[row][col],
+                    setValue: (newValue) => {
+                        values[row][col] = newValue;
+                    },
+                    getA1Notation: () => `A${row + 1}:${String.fromCharCode(65 + col)}${row + 1}`
+                })
             };
 
             let report = ModuleBuilder.newJsonStudio().minifyRange(mockRange);
@@ -79,7 +86,14 @@ class test_JsonStudio {
                 setValues: (newValues) => {
                     values.length = 0;
                     values.push(...newValues);
-                }
+                },
+                getCell: (row, col) => ({
+                    getValue: () => values[row][col],
+                    setValue: (newValue) => {
+                        values[row][col] = newValue;
+                    },
+                    getA1Notation: () => `A${row + 1}:${String.fromCharCode(65 + col)}${row + 1}`
+                })
             };
 
             // Call formatRange to format the JSON data

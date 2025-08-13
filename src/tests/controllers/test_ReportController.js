@@ -25,26 +25,25 @@ class test_ReportController {
                     ["Value 1", "Value 2"]
                 ]
             };
-            const rangeReport = new RangeReport(mockRange.getA1Notation());
-            const userStore = new UserStore();
+            const rangeReport = ModuleBuilder.newRangeReport().setRange(mockRange);
+            const userStore = ModuleBuilder.newUserStore();
             const localization = AppManager.getLocalizationResources();
             // Create a ReportController instance
-            const reportController =
-                new ReportController(
-                    userStore,
-                    localization
-                );
-            
-            const actionResponse = reportController
+            const action = ControllerBuilder
+                .newReportController(localization, userStore)
                 .home(rangeReport)
                 .build()
                 .printJson();
-            assert.ok(actionResponse, "Action response should be created successfully");
-            const card = JSON.parse(actionResponse).renderActions.action.navigations[0].pushCard;
+            assert.ok(action, "Action response should be created successfully");
+
+            const actionResponse = JSON.parse(action);
+
+            assert.ok(actionResponse, "ActionResponse should be created successfully");
+            const card = actionResponse.renderActions.action.navigations[0].pushCard;
             assert.ok(card, "Card should be created successfully");
             assert.strictEqual(
                 card.header.title,
-                AppManager.getLocalizationResources().cards.report.title,
+                localization.cards.report.title,
                 "Card title should match localization"
             );
         });
