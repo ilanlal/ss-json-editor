@@ -11,11 +11,11 @@ class test_ReportController {
 
     runTests() {
         const tests = [
-            "test_home",
+            "test_coreActions",
         ];
         tests.forEach(test => this[test]());
     }
-    test_home() {
+    test_coreActions() {
         QUnit.test("Test core actions", (assert) => {
             // Mock a range report
             const mockRange = MockRangeBuilder.newMockRange()
@@ -24,16 +24,24 @@ class test_ReportController {
                     ["Header 1", "Header 2"],
                     ["Value 1", "Value 2"]
                 ]);
-            const rangeReport = ModuleBuilder.newRangeReport()
+            assert.ok(mockRange, "Mock range should be created successfully");
+            const rangeReport = ModelBuilder.newRangeReport()
                 .setRange(mockRange)
-                .addItem(ReportItem.createInvalid("A1", "Invalid JSON in cell A1"))
-                .addItem(ReportItem.createInvalid("B2", "Invalid JSON in cell B2"));
+                .addItem(ModelBuilder.newReportItem()
+                    .setA1Notation("A1")
+                    .setMessage("Invalid JSON in cell A1")
+                    .setStatus(ReportItem.Status.INVALID))
+                .addItem(ModelBuilder.newReportItem()
+                    .setA1Notation("B2")
+                    .setMessage("Invalid JSON in cell B2")
+                    .setStatus(ReportItem.Status.INVALID));
 
-            const userStore = ModuleBuilder.newUserStore();
+            assert.ok(rangeReport, "Range report should be created successfully");
+            
             const localization = AppManager.getLocalizationResources();
             // Create a ReportController instance
             const action = ControllerBuilder
-                .newReportController(localization, userStore)
+                .newReportController()
                 .home(rangeReport)
                 .build()
                 .printJson();

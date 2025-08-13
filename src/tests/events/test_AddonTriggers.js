@@ -2,7 +2,7 @@
 class test_AddonTriggers {
     constructor() {
         QUnit.module("Addon Triggers (e2e)");
-        this.userStore = ModuleBuilder.newUserStore();
+        this.userStore = ServiceBuilder.newUserStore();
         this.memOriginals();
         this.dummySheet = this.initializeTestSheet();
         QUnit.done(() => {
@@ -76,7 +76,7 @@ class test_AddonTriggers {
             that.dummySheet.getRange("A1:B2").activate();
 
             // Set user store settings
-            ModuleBuilder.newUserStore().setIndentSpaces(2);
+            ServiceBuilder.newUserStore().setIndentSpaces(2);
 
             // Mock event object
             const e = undefined; // No specific event object needed for this test

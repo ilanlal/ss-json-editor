@@ -8,11 +8,9 @@
 function onDefaultHomePageOpen(e) {
     console.log("onDefaultHomePageOpen called with event:", e);
     try {
-        // Return the home card
         return ControllerBuilder.newHomeController()
             .home()
             .build();
-
     } catch (error) {
         SpreadsheetApp
             .getActiveSpreadsheet()
@@ -45,8 +43,8 @@ function onFormatRange(e) {
 
     try {
         const range = SpreadsheetApp.getActiveSpreadsheet().getActiveRange();
-        const indentSpaces =  ModuleBuilder.newUserStore().getIndentSpaces();
-        
+        const indentSpaces =  ServiceBuilder.newUserStore().getIndentSpaces();
+
         return ControllerBuilder.newJsonStudioController()
             .validateRange(range)
             .prettifyRange(range, indentSpaces * 1)
@@ -62,8 +60,7 @@ function onFormatRange(e) {
 function onShowAboutCard(e) {
     console.log("onShowAboutCard called with event:", e);
     try {
-        const localization = AppManager.getLocalizationResources();
-        return new AboutController(localization)
+        return ControllerBuilder.newAboutController()
             .home()
             .build();
     } catch (error) {
@@ -91,9 +88,7 @@ function onIndentSpacesSelectorChange(e) {
 function onReportItemClick(e) {
     console.log("onReportItemClick called with event:", e);
     try {
-        const localization = AppManager.getLocalizationResources();
-        const userStore = new UserStore();
-        return new ReportController(userStore, localization)
+        return ControllerBuilder.newReportController()
             .reportItemClick(e)
             .build();
     } catch (error) {
@@ -107,7 +102,7 @@ function onReportItemClick(e) {
 function onReportClose(e) {
     console.log("onReportClose called with event:", e);
     try {
-        return new ReportController()
+        return ControllerBuilder.newReportController()
             .close(e)
             .build();
     } catch (error) {

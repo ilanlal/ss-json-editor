@@ -8,7 +8,7 @@ class UserLicense {
      * @param {Date} expirationDate - Expiration date in ISO format
      * @param {number} [amount=0] - Amount associated with the license, default is 0 (e.g., for tokens or credits)
      */
-    constructor(userId='', planId='', createdOn=null, expirationDate=null, amount=0) {
+    constructor(userId = '', planId = '', createdOn = null, expirationDate = null, amount = 0) {
         this.userId = userId;
         this.planId = planId;
         this.createdOn = createdOn;
@@ -71,7 +71,7 @@ class UserLicense {
         return (now < new Date(this.expirationDate)) || this.amount > 0;
     }
 
-    static fromJSON(json) {
+    static fromJsonText(json = '{}') {
         // Parse the JSON string into a UserLicense object
         const data = JSON.parse(json, (key, value) => {
             if (key === 'createdOn' || key === 'expirationDate') {
@@ -89,7 +89,11 @@ class UserLicense {
         );
     }
 
-    static toJsonString(license) {
+    static toJsonText(license) {
+        if (!(license instanceof UserLicense)) {
+            throw new Error("Invalid UserLicense object.");
+        }
+
         return JSON.stringify({
             userId: license.userId,
             planId: license.planId,

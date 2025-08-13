@@ -55,8 +55,7 @@ class RangeReport {
         return this.items.length > 0;
     }
 
-    static newInstance() {
-        const report = new RangeReport();
-        return report;
+    static newRangeReport() {
+        return new RangeReport();
     }
 }

@@ -28,7 +28,7 @@ class test_JsonStudioController {
                 .build();
 
             const localization = AppManager.getLocalizationResources();
-            const userStore = ModuleBuilder.newUserStore();
+            const userStore = ServiceBuilder.newUserStore();
             const action = ControllerBuilder.newJsonStudioController(localization, userStore)
                 .minifyRange(mockRange)
                 .build()

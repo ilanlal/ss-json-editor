@@ -1,10 +1,10 @@
-class ModuleBuilder {
+class ServiceBuilder {
     static newJsonStudio() {
         return JsonStudio.newInstance();
     }
 
     static newRangeReport() {
-        return RangeReport.newInstance();
+        return RangeReport.newRangeReport();
     }
 
     static newUserStore() {

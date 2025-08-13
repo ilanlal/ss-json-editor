@@ -18,7 +18,7 @@ class test_HomeController {
     test_createHomeCard() {
         QUnit.test("Test home action", (assert) => {
             const localization = AppManager.getLocalizationResources();
-            const userStore = ModuleBuilder.newUserStore();
+            const userStore = ServiceBuilder.newUserStore();
             const homeAction = ControllerBuilder
                 .newHomeController(localization, userStore)
                 .home()

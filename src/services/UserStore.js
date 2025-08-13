@@ -69,7 +69,7 @@ class UserStore {
       return undefined; // Return undefined if no license is set
     }
 
-    return UserLicense.fromJSON(data);
+    return UserLicense.fromJsonText(data);
   }
 
   /**
@@ -85,7 +85,7 @@ class UserStore {
       return this.clearUserLicense();
     }
     
-    const licenseJson = UserLicense.toJsonString(license);
+    const licenseJson = UserLicense.toJsonText(license);
 
     this.userDataStorage.setProperty(UserStore.Constants.USER_LICENSE_KEY, licenseJson);
     return this;
@@ -99,6 +99,16 @@ class UserStore {
     return this;
   }
 
+  isInDebugMode() {
+    const debugMode = this.userDataStorage.getProperty(UserStore.Constants.DEBUG_MODE_KEY);
+    return debugMode === 'true';
+  }
+
+  setDebugMode(value = false) {
+    this.userDataStorage.setProperty(UserStore.Constants.DEBUG_MODE_KEY, value);
+    return this;
+  }
+
   static newInstance() {
     return new UserStore(PropertiesService.getUserProperties());
   }
@@ -108,6 +118,7 @@ UserStore.Constants = {
   INDENT_SPACES_KEY: 'indentSpaces',
   USER_LICENSE_KEY: 'userLicense',
   LOCALIZATION_KEY: 'localization',
+  DEBUG_MODE_KEY: 'debugMode',
   DEFAULT_LOCALIZATION: 'en',
   DEFAULT_INDENT_SPACES: 2
 };

@@ -16,7 +16,7 @@ class JsonStudioController {
     }
 
     validateRange(range) {
-        if(!range || !range.getA1Notation) {
+        if (!range || !range.getA1Notation) {
             throw new Error("Invalid range object provided.");
         }
         const maxRows = 100; // Example limit
@@ -32,14 +32,13 @@ class JsonStudioController {
      * @returns {CardService.ActionResponse}
      */
     prettifyRange(range, indentSpaces = 2) {
-        if(!range || !range.getA1Notation) {
+        if (!range || !range.getA1Notation) {
             throw new Error("Invalid range object provided.");
         }
 
-        const jsonStudio = ModuleBuilder.newJsonStudio();
-
         // Call the formatRange method of JsonStudio
-        const rangeReport = jsonStudio.prettifyRange(range, indentSpaces);
+        const rangeReport = ServiceBuilder.newJsonStudio()
+            .prettifyRange(range, indentSpaces);
 
         // If there are results, create and return the report card
         if (rangeReport.hasItems()) {
@@ -54,7 +53,7 @@ class JsonStudioController {
      * @returns {CardService.ActionResponse}
      */
     minifyRange(range) {
-        if(!range || !range.getA1Notation) {
+        if (!range || !range.getA1Notation) {
             throw new Error("Invalid range object provided.");
         }
         const jsonStudio = new JsonStudio(this.localization, this.userStore);

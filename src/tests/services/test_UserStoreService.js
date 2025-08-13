@@ -1,14 +1,15 @@
 // Google Apps Script code for Google Workspace Add-ons
-class test_UserStore {
+class test_UserStoreService {
     constructor() {
-        QUnit.module("UserStore (modules)");
+        QUnit.module("UserStore (services)");
         // Clean up after tests
         QUnit.done(() => {
             // Any necessary cleanup can be done here
             // For example, resetting the user license to its original state
-            ModuleBuilder.newUserStore().setUserLicense(this.originalUserLicense);
-            ModuleBuilder.newUserStore().setLocalizationCode(this.originalLocalizationCode);
-            ModuleBuilder.newUserStore().setIndentSpaces(this.originalIndentSpaces);
+            ServiceBuilder.newUserStore()
+                .setUserLicense(this.originalUserLicense)
+                .setLocalizationCode(this.originalLocalizationCode)
+                .setIndentSpaces(this.originalIndentSpaces);
         });
         this.runTests();
     }
@@ -44,44 +45,44 @@ class test_UserStore {
     test_indentSpaces() {
         QUnit.test("indentSpaces", (assert) => {
             // Set up initial indentSpaces
-            this.setOriginalIndentSpaces(ModuleBuilder.newUserStore().getIndentSpaces());
+            this.setOriginalIndentSpaces(ServiceBuilder.newUserStore().getIndentSpaces());
             assert.ok(this.originalIndentSpaces, "Original indentSpaces should be defined");
 
-            ModuleBuilder.newUserStore().setIndentSpaces(4);
-            const indentSpaces = ModuleBuilder.newUserStore().getIndentSpaces();
+            ServiceBuilder.newUserStore().setIndentSpaces(4);
+            const indentSpaces = ServiceBuilder.newUserStore().getIndentSpaces();
             assert.equal(indentSpaces, 4, "indentSpaces should return the correct indentSpaces");
 
             // check if indentSpaces is set to a different value
-            ModuleBuilder.newUserStore().setIndentSpaces("6");
-            const newIndentSpaces = ModuleBuilder.newUserStore().getIndentSpaces();
+            ServiceBuilder.newUserStore().setIndentSpaces("6");
+            const newIndentSpaces = ServiceBuilder.newUserStore().getIndentSpaces();
             assert.equal(newIndentSpaces, 6, "indentSpaces should return the correct indentSpaces");
 
             // Check for default value if no input is provided
-            ModuleBuilder.newUserStore().setIndentSpaces(""); // Reset to empty to check default
-            const defaultIndentSpaces = ModuleBuilder.newUserStore().getIndentSpaces();
+            ServiceBuilder.newUserStore().setIndentSpaces(""); // Reset to empty to check default
+            const defaultIndentSpaces = ServiceBuilder.newUserStore().getIndentSpaces();
             assert.equal(defaultIndentSpaces, UserStore.Constants.DEFAULT_INDENT_SPACES, "indentSpaces should default if not set");
         });
     }
 
     test_localization() {
         QUnit.test("localization", (assert) => {
-            this.setOriginalLocalizationCode(ModuleBuilder.newUserStore().getLocalizationCode());
+            this.setOriginalLocalizationCode(ServiceBuilder.newUserStore().getLocalizationCode());
             assert.ok(this.originalLocalizationCode, "Original localizationCode should be defined");
 
-            ModuleBuilder.newUserStore().setLocalizationCode("fr");
-            const localization = ModuleBuilder.newUserStore().getLocalizationCode();
+            ServiceBuilder.newUserStore().setLocalizationCode("fr");
+            const localization = ServiceBuilder.newUserStore().getLocalizationCode();
             assert.equal(localization, "fr", "localization should return the correct localization");
 
             // Check for default value if no input is provided
-            ModuleBuilder.newUserStore().setLocalizationCode(""); // Reset to empty to check default
-            const defaultLocalization = ModuleBuilder.newUserStore().getLocalizationCode();
+            ServiceBuilder.newUserStore().setLocalizationCode(""); // Reset to empty to check default
+            const defaultLocalization = ServiceBuilder.newUserStore().getLocalizationCode();
             assert.equal(defaultLocalization, "en", "localization should default to 'en' if not set");
         });
     }
 
     test_userLicenseCRUD() {
-        QUnit.test("User License CRUD Operations", (assert) => {
-            this.setOriginalUserLicense(ModuleBuilder.newUserStore().getUserLicense());
+        QUnit.test("UserLicense CRUD Operations", (assert) => {
+            this.setOriginalUserLicense(ServiceBuilder.newUserStore().getUserLicense());
             assert.ok(this.originalUserLicense || !this.originalUserLicense, "Original user license should be defined or undefined :-)");
 
             // Set up unique user license for testing
@@ -109,10 +110,10 @@ class test_UserStore {
                 .setCreatedOn(yesterday.toISOString())
                 .setExpirationDate(expiresInOneYear.toISOString());
 
-            ModuleBuilder.newUserStore().setUserLicense(userLicense);
+            ServiceBuilder.newUserStore().setUserLicense(userLicense);
 
             // Retrieve the license
-            const retrievedLicense = ModuleBuilder.newUserStore().getUserLicense();
+            const retrievedLicense = ServiceBuilder.newUserStore().getUserLicense();
             assert.ok(retrievedLicense, "User license should be retrieved successfully");
             assert.strictEqual(retrievedLicense.userId, userId, "User ID should match");
             assert.strictEqual(retrievedLicense.planId, planId, "Plan ID should match");
@@ -121,8 +122,8 @@ class test_UserStore {
             assert.strictEqual(retrievedLicense.amount, randomAmount, "Amount should match");
 
             // Clean up
-            ModuleBuilder.newUserStore().clearUserLicense();
-            const clearedLicense = ModuleBuilder.newUserStore().getUserLicense();
+            ServiceBuilder.newUserStore().clearUserLicense();
+            const clearedLicense = ServiceBuilder.newUserStore().getUserLicense();
             assert.strictEqual(clearedLicense, undefined, "User license should be cleared successfully");
         });
     }

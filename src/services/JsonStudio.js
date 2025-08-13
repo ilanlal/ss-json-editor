@@ -2,14 +2,14 @@
 class JsonStudio {
     constructor() {
     }
-    
+
     /**
      * @param {*} range 
      * @param {number} indentSpaces
      * @returns RangeReport
      */
     prettifyRange(range, indentSpaces = 2) {
-        const report = ModuleBuilder.newRangeReport().setRange(range);
+        const report = ModelBuilder.newRangeReport().setRange(range);
         const values = range.getValues();
 
         // Check if the range is valid and does not exceed the maximum allowed size
@@ -34,8 +34,11 @@ class JsonStudio {
                         report.incrementEffectedCells();
                         return newValue;
                     } catch (error) {
-                        report.addItem(ReportItem.createInvalid(
-                            range.getCell(i + 1, j + 1).getA1Notation(), `${error.message}`)
+                        report.addItem(
+                            ModelBuilder.newReportItem()
+                                .setA1Notation(range.getCell(i + 1, j + 1).getA1Notation())
+                                .setMessage(`${error.message}`)
+                                .setStatus(ReportItem.Status.INVALID)
                         );
 
                         return cell; // Return the original cell value
@@ -52,7 +55,7 @@ class JsonStudio {
      * @returns RangeReport
      */
     minifyRange(range) {
-        const report = ModuleBuilder.newRangeReport().setRange(range);
+        const report = ModelBuilder.newRangeReport().setRange(range);
         const values = range.getValues();
 
         // Map through the values and minify each cell
@@ -69,8 +72,11 @@ class JsonStudio {
                         report.incrementEffectedCells();
                         return newValue;
                     } catch (error) {
-                        report.addItem(ReportItem.createInvalid(
-                            range.getCell(i + 1, j + 1).getA1Notation(), `${error.message}`)
+                        report.addItem(
+                            ModelBuilder.newReportItem()
+                                .setA1Notation(range.getCell(i + 1, j + 1).getA1Notation())
+                                .setMessage(`${error.message}`)
+                                .setStatus(ReportItem.Status.INVALID)
                         );
 
                         return cell; // Return the original cell value

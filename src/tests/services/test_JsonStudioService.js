@@ -1,10 +1,8 @@
 // Google Apps Script code for Google Workspace Add-ons
-class test_JsonStudio {
+class test_JsonStudioService {
     constructor() {
-        QUnit.module("Json Studio (modules)");
-        this.localization = AppManager.getLocalizationResources();
-        this.userStore = ModuleBuilder.newUserStore();
-
+        QUnit.module("JsonStudio (services)");
+        
         // Clean up after tests
         QUnit.done(() => {
             // Any necessary cleanup can be done here
@@ -31,22 +29,12 @@ class test_JsonStudio {
                 ['{"nested": {"key": "value"}}', '{"boolean": true}']
             ];
 
-            let mockRange = {
-                getValues: () => values,
-                setValues: (newValues) => {
-                    values.length = 0;
-                    values.push(...newValues);
-                },
-                getCell: (row, col) => ({
-                    getValue: () => values[row][col],
-                    setValue: (newValue) => {
-                        values[row][col] = newValue;
-                    },
-                    getA1Notation: () => `A${row + 1}:${String.fromCharCode(65 + col)}${row + 1}`
-                })
-            };
+            let mockRange = MockRangeBuilder.newMockRange()
+                .withA1Notation("A1:B2")
+                .withValues(values)
+                .build();
 
-            let report = ModuleBuilder.newJsonStudio().minifyRange(mockRange);
+            let report = ServiceBuilder.newJsonStudio().minifyRange(mockRange);
 
             const expectedValues = [
                 ['{"key":"value"}', '{"array":[1,2,3]}'],
@@ -66,7 +54,7 @@ class test_JsonStudio {
             ];
             mockRange.setValues(invalidValues);
 
-            report = ModuleBuilder.newJsonStudio().minifyRange(mockRange);
+            report = ServiceBuilder.newJsonStudio().minifyRange(mockRange);
             const items = report.getItems();
 
             assert.strictEqual(items.length, 2, "There should be two errors in the report");
@@ -81,23 +69,13 @@ class test_JsonStudio {
                 ['{"nested":{"key":"value"}}', '{"boolean":true}']
             ];
 
-            let mockRange = {
-                getValues: () => values,
-                setValues: (newValues) => {
-                    values.length = 0;
-                    values.push(...newValues);
-                },
-                getCell: (row, col) => ({
-                    getValue: () => values[row][col],
-                    setValue: (newValue) => {
-                        values[row][col] = newValue;
-                    },
-                    getA1Notation: () => `A${row + 1}:${String.fromCharCode(65 + col)}${row + 1}`
-                })
-            };
+            let mockRange = MockRangeBuilder.newMockRange()
+                .withA1Notation("A1:B2")
+                .withValues(values)
+                .build();
 
             // Call formatRange to format the JSON data
-            let report = ModuleBuilder.newJsonStudio().prettifyRange(mockRange, 2);
+            let report = ServiceBuilder.newJsonStudio().prettifyRange(mockRange, 2);
 
             const expectedValues = [
                 ['{\n  "key": "value"\n}', '{\n  "array": [\n    1,\n    2,\n    3\n  ]\n}'],
@@ -116,13 +94,9 @@ class test_JsonStudio {
                 ['{"nested": {"key": "value"}}', '{"boolean": true']
             ];
             mockRange.setValues(invalidValues);
-            report = ModuleBuilder.newJsonStudio().prettifyRange(mockRange, 2);
+            report = ServiceBuilder.newJsonStudio().prettifyRange(mockRange, 2);
             const items = report.getItems();
             assert.strictEqual(items.length, 2, "There should be two errors in the report");
         });
-    }
-
-    tearDown() {
-        
     }
 }

@@ -12,16 +12,19 @@ class test_ReportItem {
     }
 
     test_core() {
-        QUnit.test("Test ReportItem core operations", (assert) => {
+        QUnit.test("Test ReportItem model operations", (assert) => {
             const a1Notation = "A1";
             const message = "Test message";
             const status = ReportItem.Status.INVALID;
 
-            let item = ReportItem.createInvalid(a1Notation, message);
+            let item = ModelBuilder.newReportItem()
+                .setA1Notation(a1Notation)
+                .setMessage(message)
+                .setStatus(status);
 
-            assert.strictEqual(item.a1Notation, a1Notation, "A1 notation should match");
-            assert.strictEqual(item.message, message, "Message should match");
-            assert.strictEqual(item.status, status, "INVALID status should match");
+            assert.strictEqual(item.getA1Notation(), a1Notation, "A1 notation should match");
+            assert.strictEqual(item.getMessage(), message, "Message should match");
+            assert.strictEqual(item.getStatus(), status, "INVALID status should match");
             assert.strictEqual(item.icon, ReportItem.Icons[status], "Icon should match the status icon");
         });
     }

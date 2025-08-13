@@ -1,6 +1,6 @@
 class AboutController {
     constructor(localization) {
-        this.localization = localization || AppManager.getLocalizationResources();
+        this.localization = localization;
     }
 
     /**
@@ -13,5 +13,9 @@ class AboutController {
                 .pushCard(
                     AboutCard.create(this.localization)
                         .build()));
+    }
+
+    static newAboutController(localization) {
+        return new AboutController(localization);
     }
 }
