@@ -25,9 +25,11 @@ class ReportController {
             .setNavigation(
                 CardService.newNavigation()
                     .pushCard(
-                        ReportCard
-                            .create(this.userLicense, rangeReport, this.localization)
-                            .build()));
+                        ViewBuilder
+                            .newReportCard(rangeReport, this.userLicense, this.localization)
+                            .build()
+                    )
+            );
     }
 
     close(e) {

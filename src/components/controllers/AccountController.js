@@ -18,9 +18,10 @@ class AccountController {
             .setNavigation(
                 CardService.newNavigation()
                     .pushCard(
-                        AccountCard
-                            .create(this.userLicense, this.localization)
-                            .build()));
+                        ViewBuilder.newAccountCard(this.userLicense, this.localization)
+                            .build()
+                    )
+            );
     }
 
     activatePremium(e) {
@@ -31,7 +32,7 @@ class AccountController {
         const ticks = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
         const expirDate = new Date(createdOn.getTime() + ticks); // 14 days from now
         const amount = 0; // Assuming no cost for the trial
-        const newUserLicense = UserLicense.newUserLicense()
+        const newUserLicense = ModelBuilder.newUserLicense()
             .setUserId(userId)
             .setPlanId(planId)
             .setExpirationDate(expirDate)
@@ -45,11 +46,11 @@ class AccountController {
                 CardService.newNavigation()
                     .popToRoot()
                     .updateCard(
-                        HomeCard.create(
-                            newUserLicense,
+                        ViewBuilder.newHomeCard(
+                            this.userStore.getUserLicense(),
                             this.localization,
-                            this.userStore.getIndentSpaces())
-                            .build()
+                            this.userStore.getIndentSpaces()
+                        ).build()
                     ));
     }
 
@@ -63,11 +64,11 @@ class AccountController {
                 CardService.newNavigation()
                     .popToRoot()
                     .updateCard(
-                        HomeCard.create(
+                        ViewBuilder.newHomeCard(
                             this.userStore.getUserLicense(),
                             this.localization,
-                            this.userStore.getIndentSpaces())
-                            .build()
+                            this.userStore.getIndentSpaces()
+                        ).build()
                     ));
 
     }
@@ -79,7 +80,9 @@ class AccountController {
      */
     indentSpacesChange(e) {
         try {
-            const selectedSpaces = e?.commonEventObject?.formInputs?.[Static_Resources.resources.indentSpaces]?.stringInputs?.value[0] || "2";
+            const selectedSpaces = e?.commonEventObject
+                ?.formInputs?.[Static_Resources.resources.indentSpaces]
+                ?.stringInputs?.value[0] || "2";
             this.userStore.setIndentSpaces(selectedSpaces); // Store the selected spaces in user properties
             return this.handleOperationSuccess();
         } catch (error) {

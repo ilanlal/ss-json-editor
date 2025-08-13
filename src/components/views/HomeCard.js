@@ -1,27 +1,10 @@
 // Apps Script code for Google Workspace Add-ons
 class HomeCard {
-    /**
-     * Constructor for the HomeCard class.
-     * @param {boolean} isPremium - Indicates if the user has a premium license.
-     * @param {number} indentationSpaces - The number of spaces to use for indentation.
-     * @param {Global_Resources["en"]} localization - The localization object for the card.
-     */
-    constructor(userLicense, indentationSpaces, localization) {
-        this.userLicense = userLicense;
-        this.isPremium = userLicense?.isActive?.() || false;
-        // Set the indentation level based on the provided spaces
-        this.indentationLevel = indentationSpaces;
-        this.localization = localization;
+    constructor() {
     }
 
-    static create(userLicense, localization, indentationSpaces = 2) {
-        const thisCard = new HomeCard(
-            userLicense,
-            indentationSpaces,
-            localization
-        );
-        // Build the card using the builder pattern
-        return thisCard.newCardBuilder();
+    static newHomeCard() {
+        return new HomeCard();
     }
 
     newCardBuilder() {
@@ -39,8 +22,8 @@ class HomeCard {
         cardBuilder.addSection(this.getFormatSection())
             // Add Minify section
             .addSection(this.getMinifySection());
-            // Add Edit section
-            //.addSection(this.getEditSection());
+        // Add Edit section
+        //.addSection(this.getEditSection());
 
         if (!this.isPremium) {
             // Add the footer to the card
@@ -48,6 +31,23 @@ class HomeCard {
         }
 
         return cardBuilder;
+    }
+
+    setUserLicense(userLicense) {
+        this.userLicense = userLicense;
+        this.isPremium = userLicense?.isActive?.() || false;
+
+        return this;
+    }
+
+    setLocalization(localization) {
+        this.localization = localization;
+        return this;
+    }
+
+    setIndentationSpaces(spaces) {
+        this.indentationLevel = spaces;
+        return this;
     }
 
     getHeader() {

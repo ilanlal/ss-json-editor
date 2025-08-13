@@ -10,9 +10,9 @@ class AboutController {
         return CardService.newActionResponseBuilder()
             .setNavigation(CardService
                 .newNavigation()
-                .pushCard(
-                    AboutCard.create(this.localization)
-                        .build()));
+                .pushCard(ViewBuilder
+                    .newAboutCard(this.localization)
+                    .build()));
     }
 
     static newAboutController(localization) {

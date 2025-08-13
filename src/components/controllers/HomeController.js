@@ -7,7 +7,7 @@ class HomeController {
         this.indentSpaces = this.userStore.getIndentSpaces() || "2";
     }
 
-    
+
     /**
      * @returns {CardService.ActionResponse}
      */
@@ -17,9 +17,11 @@ class HomeController {
             .setNavigation(
                 CardService.newNavigation()
                     .pushCard(
-                        HomeCard.create(
-                            this.userLicense, this.localization, this.indentSpaces)
-                            .build()));
+                        ViewBuilder
+                            .newHomeCard(this.userLicense, this.localization, this.indentSpaces)
+                            .build()
+                        )
+                    );
     }
 
     /**

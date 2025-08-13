@@ -1,25 +1,29 @@
 // Google Apps Script code for Google Workspace Add-ons
 class AccountCard {
-    constructor(userLicense, localization) {
+    constructor() {
+    }
+
+    static newAccountCard() {
+        return new AccountCard();
+    }
+
+    setUserLicense(userLicense) {
         this.userLicense = userLicense;
-        this.localization = localization;
         this.isPremium = userLicense?.isActive?.() || false;
         this.createdOn = userLicense?.createdOn || 'N/A';
         this.expiresOn = userLicense?.expiresOn || 'N/A';
+
+        return this;
+    }
+
+    setLocalization(localization) {
+        this.localization = localization;
+        return this;
     }
 
     /**
-     * Creates a card for the account information.
-     * @param {UserLicense} userLicense - The user license information.
-     * @param {Global_Resources['en']} localization - The localization resources.
      * @returns {CardService.CardBuilder} - The card builder for the account card.
      */
-    static create(userLicense, localization) {
-        const thisCard = new AccountCard(userLicense, localization);
-        // Create a new card builder
-        return thisCard.newCardBuilder();
-    }
-
     newCardBuilder() {
         // Create a new card builder
         const cardBuilder = CardService.newCardBuilder()

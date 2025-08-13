@@ -10,13 +10,13 @@ class test_HomeView {
 
     runTests() {
         const tests = [
-            "test_create"
+            "test_cardCreate"
         ];
         tests.forEach(test => this[test]());
     }
 
-    test_create() {
-        QUnit.test("create", (assert) => {
+    test_cardCreate() {
+        QUnit.test("Test create HomeCard", (assert) => {
             const localization = AppManager.getLocalizationResources();
             const indentationSpaces = "2";
             const planId = "free trial"; // Default plan ID
@@ -26,10 +26,14 @@ class test_HomeView {
             // Expiration date in 14 days
             const utcExpirationDate = new Date(createdOn.getTime() + 14 * 24 * 60 * 60 * 1000);
 
-            const userLicense = new UserLicense(
-                userId, planId, createdOn, utcExpirationDate, 0);
+            const mockUserLicense = ModelBuilder.newUserLicense()
+                .setUserId(userId)
+                .setPlanId(planId)
+                .setCreatedOn(createdOn)
+                .setExpirationDate(utcExpirationDate)
+                .setAmount(0);
 
-            const obj = HomeCard.create(userLicense, localization, indentationSpaces);
+            const obj = ViewBuilder.newHomeCard(mockUserLicense, localization, indentationSpaces);
             assert.ok(obj, "HomeCard object should be created successfully");
             const build = obj.build();
             assert.ok(build, "HomeCard build should be created successfully");
@@ -41,7 +45,7 @@ class test_HomeView {
             );
 
             // Check with undefined userLicense
-            const objWithUndefinedLicense = HomeCard.create(undefined, localization, indentationSpaces);
+            const objWithUndefinedLicense = ViewBuilder.newHomeCard(undefined, localization, indentationSpaces);
             assert.ok(objWithUndefinedLicense, "HomeCard object should be created successfully with undefined userLicense");
             const buildWithUndefinedLicense = objWithUndefinedLicense.build();
             assert.ok(buildWithUndefinedLicense, "HomeCard build should be created successfully with undefined userLicense");

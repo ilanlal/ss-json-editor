@@ -1,26 +1,29 @@
 // Google Apps Script code for Google Workspace Add-ons
 class ReportCard {
-  /**
-   * Constructor for the ReportCard class.
-   * @param {UserLicense} userLicense - The user license information.
-   * @param {RangeReport} rangeReport - The report for the range.
-   * @param {Global_Resources["en"]} localization - Localization resources.
-   */
-  constructor(userLicense, rangeReport, localization) {
+  constructor() {
+  }
+
+  setRangeReport(rangeReport) {
     if (!rangeReport || !rangeReport.getA1Notation) {
       throw new Error("Invalid range provided. Must be a Google Sheets Range object.");
     }
-    // Initialize the range report
-    /** @type {RangeReport} */
     this.rangeReport = rangeReport;
-    this.localization = localization || AppManager.getLocalizationResources();
-    this.userLicense = userLicense;
-    this.isPremium = userLicense?.isActive?.() || false;
+    return this;
   }
 
-  static create(userLicense, rangeReport, localization) {
-    const card = new ReportCard(userLicense, rangeReport, localization);
-    return card.newCardBuilder();
+  setLocalization(localization) {
+    this.localization = localization;
+    return this;
+  }
+
+  setUserLicense(userLicense) {
+    this.userLicense = userLicense;
+    this.isPremium = userLicense?.isActive?.() || false;
+    return this;
+  }
+
+  static newReportCard() {
+    return new ReportCard();
   }
 
   /**

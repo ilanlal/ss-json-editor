@@ -12,13 +12,16 @@ class test_AccountView {
     }
 
     test_create() {
-        QUnit.test("create", (assert) => {
+        QUnit.test("Test create AccountCard", (assert) => {
             const localization = AppManager.getLocalizationResources();
-            const userLicense = new UserLicense(
-                "me", "free trial", new Date(),
-                new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), 0
-            )
-            const cardBuilder = AccountCard.create(userLicense, localization);
+            const userLicense = ModelBuilder.newUserLicense()
+                .setAmount(0)
+                .setUserId("me")
+                .setPlanId("free trial")
+                .setCreatedOn(new Date())
+                .setExpirationDate(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000));
+
+            const cardBuilder = ViewBuilder.newAccountCard(userLicense, localization);
             assert.ok(cardBuilder, "AccountCard should be created");
             const card = cardBuilder
                 .build()

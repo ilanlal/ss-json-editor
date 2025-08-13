@@ -1,17 +1,20 @@
 // Google Apps Script code for Google Workspace Add-ons
 class AboutCard {
-  constructor(localization) {
+  constructor() {
+  }
+
+  setLocalization(localization) {
     this.localization = localization;
+    return this;
+  }
+
+  static newAboutCard() {
+    return new AboutCard();
   }
 
   /**
    * @returns {CardService.CardBuilder}
    */
-  static create(localization) {
-    const aboutCard = new AboutCard(localization);
-    return aboutCard.newCardBuilder();
-  }
-
   newCardBuilder() {
     var builder = CardService.newCardBuilder();
 

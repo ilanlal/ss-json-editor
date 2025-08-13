@@ -56,10 +56,8 @@ class JsonStudioController {
         if (!range || !range.getA1Notation) {
             throw new Error("Invalid range object provided.");
         }
-        const jsonStudio = new JsonStudio(this.localization, this.userStore);
-
-        // Call the minifyRange method of JsonStudio
-        const rangeReport = jsonStudio.minifyRange(range);
+        const rangeReport = ServiceBuilder.newJsonStudio()
+            .minifyRange(range);
         // If there are results, create and return the report card
         if (rangeReport.hasItems()) {
             return this.handleInvalidJsonReport(rangeReport);
