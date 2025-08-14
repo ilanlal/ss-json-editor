@@ -31,9 +31,10 @@ class ViewBuilder {
             .newCardBuilder();
     }
 
-    static newAboutCard(localization = AppManager.getLocalizationResources()) {
+    static newAboutCard(localization = AppManager.getLocalizationResources(), packageInfo = Static_Resources.package) {
         return AboutCard.newAboutCard()
             .setLocalization(localization)
+            .setPackageInfo(packageInfo)
             .newCardBuilder();
     }
 }

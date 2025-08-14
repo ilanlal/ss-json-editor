@@ -37,6 +37,7 @@ const Global_Resources = {
             premiumActivated: "Premium Activated",
             claimPremium: "Claim your free {0} days premium membership now!",
             focusedOnCell: "Focused on cell: {0}",
+            packageInfo: "Add-On Information",
         },
         menu: {
             top: "Json studio",

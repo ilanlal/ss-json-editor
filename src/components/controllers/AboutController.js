@@ -11,7 +11,7 @@ class AboutController {
             .setNavigation(CardService
                 .newNavigation()
                 .pushCard(ViewBuilder
-                    .newAboutCard(this.localization)
+                    .newAboutCard(this.localization, Static_Resources.package)
                     .build()));
     }
 
