@@ -21,7 +21,7 @@ class test_AccountView {
                 .setCreatedOn(new Date())
                 .setExpirationDate(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000));
 
-            const cardBuilder = ViewBuilder.newAccountCard(userLicense, localization);
+            const cardBuilder = ViewBuilder.newAccountCard(localization);
             assert.ok(cardBuilder, "AccountCard should be created");
             const card = cardBuilder
                 .build()

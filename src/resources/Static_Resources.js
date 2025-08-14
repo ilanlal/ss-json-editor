@@ -34,6 +34,7 @@ const Static_Resources = {
   },
   parameters: {
     maxRangeSize: 1000, // Maximum number of cells in a range
+    freeActivationDays: 90, // Number of free activation days
   },
   userLicense: "userLicense",
   dataInput: "dataInput",

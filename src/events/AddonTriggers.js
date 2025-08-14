@@ -43,7 +43,7 @@ function onFormatRange(e) {
 
     try {
         const range = SpreadsheetApp.getActiveSpreadsheet().getActiveRange();
-        const indentSpaces =  ServiceBuilder.newUserStore().getIndentSpaces();
+        const indentSpaces = ServiceBuilder.newUserStore().getIndentSpaces();
 
         return ControllerBuilder.newJsonStudioController()
             .validateRange(range)
@@ -196,6 +196,13 @@ function onOpenAccountCard(e) {
     console.log("onOpenAccountCard called with event:", e);
     try {
         return ControllerBuilder.newAccountController()
+            .setUserInfo(ModelBuilder.newUserInfo()
+                .setUserId('_user')
+                .setUserLocaleCode(e?.commonEventObject?.userLocale || UserStore.Constants.DEFAULT_USER_LOCALE_CODE)
+                .setUserCountry(e?.commonEventObject?.userCountry || 'US')
+                .setUserTimezone(e?.commonEventObject?.userTimezone || Session.getScriptTimeZone())
+                .setUserLicense(
+                    ServiceBuilder.newUserStore().getUserLicense()))
             .home()
             .build();
 
@@ -213,7 +220,7 @@ function onActivatePremium(e) {
     console.log("onActivatePremium called with event:", e);
     try {
         return ControllerBuilder.newAccountController()
-            .activatePremium()
+            .activatePremium(e)
             .build();
     } catch (error) {
         return CardService.newActionResponseBuilder()
@@ -229,7 +236,7 @@ function onRevokeLicense(e) {
     console.log("onRevokeLicense called with event:", e);
     try {
         return ControllerBuilder.newAccountController()
-            .revokePremium()
+            .revokePremium(e)
             .build();
     } catch (error) {
         return CardService.newActionResponseBuilder()

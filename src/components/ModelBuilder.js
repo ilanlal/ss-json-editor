@@ -10,4 +10,8 @@ class ModelBuilder {
     static newUserLicense() {
         return UserLicense.newUserLicense();
     }
+
+    static newUserInfo() {
+        return UserInfo.newUserInfo();
+    }
 }

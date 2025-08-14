@@ -1,22 +1,26 @@
 class ViewBuilder {
-    static newHomeCard
-        (userLicense = ServiceBuilder.newUserStore().getUserLicense(),
-            localization = AppManager.getLocalizationResources(),
-            indentationSpaces = ServiceBuilder.newUserStore().getIndentSpaces()) {
+    static newHomeCard(
+        userInfo = ModelBuilder.newUserInfo()
+            .setUserId('_user')
+            .setUserLicense(ServiceBuilder.newUserStore().getUserLicense()),
+        localization = AppManager.getLocalizationResources(),
+        indentationSpaces = ServiceBuilder.newUserStore().getIndentSpaces()
+    ) {
         return HomeCard.newHomeCard()
             .setIndentationSpaces(indentationSpaces)
             .setLocalization(localization)
-            .setUserLicense(userLicense)
+            .setUserInfo(userInfo)
             .newCardBuilder();
     }
 
 
-    static newAccountCard
-        (userLicense = ServiceBuilder.newUserStore().getUserLicense(),
-            localization = AppManager.getLocalizationResources()) {
+    static newAccountCard(
+        localization = AppManager.getLocalizationResources(),
+        userInfo
+    ) {
         return AccountCard.newAccountCard()
-            .setUserLicense(userLicense)
             .setLocalization(localization)
+            .setUserInfo(userInfo)
             .newCardBuilder();
     }
 

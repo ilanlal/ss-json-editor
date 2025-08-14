@@ -1,13 +1,38 @@
 class AccountController {
-    constructor(localization, userStore) {
-        this.localization = localization;
-        this.userStore = userStore;
-        this.userLicense = this.userStore.getUserLicense();
+    constructor() {
     }
 
-    static newAccountController(localization, userStore) {
-        return new AccountController(localization, userStore);
+    setLocalization(localization) {
+        this.localization = localization;
+        return this;
     }
+
+    getLocalization() {
+        return this.localization;
+    }
+
+    setUserInfo(userInfo) {
+        this.userInfo = userInfo;
+        return this;
+    }
+
+    getUserInfo() {
+        return this.userInfo;
+    }
+
+    setUserStore(userStore) {
+        this.userStore = userStore;
+        return this;
+    }
+
+    getUserStore() {
+        return this.userStore;
+    }
+
+    getUserLicense() {
+        return this.getUserInfo()?.getUserLicense();
+    }
+
 
     /**
      * Creates a card for account management.
@@ -18,7 +43,7 @@ class AccountController {
             .setNavigation(
                 CardService.newNavigation()
                     .pushCard(
-                        ViewBuilder.newAccountCard(this.userLicense, this.localization)
+                        ViewBuilder.newAccountCard(this.localization, this.getUserInfo())
                             .build()
                     )
             );
@@ -26,11 +51,12 @@ class AccountController {
 
     activatePremium(e) {
         // Set the user license in the UserStore
-        const userId = 'me'; // Assuming 'me' refers to the current user
-        const planId = 'premium'; // Example plan ID
+        const userId = e?.parameters?.userId || '_user'; // Assuming 'me' refers to the current user
+        const planId = e?.parameters?.planId || '_plan'; // Default to 'premium' plan
+        const days = parseInt(e?.parameters?.days || 1);
         const createdOn = new Date();
-        const ticks = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
-        const expirDate = new Date(createdOn.getTime() + ticks); // 14 days from now
+        const milliseconds = days * 24 * 60 * 60 * 1000; // Convert days to milliseconds
+        const expirDate = new Date(createdOn.getTime() + milliseconds); // Calculate expiration date
         const amount = 0; // Assuming no cost for the trial
         const newUserLicense = ModelBuilder.newUserLicense()
             .setUserId(userId)
@@ -47,7 +73,7 @@ class AccountController {
                     .popToRoot()
                     .updateCard(
                         ViewBuilder.newHomeCard(
-                            this.userStore.getUserLicense(),
+                            this.getUserInfo(),
                             this.localization,
                             this.userStore.getIndentSpaces()
                         ).build()
@@ -102,5 +128,11 @@ class AccountController {
                 CardService.newNotification()
                     .setText(this.localization.messages.success))
             .setStateChanged(false);
+    }
+
+    static newAccountController(localization, userStore) {
+        return new AccountController()
+            .setLocalization(localization)
+            .setUserStore(userStore);
     }
 }

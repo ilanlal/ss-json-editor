@@ -33,11 +33,21 @@ class HomeCard {
         return cardBuilder;
     }
 
-    setUserLicense(userLicense) {
-        this.userLicense = userLicense;
-        this.isPremium = userLicense?.isActive?.() || false;
-
+    setUserInfo(userInfo) {
+        this.userInfo = userInfo;
         return this;
+    }
+
+    getUserInfo() {
+        return this.userInfo;
+    }
+
+    getUserLicense() {
+        return this.getUserInfo()?.getUserLicense();
+    }
+
+    isPremium() {
+        return this.getUserLicense()?.isActive?.() || false;
     }
 
     setLocalization(localization) {
@@ -45,8 +55,12 @@ class HomeCard {
         return this;
     }
 
+    getIndentationSpaces() {
+        return this.indentationLevel || UserStore.Constants.DEFAULT_INDENT_SPACES;
+    }
+
     setIndentationSpaces(spaces) {
-        this.indentationLevel = spaces;
+        this.indentationLevel = spaces || UserStore.Constants.DEFAULT_INDENT_SPACES;
         return this;
     }
 

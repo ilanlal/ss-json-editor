@@ -1,12 +1,42 @@
 // Apps Script code for Google Workspace Add-ons
 class HomeController {
-    constructor(localization, userStore) {
-        this.localization = localization;
-        this.userStore = userStore;
-        this.userLicense = this.userStore.getUserLicense();
-        this.indentSpaces = this.userStore.getIndentSpaces() || "2";
+    constructor() {
     }
 
+    setIndentSpaces(spaces) {
+        this.indentSpaces = spaces || UserStore.Constants.DEFAULT_INDENT_SPACES;
+        return this;
+    }
+
+    getIndentSpaces() {
+        return this.indentSpaces || UserStore.Constants.DEFAULT_INDENT_SPACES;
+    }
+
+    getLocalization() {
+        return this.localization;
+    }
+
+    setUserInfo(userInfo) {
+        this.userInfo = userInfo;
+        return this;
+    }
+
+    getUserInfo() {
+        return this.userInfo;
+    }
+
+    setUserStore(userStore) {
+        this.userStore = userStore;
+        return this;
+    }
+
+    getUserStore() {
+        return this.userStore;
+    }
+
+    getUserLicense() {
+        return this.getUserInfo()?.getUserLicense();
+    }
 
     /**
      * @returns {CardService.ActionResponse}
@@ -20,8 +50,8 @@ class HomeController {
                         ViewBuilder
                             .newHomeCard(this.userLicense, this.localization, this.indentSpaces)
                             .build()
-                        )
-                    );
+                    )
+            );
     }
 
     /**

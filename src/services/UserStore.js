@@ -16,14 +16,14 @@ class UserStore {
    */
   getLocalizationCode() {
     return this.userDataStorage
-      .getProperty(UserStore.Constants.LOCALIZATION_KEY) || UserStore.Constants.DEFAULT_LOCALIZATION;
+      .getProperty(UserStore.Constants.LOCALIZATION_KEY) || UserStore.Constants.DEFAULT_USER_LOCALE_CODE;
   }
 
   /**
    * Sets the localization for the user.
    * @param {string} locale The locale to set, default is "en".
    */
-  setLocalizationCode(locale = UserStore.Constants.DEFAULT_LOCALIZATION) {
+  setLocalizationCode(locale = UserStore.Constants.DEFAULT_USER_LOCALE_CODE) {
     this.userDataStorage.setProperty(UserStore.Constants.LOCALIZATION_KEY, locale);
     return this;
   }
@@ -119,6 +119,6 @@ UserStore.Constants = {
   USER_LICENSE_KEY: 'userLicense',
   LOCALIZATION_KEY: 'localization',
   DEBUG_MODE_KEY: 'debugMode',
-  DEFAULT_LOCALIZATION: 'en',
+  DEFAULT_USER_LOCALE_CODE: 'en',
   DEFAULT_INDENT_SPACES: 2
 };
