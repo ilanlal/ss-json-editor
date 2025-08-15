@@ -10,50 +10,32 @@ class test_RangeReport {
 
     runTests() {
         const tests = [
-            "test_createRangeReport",
-            "test_addItem"
+            "test_core"
         ];
         tests.forEach(test => this[test]());
     }
 
-    test_createRangeReport() {
-        QUnit.test("Test create RangeReport object", (assert) => {
+    test_core() {
+        QUnit.test("Test core functionality", (assert) => {
             // Create a mock range with dummy data
-            const mockRange = SpreadsheetApp
-                .getActiveSpreadsheet()
-                .getActiveSheet()
-                .getRange("A1:B2");
-            const rangeReport = new RangeReport(mockRange.getA1Notation());
+            const mockRange = MockRangeBuilder.newMockRange()
+                .withA1Notation("A1")
+                .withValues([["Test value"]])
+                .build();
+
+            const rangeReport = ModelBuilder.newRangeReport()
+                .setRange(mockRange)
+                .addItem(ModelBuilder.newReportItem("TestSheet")
+                    .setA1Notation("A1")
+                    .setMessage("Invalid JSON in cell A1")
+                    .setStatus(ReportItem.Status.INVALID));
+
             assert.ok(rangeReport, "RangeReport instance should be created");
-            assert.strictEqual(rangeReport.a1Notation, mockRange.getA1Notation(), "A1 notation should match");
-
-            // Check if items array is initialized
-            assert.ok(Array.isArray(rangeReport.items), "Items should be an array");
-            assert.strictEqual(rangeReport.items.length, 0, "Items array should be empty initially");
-        });
-    }
-
-    test_addItem() {
-        QUnit.test("Test addItem", (assert) => {
-            const mockRange = SpreadsheetApp
-                .getActiveSpreadsheet()
-                .getActiveSheet()
-                .getRange("A1:B2");
-            const rangeReport = new RangeReport(mockRange.getA1Notation());
-
-            // Add an item to the report
-            rangeReport
-                .addItem(
-                    new ReportItem(
-                        "A1",
-                        "Test message",
-                        ReportItem.Status.VALID));
-
-            // Check if the item was added
-            assert.strictEqual(rangeReport.items.length, 1, "Items array should contain one item");
-            assert.strictEqual(rangeReport.items[0].a1Notation, "A1", "A1 notation should match");
-            assert.strictEqual(rangeReport.items[0].message, "Test message", "Message should match");
-            assert.strictEqual(rangeReport.items[0].status, ReportItem.Status.VALID, "Status should match");
+            assert.strictEqual(rangeReport.getA1Notation(), mockRange.getA1Notation(), "A1 notation should match");
+            assert.strictEqual(rangeReport.getRange(), mockRange, "Range should match the mock range");
+            assert.strictEqual(rangeReport.getEffectedCells(), 0, "Effected cells should be initialized to 0");
+            assert.ok(rangeReport.hasItems(), "RangeReport should have items");
+            assert.strictEqual(rangeReport.getItems().length, 1, "RangeReport should contain one item");
         });
     }
 }

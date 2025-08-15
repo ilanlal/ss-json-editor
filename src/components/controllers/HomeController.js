@@ -1,78 +1,76 @@
 // Apps Script code for Google Workspace Add-ons
 class HomeController {
-    constructor(localization, userStore) {
+    constructor() {
+    }
+
+    setIndentSpaces(spaces) {
+        this.indentSpaces = spaces || UserStore.Constants.DEFAULT_INDENT_SPACES;
+        return this;
+    }
+
+    getIndentSpaces() {
+        return this.indentSpaces || UserStore.Constants.DEFAULT_INDENT_SPACES;
+    }
+
+    setLocalization(localization) {
         this.localization = localization;
+        return this;
+    }
+
+    getLocalization() {
+        return this.localization;
+    }
+
+    setUserInfo(userInfo) {
+        this.userInfo = userInfo;
+        return this;
+    }
+
+    getUserInfo() {
+        return this.userInfo;
+    }
+
+    setUserStore(userStore) {
         this.userStore = userStore;
-        this.userLicenseManager = new UserLicenseManager(userStore);
-        this.userLicense = this.userLicenseManager.getLicense();
+        return this;
+    }
+
+    getUserStore() {
+        return this.userStore;
+    }
+
+    getUserLicense() {
+        return this.getUserInfo()?.getUserLicense();
     }
 
     /**
      * @returns {CardService.ActionResponse}
      */
     home() {
-        const indentSpaces = this.userStore.getIndentSpaces() || "2";
-        const userLicense = this.userLicenseManager.getLicense();
         return CardService
             .newActionResponseBuilder()
             .setNavigation(
                 CardService.newNavigation()
-                    .pushCard(HomeCard
-                        .create(userLicense, this.localization, indentSpaces)
-                        .build()));
+                    .pushCard(
+                        ViewBuilder
+                            .newHomeCard(
+                                this.getLocalization(),
+                                this.getUserInfo(),
+                                this.getIndentSpaces())
+                            .build()
+                    )
+            );
     }
 
     /**
-     * @returns {CardService.ActionResponse}
+     * Creates a new instance of HomeController with the necessary dependencies.
+     * @returns {HomeController}
      */
-    prettyJsonFormat() {
-        const jsonStudio =
-            new JsonStudio(
-                SpreadsheetApp.getActiveSpreadsheet(),
-                this.localization,
-                this.userStore);
-
-        // Call the formatRange method of JsonStudio
-        const rangeReport = jsonStudio.formatRange();
-        const reportItems = rangeReport.getItems();
-        // If there are results, create and return the report card
-        if (reportItems?.length > 0) {
-            return new ReportController(this.userStore, this.localization)
-                .home(rangeReport)
-                .setStateChanged(true);
-        }
-
-
-        return CardService.newActionResponseBuilder()
-            .setNotification(
-                CardService.newNotification()
-                    .setText(
-                        this.localization.messages.success))
-            .setStateChanged(true);
-    }
-
-    minifyJsonFormat() {
-        const jsonStudio = new JsonStudio(
-            SpreadsheetApp
-                .getActiveSpreadsheet(), this.localization, this.userStore);
-
-        // minify the range
-        const rangeReport = jsonStudio.minifyRange();
-        const reportItems = rangeReport.getItems();
-
-        // If there are results, create and return the report card
-        if (reportItems?.length > 0) {
-            return new ReportController(this.userStore, this.localization)
-                .home(rangeReport)
-                .setStateChanged(true);
-        }
-
-
-        return CardService.newActionResponseBuilder()
-            .setNotification(
-                CardService.newNotification()
-                    .setText(
-                        this.localization.messages.success))
-            .setStateChanged(true);
+    static newHomeController(localization, userStore, userInfo) {
+        return new HomeController()
+            .setLocalization(localization)
+            .setUserStore(userStore)
+            .setUserInfo(userInfo)
+            .setIndentSpaces(userStore?.getIndentSpaces() || UserStore.Constants.DEFAULT_INDENT_SPACES);
     }
 }

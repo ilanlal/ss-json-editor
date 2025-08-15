@@ -4,11 +4,15 @@ class ReportController {
      * Represents a report for a specific range in Google Sheets.
      * @param {RangeReport} rangeReport - The report for the range.
      */
-    constructor(userStore = new UserStore(), localization = AppManager.getLocalizationResources()) {
+    constructor(localization, userStore, userInfo) {
         this.localization = localization;
         this.userStore = userStore;
-        this.userLicenseManager = new UserLicenseManager(userStore);
-        this.userLicense = this.userLicenseManager.getLicense();
+        this.userLicense = userInfo?.getUserLicense();
+        this.userInfo = userInfo;
+    }
+
+    static newReportController(localization, userStore, userInfo) {
+        return new ReportController(localization, userStore, userInfo);
     }
 
     home(rangeReport) {
@@ -21,9 +25,12 @@ class ReportController {
             .newActionResponseBuilder()
             .setNavigation(
                 CardService.newNavigation()
-                    .pushCard(ReportCard
-                        .create(this.userLicense, rangeReport, this.localization)
-                        .build()));
+                    .pushCard(
+                        ViewBuilder
+                            .newReportCard(rangeReport, this.userLicense, this.localization)
+                            .build()
+                    )
+            );
     }
 
     close(e) {
@@ -37,15 +44,26 @@ class ReportController {
      * @returns {CardService.ActionResponse}
      */
     reportItemClick(e) {
-        const a1Notation = e.parameters.a1Notation;
+        const a1Notation = e?.parameters?.a1Notation;
         if (!a1Notation) {
             throw new Error("No A1 notation provided in the event parameters.");
         }
 
-        // Focus on the cell in the active spreadsheet
-        const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-        const range = sheet.getRange(a1Notation);
-        sheet.setActiveRange(range);
+        const sheetName = e?.parameters?.sheetName;
+        if (!sheetName) {
+            throw new Error("No sheet name provided in the event parameters.");
+        }
+
+        const rangeService = ServiceBuilder.newRangeService(sheetName, a1Notation);
+
+        const currentColor = rangeService.getBackgroundColor();
+        if (currentColor === '#ffffff' || currentColor === 'white') {
+            // Highlight the range in the Google Sheets UI
+            rangeService.setBackgroundColor('#ffff00');
+        }
+        else {
+            rangeService.setBackgroundColor('#ffffff');
+        }
 
         // Return a notification to the user
         return CardService.newActionResponseBuilder()

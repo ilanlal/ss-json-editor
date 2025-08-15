@@ -1,7 +1,7 @@
 // Google Apps Script code for Google Workspace Add-ons
 class test_ReportController {
     constructor() {
-        QUnit.module("Report (controllers)");
+        QUnit.module("ReportController (controllers)");
         this.runTests();
         QUnit.done(() => {
             //this.tearDown();
@@ -11,40 +11,50 @@ class test_ReportController {
 
     runTests() {
         const tests = [
-            "test_home",
+            "test_coreActions",
         ];
         tests.forEach(test => this[test]());
     }
-    test_home() {
-        QUnit.test("Test home action", (assert) => {
+    test_coreActions() {
+        QUnit.test("Test core actions", (assert) => {
             // Mock a range report
-            const mockRange = {
-                getA1Notation: () => "A1:B2",
-                getValues: () => [
+            const mockRange = MockRangeBuilder.newMockRange()
+                .withA1Notation("A1:B2")
+                .withValues([
                     ["Header 1", "Header 2"],
                     ["Value 1", "Value 2"]
-                ]
-            };
-            const rangeReport = new RangeReport(mockRange.getA1Notation());
-            const userStore = new UserStore();
+                ]);
+            assert.ok(mockRange, "Mock range should be created successfully");
+            const rangeReport = ModelBuilder.newRangeReport()
+                .setRange(mockRange)
+                .addItem(ModelBuilder.newReportItem('TestSheet')
+                    .setA1Notation("A1")
+                    .setMessage("Invalid JSON in cell A1")
+                    .setStatus(ReportItem.Status.INVALID))
+                .addItem(ModelBuilder.newReportItem('TestSheet')
+                    .setA1Notation("B2")
+                    .setMessage("Invalid JSON in cell B2")
+                    .setStatus(ReportItem.Status.INVALID));
+
+            assert.ok(rangeReport, "Range report should be created successfully");
+            
             const localization = AppManager.getLocalizationResources();
             // Create a ReportController instance
-            const reportController =
-                new ReportController(
-                    userStore,
-                    localization
-                );
-            
-            const actionResponse = reportController
+            const action = ControllerBuilder
+                .newReportController()
                 .home(rangeReport)
                 .build()
                 .printJson();
-            assert.ok(actionResponse, "Action response should be created successfully");
-            const card = JSON.parse(actionResponse).renderActions.action.navigations[0].pushCard;
+            assert.ok(action, "Action response should be created successfully");
+
+            const actionResponse = JSON.parse(action);
+
+            assert.ok(actionResponse, "ActionResponse should be created successfully");
+            const card = actionResponse.renderActions.action.navigations[0].pushCard;
             assert.ok(card, "Card should be created successfully");
             assert.strictEqual(
                 card.header.title,
-                AppManager.getLocalizationResources().cards.report.title,
+                localization.cards.report.title,
                 "Card title should match localization"
             );
         });

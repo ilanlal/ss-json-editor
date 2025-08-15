@@ -9,9 +9,9 @@ const Static_Resources = {
     // build number. 
     // This is used to identify the version of the static resources.
     // It should be updated with each deployment 😉.
-    build: "20250802.0435500",
+    build: "20250815.112900",
     // version of the Google Apps Script deployment (usually vnext)
-    version: "9",
+    version: "v9.mp.rev",
     // Google Marketplace URL for the add-on.
     marketplaceUrl: "https://workspace.google.com/marketplace/app/json_studio/1234567890",
     // Google Apps Script project URL for the add-on.
@@ -34,6 +34,7 @@ const Static_Resources = {
   },
   parameters: {
     maxRangeSize: 1000, // Maximum number of cells in a range
+    freeActivationDays: 90, // Number of free activation days
   },
   userLicense: "userLicense",
   dataInput: "dataInput",

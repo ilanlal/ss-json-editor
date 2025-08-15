@@ -6,13 +6,13 @@ This document outlines the roadmap for the JSON Studio add-on for Google Sheetsâ
 
 ### The roadmap to publish the add-on to the Google Workspace Marketplace
 
-1. **Development Phase**:
+1. **Development**:
    - Complete the core functionality of the add-on, including JSON formatting (prettify and minify).
    - Implement user interface components using Google Apps Script and CardService.
-2. **Testing Phase**:
+2. **Testing**:
    - Conduct thorough testing of the add-on to ensure it works as expected.
    - Use qUnit.js for unit testing and ensure all features are functioning correctly.
-3. **Documentation Phase**:
+3. **Documentation**:
    - Create comprehensive documentation for the add-on, including installation instructions, usage guides, and troubleshooting tips.
    - Write a detailed README.md file to provide an overview of the add-on and its features.
 4. **Publishing Phase**:
@@ -25,4 +25,6 @@ This document outlines the roadmap for the JSON Studio add-on for Google Sheetsâ
 
 ## Coming Features
 
-- **Validate JSON**: Implement functionality to check if the JSON data is valid and well-formed.
+- **Edit JSON**: Allow users to edit JSON data directly within the spreadsheet.
+- **Billing Support**: Integrate billing support to manage premium features and memberships.
+- **Enhanced User Interface**: Improve the user interface for better usability and accessibility.

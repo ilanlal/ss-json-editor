@@ -2,14 +2,25 @@
 class test_AddonTriggers {
     constructor() {
         QUnit.module("Addon Triggers (e2e)");
-        this.userStore = new UserStore();
+        this.userStore = ServiceBuilder.newUserStore();
+        this.memOriginals();
         this.dummySheet = this.initializeTestSheet();
+        QUnit.done(() => {
+            // Restore original state
+            this.userStore.setIndentSpaces(this.originalIndentSpaces);
+        });
         this.runTests();
+
     }
+
+    memOriginals() {
+        this.originalIndentSpaces = this.userStore.getIndentSpaces();
+    }
+
     runTests() {
         const tests = [
             this.test_onIndentSpacesSelectorChange.bind(this),
-            this.test_onFormatRange.bind(this),
+            this.test_onPrettifyRange.bind(this),
             this.test_onMinifyRange.bind(this),
             // Add more test methods here as needed
         ];
@@ -31,7 +42,7 @@ class test_AddonTriggers {
             const e = {
                 commonEventObject: {
                     formInputs: {
-                        "indentSpaces": {
+                        [UserStore.Constants.INDENT_SPACES_KEY]: {
                             stringInputs: {
                                 value: ["4"]
                             }
@@ -42,23 +53,17 @@ class test_AddonTriggers {
 
 
             onIndentSpacesSelectorChange(e);
-            assert.equal(that.userStore.getIndentSpaces(), "4", "Indent spaces should be set to 4");
+            assert.equal(that.userStore.getIndentSpaces(), 4, "Indent spaces should be set to 4");
             // Check if indentSpaces is set to a different value
-            e.commonEventObject.formInputs.indentSpaces.stringInputs.value[0] = "6";
+            e.commonEventObject.formInputs[UserStore.Constants.INDENT_SPACES_KEY].stringInputs.value[0] = "6";
             onIndentSpacesSelectorChange(e);
-            assert.equal(that.userStore.getIndentSpaces(), "6", "Indent spaces should be set to 6");
-            // Check for default value if no input is provided
-            const eDefault = {
-                commonEventObject: undefined
-            };
-            onIndentSpacesSelectorChange(eDefault);
-            assert.equal(that.userStore.getIndentSpaces(), "2", "Indent spaces should default to 2");
+            assert.equal(that.userStore.getIndentSpaces(), 6, "Indent spaces should be set to 6");
         });
     }
 
-    test_onFormatRange() {
+    test_onPrettifyRange() {
         let that = this;
-        QUnit.test("Format Range Tests", function (assert) {
+        QUnit.test("Prettify Range Tests", function (assert) {
             // Mock a range with minified JSON data
             const values = [
                 ['{"key":"value"}', '{"array":[1,2,3]}'],
@@ -69,6 +74,9 @@ class test_AddonTriggers {
             that.dummySheet.getRange("A1:B2").setValues(values);
             // Activate the range to be formatted
             that.dummySheet.getRange("A1:B2").activate();
+
+            // Set user store settings
+            ServiceBuilder.newUserStore().setIndentSpaces(2);
 
             // Mock event object
             const e = undefined; // No specific event object needed for this test

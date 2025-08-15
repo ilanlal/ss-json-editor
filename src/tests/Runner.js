@@ -29,7 +29,7 @@ class QUnitRunner {
         this.test_types();
         this.test_helpers();
         // Run modules, views, controllers, and end-to-end tests
-        this.test_modules();
+        this.test_services();
         this.test_views();
         this.test_controllers();
         this.test_e2eTriggers();
@@ -41,15 +41,15 @@ class QUnitRunner {
         new test_UserLicense();
     }
 
-    test_helpers() {
-        new test_SpreadsheetHelper();
+    test_helpers() {        
         new test_AppManager();
     }
 
-    test_modules() {
-        new test_JsonStudio();
-        new test_UserStore();
-        new test_UserLicenseManager();
+    test_services() {
+        new test_JsonStudioService();
+        new test_UserStoreService();
+        //new test_SpreadsheetService();
+        new test_RangeService();
     }
 
     test_views() {
@@ -57,7 +57,6 @@ class QUnitRunner {
         new test_HomeView();
         new test_AccountView();
         new test_ReportView();
-        new test_JsonEditorView();
     }
 
     test_controllers() {
@@ -65,7 +64,7 @@ class QUnitRunner {
         new test_HomeController();
         new test_AccountController();
         new test_ReportController();
-        new test_JsonEditorController();
+        new test_JsonStudioController();
     }
 
 

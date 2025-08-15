@@ -1,27 +1,13 @@
 // Apps Script code for Google Workspace Add-ons
 class HomeCard {
-    /**
-     * Constructor for the HomeCard class.
-     * @param {boolean} isPremium - Indicates if the user has a premium license.
-     * @param {number} indentationSpaces - The number of spaces to use for indentation.
-     * @param {Global_Resources["en"]} localization - The localization object for the card.
-     */
-    constructor(userLicense, indentationSpaces, localization) {
-        this.userLicense = userLicense;
-        this.isPremium = userLicense?.isActive?.() || false;
-        // Set the indentation level based on the provided spaces
-        this.indentationLevel = indentationSpaces;
-        this.localization = localization;
+    constructor() {
+        this.localization = AppManager.getLocalizationResources();
+        this.indentationLevel = UserStore.Constants.DEFAULT_INDENT_SPACES;
+        this.FREE_ACTIVATION_DAYS = Static_Resources.parameters.freeActivationDays;
     }
 
-    static create(userLicense, localization, indentationSpaces = 2) {
-        const thisCard = new HomeCard(
-            userLicense,
-            indentationSpaces,
-            localization
-        );
-        // Build the card using the builder pattern
-        return thisCard.newCardBuilder();
+    static newHomeCard() {
+        return new HomeCard();
     }
 
     newCardBuilder() {
@@ -30,7 +16,7 @@ class HomeCard {
             .setName(Static_Resources.resources.homeCardName)
             // Set the card header
             .setHeader(this.getHeader());
-        if (!this.isPremium) {
+        if (!this.isPremium()) {
             // Add the premium required section if the user is not premium
             cardBuilder.addSection(this.getPremiumRequiredSection());
         }
@@ -39,15 +25,46 @@ class HomeCard {
         cardBuilder.addSection(this.getFormatSection())
             // Add Minify section
             .addSection(this.getMinifySection());
-            // Add Edit section
-            //.addSection(this.getEditSection());
+        // Add Edit section
+        //.addSection(this.getEditSection());
 
-        if (!this.isPremium) {
+        if (!this.isPremium()) {
             // Add the footer to the card
             cardBuilder.setFixedFooter(this.getFixedFooter());
         }
 
         return cardBuilder;
+    }
+
+    setUserInfo(userInfo) {
+        this.userInfo = userInfo;
+        return this;
+    }
+
+    getUserInfo() {
+        return this.userInfo;
+    }
+
+    getUserLicense() {
+        return this.getUserInfo()?.getUserLicense();
+    }
+
+    isPremium() {
+        return this.getUserLicense()?.isActive?.() || false;
+    }
+
+    setLocalization(localization) {
+        this.localization = localization;
+        return this;
+    }
+
+    getIndentationSpaces() {
+        return this.indentationLevel || UserStore.Constants.DEFAULT_INDENT_SPACES;
+    }
+
+    setIndentationSpaces(spaces) {
+        this.indentationLevel = spaces || UserStore.Constants.DEFAULT_INDENT_SPACES;
+        return this;
     }
 
     getHeader() {
@@ -67,7 +84,7 @@ class HomeCard {
         section.addWidget(
             this.getFormatDecoratedTextWidget());
 
-        if (this.isPremium) {
+        if (this.isPremium()) {
             // Create a selection input for indentation spaces
             const spaceSelectionDropdown =
                 CardService.newSelectionInput()
@@ -75,11 +92,11 @@ class HomeCard {
                     // Enable for premium users
                     .setTitle(this.localization.cards.home.indentSpaces)
                     .setFieldName(Static_Resources.resources.indentSpaces)
-                    .addItem('1 {.}', '1', this.indentationLevel === "1")
-                    .addItem('2 {..}', '2', this.indentationLevel === "2") // Default selected
-                    .addItem('4 {....}', '4', this.indentationLevel === "4")
-                    .addItem('6 {......}', '6', this.indentationLevel === "6")
-                    .addItem('8 {........}', '8', this.indentationLevel === "8")
+                    .addItem('1 {.}', '1', this.indentationLevel === 1)
+                    .addItem('2 {..} (default)', '2', this.indentationLevel === 2) // Default selected
+                    .addItem('4 {....}', '4', this.indentationLevel === 4)
+                    .addItem('6 {......}', '6', this.indentationLevel === 6)
+                    .addItem('8 {........}', '8', this.indentationLevel === 8)
                     .setOnChangeAction(
                         CardService
                             .newAction()
@@ -133,7 +150,7 @@ class HomeCard {
             //.setTopLabel(`${this.getPremiumRequiredMessage()}`)
             .setButton(
                 CardService.newTextButton()
-                    .setDisabled(!this.isPremium)
+                    .setDisabled(!this.isPremium())
                     .setText(`${this.getPremiumLockedEmoji()}${this.localization.actions.minify}`)
                     .setOnClickAction(
                         CardService.newAction()
@@ -159,7 +176,7 @@ class HomeCard {
             //.setTopLabel(`${this.getPremiumRequiredMessage()}`)
             .setButton(
                 CardService.newTextButton()
-                    .setDisabled(!this.isPremium)
+                    .setDisabled(!this.isPremium())
                     .setText(`${this.getPremiumLockedEmoji()}${this.localization.actions.edit}`)
                     .setOnClickAction(
                         CardService.newAction()
@@ -177,8 +194,8 @@ class HomeCard {
         return CardService.newFixedFooter()
             .setPrimaryButton(
                 CardService.newTextButton()
-                    .setDisabled(this.isPremium)
-                    .setText(this.localization.actions.activatePremium)
+                    .setDisabled(this.isPremium())
+                    .setText(this.localization.actions.claimFreeXDays.replace('{0}', this.FREE_ACTIVATION_DAYS))
                     .setOnClickAction(
                         CardService.newAction()
                             .setFunctionName('onOpenAccountCard')));
@@ -186,11 +203,11 @@ class HomeCard {
 
     getPremiumRequiredMessage() {
         // Return the message indicating that the feature requires a premium license
-        return `${!this.isPremium ? (Static_Resources.emojis.lock + ' ' + this.localization.messages.premiumRequired) : ''}`;
+        return `${!this.isPremium() ? (Static_Resources.emojis.lock + ' ' + this.localization.messages.premiumRequired) : ''}`;
     }
 
     getPremiumLockedEmoji() {
-        if (this.isPremium) {
+        if (this.isPremium()) {
             // Return an empty string if the user has a premium license
             return '';
         }

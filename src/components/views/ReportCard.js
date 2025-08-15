@@ -1,26 +1,29 @@
 // Google Apps Script code for Google Workspace Add-ons
 class ReportCard {
-  /**
-   * Constructor for the ReportCard class.
-   * @param {UserLicense} userLicense - The user license information.
-   * @param {RangeReport} rangeReport - The report for the range.
-   * @param {Global_Resources["en"]} localization - Localization resources.
-   */
-  constructor(userLicense, rangeReport, localization) {
+  constructor() {
+  }
+
+  setRangeReport(rangeReport) {
     if (!rangeReport || !rangeReport.getA1Notation) {
       throw new Error("Invalid range provided. Must be a Google Sheets Range object.");
     }
-    // Initialize the range report
-    /** @type {RangeReport} */
     this.rangeReport = rangeReport;
-    this.localization = localization || AppManager.getLocalizationResources();
-    this.userLicense = userLicense;
-    this.isPremium = userLicense?.isActive?.() || false;
+    return this;
   }
 
-  static create(userLicense, rangeReport, localization) {
-    const card = new ReportCard(userLicense, rangeReport, localization);
-    return card.newCardBuilder();
+  setLocalization(localization) {
+    this.localization = localization;
+    return this;
+  }
+
+  setUserLicense(userLicense) {
+    this.userLicense = userLicense;
+    this.isPremium = userLicense?.isActive?.() || false;
+    return this;
+  }
+
+  static newReportCard() {
+    return new ReportCard();
   }
 
   /**
@@ -66,7 +69,7 @@ class ReportCard {
   getReportSection() {
     const section = CardService.newCardSection()
       .setCollapsible(true)
-      .setNumUncollapsibleWidgets((4 * 2)-1) // 4 columns, 3 divider widgets;
+      .setNumUncollapsibleWidgets((4 * 2)) // 4 columns, 3 divider widgets;
     // @see https://developers.google.com/apps-script/reference/card-service/grid
 
     // Iterate over the report items and add them to section
@@ -88,19 +91,25 @@ class ReportCard {
     return section;
   }
 
+
+  /**
+   * Get the decorated text widget for a report item.
+   * @param {ReportItem} item - The report item.
+   * @returns {CardService.DecoratedText} - The decorated text widget.
+   */
   getReportItemDecoratedTextWidget(item) {
     return CardService.newDecoratedText()
-      .setText(`${item.a1Notation}`)
+      .setText(`${item.getA1Notation()}`)
       .setWrapText(true)
-      .setBottomLabel(`${Static_Resources.emojis.warning} ${item.message}`)
+      .setBottomLabel(`${Static_Resources.emojis.warning} ${item.getMessage()}`)
       .setButton(
         CardService.newTextButton()
           .setDisabled(!this.isPremium)
-          .setText(`${!this.isPremium ? (Static_Resources.emojis.lock + ' ') : ''}${this.localization.actions.focus.replace('{0}', item.a1Notation)}`)
+          .setText(`${!this.isPremium ? (Static_Resources.emojis.lock + ' ') : ''}${this.localization.actions.focus.replace('{0}', item.getA1Notation())}`)
           .setOnClickAction(
             CardService.newAction()
               .setFunctionName('onReportItemClick')
-              .setParameters({ a1Notation: item.a1Notation })));
+              .setParameters({ a1Notation: item.getA1Notation(), sheetName: item.getSheetName() })));
   }
 
   getPremiumRequiredSection() {

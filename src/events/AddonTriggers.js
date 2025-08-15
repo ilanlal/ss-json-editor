@@ -7,22 +7,49 @@
  */
 function onDefaultHomePageOpen(e) {
     console.log("onDefaultHomePageOpen called with event:", e);
-    const localization = AppManager.getLocalizationResources();
     try {
-        const userStore = new UserStore();
-
-        // Return the home card
-        return new HomeController(localization, userStore)
+        return ControllerBuilder.newHomeController()
+            .setLocalization(AppManager.getLocalizationResources())
+            .setUserInfo(ModelBuilder.newUserInfo()
+                .setUserId('_user')
+                .setUserLocaleCode(e?.userLocale || UserStore.Constants.DEFAULT_USER_LOCALE_CODE)
+                .setUserCountry(e?.userCountry || 'US')
+                .setUserTimezone(e?.userTimezone || Session.getScriptTimeZone())
+                .setUserLicense(
+                    ServiceBuilder.newUserStore().getUserLicense()))
             .home()
             .build();
-
     } catch (error) {
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
                 error.message || error.toString(),
-                localization.messages.error,
+                "Error",
                 7);
+    }
+
+}
+function onOpenAccountCard(e) {
+    console.log("onOpenAccountCard called with event:", e);
+    try {
+        return ControllerBuilder.newAccountController()
+            .setUserInfo(ModelBuilder.newUserInfo()
+                .setUserId('_user')
+                .setUserLocaleCode(e?.commonEventObject?.userLocale || UserStore.Constants.DEFAULT_USER_LOCALE_CODE)
+                .setUserCountry(e?.commonEventObject?.userCountry || 'US')
+                .setUserTimezone(e?.commonEventObject?.userTimezone || Session.getScriptTimeZone())
+                .setUserLicense(
+                    ServiceBuilder.newUserStore().getUserLicense()))
+            .home()
+            .build();
+
+    } catch (error) {
+        return CardService.newActionResponseBuilder()
+            .setNotification(
+                CardService.newNotification()
+                    .setText(
+                        error.toString()))
+            .build();
     }
 }
 
@@ -30,10 +57,10 @@ function onMinifyRange(e) {
     // This function is called when the user selects "Minify" from the add-on menu    
     console.log("onMinifyRange called with event:", e);
     try {
-        const localization = AppManager.getLocalizationResources();
-        const userStore = new UserStore();
-        return new HomeController(localization, userStore)
-            .minifyJsonFormat()
+        const range = SpreadsheetApp.getActiveSpreadsheet().getActiveRange();
+        return ControllerBuilder.newJsonStudioController()
+            .validateRange(range)
+            .minifyRange(range)
             .build();
     } catch (error) {
         return CardService.newActionResponseBuilder()
@@ -47,10 +74,12 @@ function onFormatRange(e) {
     console.log("onFormatRange called with event:", e);
 
     try {
-        const localization = AppManager.getLocalizationResources();
-        const userStore = new UserStore();
-        return new HomeController(localization, userStore)
-            .prettyJsonFormat()
+        const range = SpreadsheetApp.getActiveSpreadsheet().getActiveRange();
+        const indentSpaces = ServiceBuilder.newUserStore().getIndentSpaces();
+
+        return ControllerBuilder.newJsonStudioController()
+            .validateRange(range)
+            .prettifyRange(range, indentSpaces * 1)
             .build();
     } catch (error) {
         return CardService.newActionResponseBuilder()
@@ -63,8 +92,7 @@ function onFormatRange(e) {
 function onShowAboutCard(e) {
     console.log("onShowAboutCard called with event:", e);
     try {
-        const localization = AppManager.getLocalizationResources();
-        return new AboutController(localization)
+        return ControllerBuilder.newAboutController()
             .home()
             .build();
     } catch (error) {
@@ -78,28 +106,21 @@ function onShowAboutCard(e) {
 function onIndentSpacesSelectorChange(e) {
     console.log("onIndentSpacesSelectorChange called with event:", e);
     try {
-        const userStore = new UserStore();
-        const selectedSpaces = e?.commonEventObject?.formInputs?.[Static_Resources.resources.indentSpaces]?.stringInputs?.value[0] || "2";
-        userStore.setIndentSpaces(selectedSpaces); // Store the selected spaces in user properties
+        return ControllerBuilder.newAccountController()
+            .indentSpacesChange(e)
+            .build();
     } catch (error) {
-        const localization = AppManager.getLocalizationResources();
-        SpreadsheetApp
-            .getActiveSpreadsheet()
-            .toast(
-                error.toString(),
-                localization.messages.error,
-                7);
+        return CardService.newActionResponseBuilder()
+            .setNotification(CardService.newNotification()
+                .setText(error.toString()))
+            .build();
     }
-    // Return nothing as this is just a change event
-    return;
 }
 
 function onReportItemClick(e) {
     console.log("onReportItemClick called with event:", e);
     try {
-        const localization = AppManager.getLocalizationResources();
-        const userStore = new UserStore();
-        return new ReportController(userStore, localization)
+        return ControllerBuilder.newReportController()
             .reportItemClick(e)
             .build();
     } catch (error) {
@@ -113,7 +134,7 @@ function onReportItemClick(e) {
 function onReportClose(e) {
     console.log("onReportClose called with event:", e);
     try {
-        return new ReportController()
+        return ControllerBuilder.newReportController()
             .close(e)
             .build();
     } catch (error) {
@@ -203,28 +224,13 @@ function onEditRange(e) {
     return;
 }
 
-function onOpenAccountCard(e) {
-    console.log("onOpenAccountCard called with event:", e);
-    try {
-        return new AccountController()
-            .home()
-            .build();
 
-    } catch (error) {
-        return CardService.newActionResponseBuilder()
-            .setNotification(
-                CardService.newNotification()
-                    .setText(
-                        error.toString()))
-            .build();
-    }
-}
 
 function onActivatePremium(e) {
     console.log("onActivatePremium called with event:", e);
     try {
-        return new AccountController()
-            .activatePremium()
+        return ControllerBuilder.newAccountController()
+            .activatePremium(e)
             .build();
     } catch (error) {
         return CardService.newActionResponseBuilder()
@@ -239,8 +245,8 @@ function onActivatePremium(e) {
 function onRevokeLicense(e) {
     console.log("onRevokeLicense called with event:", e);
     try {
-        return new AccountController()
-            .revokePremium()
+        return ControllerBuilder.newAccountController()
+            .revokePremium(e)
             .build();
     } catch (error) {
         return CardService.newActionResponseBuilder()
