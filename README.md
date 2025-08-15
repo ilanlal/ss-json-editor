@@ -17,9 +17,9 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 
 ### Screenshots
 
-| Home Card | Report Card | Account Card | About Card |
-| --- | --- | --- | --- |
-| <img width="250" alt="image" src="https://github.com/user-attachments/assets/eb457ab0-74a5-4172-aee1-a865bdedbba3" /> | <img width="250" alt="image" src="https://github.com/user-attachments/assets/43f892ea-37e6-4a22-9c55-81037512685e" /> | <img width="250" alt="image" src="https://github.com/user-attachments/assets/43f892ea-37e6-4a22-9c55-81037512685e" /> | <img width="250" alt="image" src="https://github.com/user-attachments/assets/43f892ea-37e6-4a22-9c55-81037512685e" /> |
+| Home | Report |
+| --- | --- |
+| <img width="480" alt="image" src="https://lh3.googleusercontent.com/-WCx0wZsAP7E/aI3dvgckXII/AAAAAAAAB6U/029MQrH8L30UbGiat-NIUFCc4oNGzHiFACNcBGAsYHQ/Screenshot-1280x800-v9001.png" /> | <img width="480" alt="image" src="https://lh3.googleusercontent.com/-DN8IkZ9oUlU/aJ-a5t22dcI/AAAAAAAAB6g/uWyzs_3n3QYl7_nAzDe7MtDwRj_YJ2UuQCNcBGAsYHQ/Screenshot-1280x800-v9002.png" /> |
 
 ### Membership Plans
 
