@@ -55,13 +55,28 @@ class AccountCard {
 
     newUserInfoSection() {
         return CardService.newCardSection()
-            //.setHeader(this.localization.cards.account.subtitle)
+            .setHeader(this.localization.messages.profileInfo)
+            .addWidget(CardService.newDivider())
             .addWidget(CardService.newTextParagraph()
-                .setText("No information available for this user."));
+                .setText(`User: ${this.getUserInfo()?.getUserId() || '(unknown user)'}`)
+            )
+            .addWidget(CardService.newTextParagraph()
+                .setText(`Locale: ${this.getUserInfo()?.getUserLocaleCode() || '(unknown locale)'}`)
+            )
+            //getUserCountry
+            .addWidget(CardService.newTextParagraph()
+                .setText(`Country: ${this.getUserInfo()?.getUserCountry() || '(unknown country)'}`)
+            )
+            //getUserTimezone
+            .addWidget(CardService.newTextParagraph()
+                .setText(`Timezone: ${this.getUserInfo()?.getUserTimezone()?.id || '(unknown timezone)'}`)
+            );
     }
 
     newMembershipSection() {
-        const section = CardService.newCardSection();
+        const section = CardService.newCardSection()
+            .setHeader(this.localization.messages.membershipInfo)
+            .addWidget(CardService.newDivider());
 
         if (this.isPremium()) {
             section
@@ -74,24 +89,31 @@ class AccountCard {
                 .addWidget(CardService.newTextParagraph()
                     .setText(new Date(this.getUserLicense()?.getExpirationDate())?.toLocaleString() || ''))
                 .addWidget(CardService.newTextButton()
-                    .setText(this.localization.actions.revokeLicense)
+                    .setText(this.localization.actions.cancelPremium)
                     .setOnClickAction(CardService.newAction()
                         .setFunctionName("onRevokeLicense")));
         } else {
             section
-                .addWidget(
-                    CardService.newTextParagraph()
-                        .setText(this.localization.cards.account.activationInstructions))
                 .addWidget(CardService.newTextParagraph()
-                    .setText(this.localization.messages.claimPremium.replace('{0}', this.FREE_ACTIVATION_DAYS)))
+                    .setText(
+                        this.localization.messages.claimPremium
+                            .replace('{0}', this.FREE_ACTIVATION_DAYS)
+                    )
+                )
+                .addWidget(CardService.newTextParagraph()
+                    .setText(this.localization.cards.account.activationInstructions)
+                )
                 .addWidget(CardService.newTextButton()
-                    .setText(this.localization.actions.activate)
-                    .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
+                    .setText(this.localization.actions.activatePremium)
+                    //.setTextButtonStyle(CardService.TextButtonStyle.FILLED)
                     .setOnClickAction(CardService.newAction()
                         .setFunctionName("onActivatePremium")
                         .setParameters({
-                            userId: 'me', planId: 'premium', days: this.FREE_ACTIVATION_DAYS.toString()
-                        })));
+                            userId: 'view_user',
+                            planId: 'Premium membership',
+                            days: this.FREE_ACTIVATION_DAYS.toString()
+                        }))
+                );
         }
 
         return section;

@@ -1,6 +1,9 @@
 // Apps Script code for Google Workspace Add-ons
 class HomeCard {
     constructor() {
+        this.localization = AppManager.getLocalizationResources();
+        this.indentationLevel = UserStore.Constants.DEFAULT_INDENT_SPACES;
+        this.FREE_ACTIVATION_DAYS = Static_Resources.parameters.freeActivationDays;
     }
 
     static newHomeCard() {
@@ -192,7 +195,7 @@ class HomeCard {
             .setPrimaryButton(
                 CardService.newTextButton()
                     .setDisabled(this.isPremium())
-                    .setText(this.localization.actions.activatePremium)
+                    .setText(this.localization.actions.claimFreeXDays.replace('{0}', this.FREE_ACTIVATION_DAYS))
                     .setOnClickAction(
                         CardService.newAction()
                             .setFunctionName('onOpenAccountCard')));
