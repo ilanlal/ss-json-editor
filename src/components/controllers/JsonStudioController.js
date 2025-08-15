@@ -1,18 +1,19 @@
 // Apps Script code for Google Workspace Add-ons
 class JsonStudioController {
-    constructor(localization, userStore) {
+    constructor(localization, userStore, userInfo) {
         this.localization = localization;
         this.userStore = userStore;
-        this.userLicense = this.userStore.getUserLicense();
+        this.userLicense = userInfo?.getUserLicense();
         this.indentSpaces = this.userStore.getIndentSpaces() || "2";
+        this.userInfo = userInfo;
     }
 
     /**
      * Creates a new instance of JsonStudioController with the necessary dependencies.
      * @returns {JsonStudioController}
      */
-    static newJsonStudioController(localization, userStore) {
-        return new JsonStudioController(localization, userStore);
+    static newJsonStudioController(localization, userStore, userInfo) {
+        return new JsonStudioController(localization, userStore, userInfo);
     }
 
     validateRange(range) {

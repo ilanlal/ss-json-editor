@@ -4,14 +4,15 @@ class ReportController {
      * Represents a report for a specific range in Google Sheets.
      * @param {RangeReport} rangeReport - The report for the range.
      */
-    constructor(localization, userStore) {
+    constructor(localization, userStore, userInfo) {
         this.localization = localization;
         this.userStore = userStore;
-        this.userLicense = this.userStore.getUserLicense();
+        this.userLicense = userInfo?.getUserLicense();
+        this.userInfo = userInfo;
     }
 
-    static newReportController(localization, userStore) {
-        return new ReportController(localization, userStore);
+    static newReportController(localization, userStore, userInfo) {
+        return new ReportController(localization, userStore, userInfo);
     }
 
     home(rangeReport) {

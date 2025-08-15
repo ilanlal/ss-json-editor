@@ -12,6 +12,11 @@ class HomeController {
         return this.indentSpaces || UserStore.Constants.DEFAULT_INDENT_SPACES;
     }
 
+    setLocalization(localization) {
+        this.localization = localization;
+        return this;
+    }
+
     getLocalization() {
         return this.localization;
     }
@@ -48,7 +53,10 @@ class HomeController {
                 CardService.newNavigation()
                     .pushCard(
                         ViewBuilder
-                            .newHomeCard(this.userLicense, this.localization, this.indentSpaces)
+                            .newHomeCard(
+                                this.getLocalization(),
+                                this.getUserInfo(),
+                                this.getIndentSpaces())
                             .build()
                     )
             );
@@ -58,7 +66,11 @@ class HomeController {
      * Creates a new instance of HomeController with the necessary dependencies.
      * @returns {HomeController}
      */
-    static newHomeController(localization, userStore) {
-        return new HomeController(localization, userStore);
+    static newHomeController(localization, userStore, userInfo) {
+        return new HomeController()
+            .setLocalization(localization)
+            .setUserStore(userStore)
+            .setUserInfo(userInfo)
+            .setIndentSpaces(userStore?.getIndentSpaces() || UserStore.Constants.DEFAULT_INDENT_SPACES);
     }
 }

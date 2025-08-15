@@ -19,21 +19,24 @@ class test_HomeView {
         QUnit.test("Test create HomeCard", (assert) => {
             const localization = AppManager.getLocalizationResources();
             const indentationSpaces = "2";
-            const planId = "free trial"; // Default plan ID
+            const planId = "test_plan"; // Default plan ID
             // Default user ID
-            const userId = "me"; // Default user ID
+            const userId = "code_user"; // Default user ID
             const createdOn = new Date();  // Current date as createdOn
             // Expiration date in 14 days
-            const utcExpirationDate = new Date(createdOn.getTime() + 14 * 24 * 60 * 60 * 1000);
+            const expirationDate = new Date(createdOn.getTime() + 14 * 24 * 60 * 60 * 1000);
 
-            const mockUserLicense = ModelBuilder.newUserLicense()
+            const dummyUserLicense = ModelBuilder.newUserLicense()
                 .setUserId(userId)
                 .setPlanId(planId)
                 .setCreatedOn(createdOn)
-                .setExpirationDate(utcExpirationDate)
+                .setExpirationDate(expirationDate)
                 .setAmount(0);
+            const dummyUserInfo = ModelBuilder.newUserInfo()
+                .setUserId(userId)
+                .setUserLicense(dummyUserLicense);
 
-            const obj = ViewBuilder.newHomeCard(mockUserLicense, localization, indentationSpaces);
+            const obj = ViewBuilder.newHomeCard(localization, dummyUserInfo, indentationSpaces);
             assert.ok(obj, "HomeCard object should be created successfully");
             const build = obj.build();
             assert.ok(build, "HomeCard build should be created successfully");
@@ -44,8 +47,8 @@ class test_HomeView {
                 "Home card title should match localization"
             );
 
-            // Check with undefined userLicense
-            const objWithUndefinedLicense = ViewBuilder.newHomeCard(undefined, localization, indentationSpaces);
+            // Check with undefined userLicense (userInfo)
+            const objWithUndefinedLicense = ViewBuilder.newHomeCard(localization,undefined, indentationSpaces);
             assert.ok(objWithUndefinedLicense, "HomeCard object should be created successfully with undefined userLicense");
             const buildWithUndefinedLicense = objWithUndefinedLicense.build();
             assert.ok(buildWithUndefinedLicense, "HomeCard build should be created successfully with undefined userLicense");

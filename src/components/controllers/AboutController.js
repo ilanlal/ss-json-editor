@@ -1,6 +1,8 @@
 class AboutController {
-    constructor(localization) {
+    constructor(localization, userStore, userInfo) {
         this.localization = localization;
+        this.userStore = userStore;
+        this.userInfo = userInfo;
     }
 
     /**
@@ -15,7 +17,7 @@ class AboutController {
                     .build()));
     }
 
-    static newAboutController(localization) {
-        return new AboutController(localization);
+    static newAboutController(localization, userStore, userInfo) {
+        return new AboutController(localization, userStore, userInfo);
     }
 }

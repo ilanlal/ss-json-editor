@@ -43,8 +43,10 @@ class AccountController {
             .setNavigation(
                 CardService.newNavigation()
                     .pushCard(
-                        ViewBuilder.newAccountCard(this.localization, this.getUserInfo())
-                            .build()
+                        ViewBuilder.newAccountCard(
+                            this.getLocalization(),
+                            this.getUserInfo()
+                        ).build()
                     )
             );
     }
@@ -73,8 +75,8 @@ class AccountController {
                     .popToRoot()
                     .updateCard(
                         ViewBuilder.newHomeCard(
+                            this.getLocalization(),
                             this.getUserInfo(),
-                            this.localization,
                             this.userStore.getIndentSpaces()
                         ).build()
                     ));
@@ -82,6 +84,7 @@ class AccountController {
 
     revokePremium(e) {
         this.userStore.clearUserLicense();
+        this.userStore.setIndentSpaces(UserStore.Constants.DEFAULT_INDENT_SPACES);
 
         // navigate to root
         return CardService
@@ -91,8 +94,8 @@ class AccountController {
                     .popToRoot()
                     .updateCard(
                         ViewBuilder.newHomeCard(
-                            this.userStore.getUserLicense(),
-                            this.localization,
+                            this.getLocalization(),
+                            this.getUserInfo(),
                             this.userStore.getIndentSpaces()
                         ).build()
                     ));
@@ -130,9 +133,10 @@ class AccountController {
             .setStateChanged(false);
     }
 
-    static newAccountController(localization, userStore) {
+    static newAccountController(localization, userStore, userInfo) {
         return new AccountController()
             .setLocalization(localization)
-            .setUserStore(userStore);
+            .setUserStore(userStore)
+            .setUserInfo(userInfo);
     }
 }

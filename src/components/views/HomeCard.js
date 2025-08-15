@@ -13,7 +13,7 @@ class HomeCard {
             .setName(Static_Resources.resources.homeCardName)
             // Set the card header
             .setHeader(this.getHeader());
-        if (!this.isPremium) {
+        if (!this.isPremium()) {
             // Add the premium required section if the user is not premium
             cardBuilder.addSection(this.getPremiumRequiredSection());
         }
@@ -25,7 +25,7 @@ class HomeCard {
         // Add Edit section
         //.addSection(this.getEditSection());
 
-        if (!this.isPremium) {
+        if (!this.isPremium()) {
             // Add the footer to the card
             cardBuilder.setFixedFooter(this.getFixedFooter());
         }
@@ -81,7 +81,7 @@ class HomeCard {
         section.addWidget(
             this.getFormatDecoratedTextWidget());
 
-        if (this.isPremium) {
+        if (this.isPremium()) {
             // Create a selection input for indentation spaces
             const spaceSelectionDropdown =
                 CardService.newSelectionInput()
@@ -147,7 +147,7 @@ class HomeCard {
             //.setTopLabel(`${this.getPremiumRequiredMessage()}`)
             .setButton(
                 CardService.newTextButton()
-                    .setDisabled(!this.isPremium)
+                    .setDisabled(!this.isPremium())
                     .setText(`${this.getPremiumLockedEmoji()}${this.localization.actions.minify}`)
                     .setOnClickAction(
                         CardService.newAction()
@@ -173,7 +173,7 @@ class HomeCard {
             //.setTopLabel(`${this.getPremiumRequiredMessage()}`)
             .setButton(
                 CardService.newTextButton()
-                    .setDisabled(!this.isPremium)
+                    .setDisabled(!this.isPremium())
                     .setText(`${this.getPremiumLockedEmoji()}${this.localization.actions.edit}`)
                     .setOnClickAction(
                         CardService.newAction()
@@ -191,7 +191,7 @@ class HomeCard {
         return CardService.newFixedFooter()
             .setPrimaryButton(
                 CardService.newTextButton()
-                    .setDisabled(this.isPremium)
+                    .setDisabled(this.isPremium())
                     .setText(this.localization.actions.activatePremium)
                     .setOnClickAction(
                         CardService.newAction()
@@ -200,11 +200,11 @@ class HomeCard {
 
     getPremiumRequiredMessage() {
         // Return the message indicating that the feature requires a premium license
-        return `${!this.isPremium ? (Static_Resources.emojis.lock + ' ' + this.localization.messages.premiumRequired) : ''}`;
+        return `${!this.isPremium() ? (Static_Resources.emojis.lock + ' ' + this.localization.messages.premiumRequired) : ''}`;
     }
 
     getPremiumLockedEmoji() {
-        if (this.isPremium) {
+        if (this.isPremium()) {
             // Return an empty string if the user has a premium license
             return '';
         }

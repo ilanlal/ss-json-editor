@@ -1,9 +1,9 @@
 class ViewBuilder {
     static newHomeCard(
+        localization = AppManager.getLocalizationResources(),
         userInfo = ModelBuilder.newUserInfo()
             .setUserId('_user')
             .setUserLicense(ServiceBuilder.newUserStore().getUserLicense()),
-        localization = AppManager.getLocalizationResources(),
         indentationSpaces = ServiceBuilder.newUserStore().getIndentSpaces()
     ) {
         return HomeCard.newHomeCard()
@@ -16,7 +16,9 @@ class ViewBuilder {
 
     static newAccountCard(
         localization = AppManager.getLocalizationResources(),
-        userInfo
+        userInfo = ModelBuilder.newUserInfo()
+            .setUserId('_user')
+            .setUserLicense(ServiceBuilder.newUserStore().getUserLicense())
     ) {
         return AccountCard.newAccountCard()
             .setLocalization(localization)

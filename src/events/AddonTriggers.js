@@ -9,6 +9,14 @@ function onDefaultHomePageOpen(e) {
     console.log("onDefaultHomePageOpen called with event:", e);
     try {
         return ControllerBuilder.newHomeController()
+            .setLocalization(AppManager.getLocalizationResources())
+            .setUserInfo(ModelBuilder.newUserInfo()
+                .setUserId('_user')
+                .setUserLocaleCode(e?.userLocale || UserStore.Constants.DEFAULT_USER_LOCALE_CODE)
+                .setUserCountry(e?.userCountry || 'US')
+                .setUserTimezone(e?.userTimezone || Session.getScriptTimeZone())
+                .setUserLicense(
+                    ServiceBuilder.newUserStore().getUserLicense()))
             .home()
             .build();
     } catch (error) {
@@ -18,6 +26,30 @@ function onDefaultHomePageOpen(e) {
                 error.message || error.toString(),
                 "Error",
                 7);
+    }
+
+}
+function onOpenAccountCard(e) {
+    console.log("onOpenAccountCard called with event:", e);
+    try {
+        return ControllerBuilder.newAccountController()
+            .setUserInfo(ModelBuilder.newUserInfo()
+                .setUserId('_user')
+                .setUserLocaleCode(e?.commonEventObject?.userLocale || UserStore.Constants.DEFAULT_USER_LOCALE_CODE)
+                .setUserCountry(e?.commonEventObject?.userCountry || 'US')
+                .setUserTimezone(e?.commonEventObject?.userTimezone || Session.getScriptTimeZone())
+                .setUserLicense(
+                    ServiceBuilder.newUserStore().getUserLicense()))
+            .home()
+            .build();
+
+    } catch (error) {
+        return CardService.newActionResponseBuilder()
+            .setNotification(
+                CardService.newNotification()
+                    .setText(
+                        error.toString()))
+            .build();
     }
 }
 
@@ -192,29 +224,7 @@ function onEditRange(e) {
     return;
 }
 
-function onOpenAccountCard(e) {
-    console.log("onOpenAccountCard called with event:", e);
-    try {
-        return ControllerBuilder.newAccountController()
-            .setUserInfo(ModelBuilder.newUserInfo()
-                .setUserId('_user')
-                .setUserLocaleCode(e?.commonEventObject?.userLocale || UserStore.Constants.DEFAULT_USER_LOCALE_CODE)
-                .setUserCountry(e?.commonEventObject?.userCountry || 'US')
-                .setUserTimezone(e?.commonEventObject?.userTimezone || Session.getScriptTimeZone())
-                .setUserLicense(
-                    ServiceBuilder.newUserStore().getUserLicense()))
-            .home()
-            .build();
 
-    } catch (error) {
-        return CardService.newActionResponseBuilder()
-            .setNotification(
-                CardService.newNotification()
-                    .setText(
-                        error.toString()))
-            .build();
-    }
-}
 
 function onActivatePremium(e) {
     console.log("onActivatePremium called with event:", e);
