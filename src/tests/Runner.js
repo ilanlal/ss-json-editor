@@ -41,14 +41,15 @@ class QUnitRunner {
         new test_UserLicense();
     }
 
-    test_helpers() {
-        new test_SpreadsheetHelper();
+    test_helpers() {        
         new test_AppManager();
     }
 
     test_services() {
         new test_JsonStudioService();
         new test_UserStoreService();
+        //new test_SpreadsheetService();
+        new test_RangeService();
     }
 
     test_views() {

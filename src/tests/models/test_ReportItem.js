@@ -17,7 +17,7 @@ class test_ReportItem {
             const message = "Test message";
             const status = ReportItem.Status.INVALID;
 
-            let item = ModelBuilder.newReportItem()
+            let item = ModelBuilder.newReportItem("TestSheet")
                 .setA1Notation(a1Notation)
                 .setMessage(message)
                 .setStatus(status);

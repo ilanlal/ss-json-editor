@@ -27,11 +27,11 @@ class test_ReportController {
             assert.ok(mockRange, "Mock range should be created successfully");
             const rangeReport = ModelBuilder.newRangeReport()
                 .setRange(mockRange)
-                .addItem(ModelBuilder.newReportItem()
+                .addItem(ModelBuilder.newReportItem('TestSheet')
                     .setA1Notation("A1")
                     .setMessage("Invalid JSON in cell A1")
                     .setStatus(ReportItem.Status.INVALID))
-                .addItem(ModelBuilder.newReportItem()
+                .addItem(ModelBuilder.newReportItem('TestSheet')
                     .setA1Notation("B2")
                     .setMessage("Invalid JSON in cell B2")
                     .setStatus(ReportItem.Status.INVALID));

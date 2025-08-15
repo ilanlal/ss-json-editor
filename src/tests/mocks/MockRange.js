@@ -29,6 +29,15 @@ class MockRange {
             getA1Notation: () => `A${row + 1}:${String.fromCharCode(65 + column)}${row + 1}`
         }
     }
+
+    getSheet() {
+        return {
+            getName: () => this.sheetName || 'Sheet1',
+            setName: (name) => {
+                this.sheetName = name;
+            }
+        };
+    }
 }
 
 class MockRangeBuilder {

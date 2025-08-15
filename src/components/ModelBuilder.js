@@ -1,10 +1,12 @@
 class ModelBuilder {
-    static newReportItem() {
-        return ReportItem.newReportItem();
+    static newReportItem(sheetName = null) {
+        return ReportItem.newReportItem()
+            .setSheetName(sheetName);
     }
 
-    static newRangeReport() {
-        return RangeReport.newRangeReport();
+    static newRangeReport(sheetName = null) {
+        return RangeReport.newRangeReport()
+            .setSheetName(sheetName);
     }
 
     static newUserLicense() {

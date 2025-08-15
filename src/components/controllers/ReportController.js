@@ -44,15 +44,26 @@ class ReportController {
      * @returns {CardService.ActionResponse}
      */
     reportItemClick(e) {
-        const a1Notation = e.parameters.a1Notation;
+        const a1Notation = e?.parameters?.a1Notation;
         if (!a1Notation) {
             throw new Error("No A1 notation provided in the event parameters.");
         }
 
-        // Focus on the cell in the active spreadsheet
-        const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-        const range = sheet.getRange(a1Notation);
-        sheet.setActiveRange(range);
+        const sheetName = e?.parameters?.sheetName;
+        if (!sheetName) {
+            throw new Error("No sheet name provided in the event parameters.");
+        }
+
+        const rangeService = ServiceBuilder.newRangeService(sheetName, a1Notation);
+
+        const currentColor = rangeService.getBackgroundColor();
+        if (currentColor === '#ffffff' || currentColor === 'white') {
+            // Highlight the range in the Google Sheets UI
+            rangeService.setBackgroundColor('#ffff00');
+        }
+        else {
+            rangeService.setBackgroundColor('#ffffff');
+        }
 
         // Return a notification to the user
         return CardService.newActionResponseBuilder()

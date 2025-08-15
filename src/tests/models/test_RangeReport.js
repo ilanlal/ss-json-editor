@@ -25,7 +25,7 @@ class test_RangeReport {
 
             const rangeReport = ModelBuilder.newRangeReport()
                 .setRange(mockRange)
-                .addItem(ModelBuilder.newReportItem()
+                .addItem(ModelBuilder.newReportItem("TestSheet")
                     .setA1Notation("A1")
                     .setMessage("Invalid JSON in cell A1")
                     .setStatus(ReportItem.Status.INVALID));

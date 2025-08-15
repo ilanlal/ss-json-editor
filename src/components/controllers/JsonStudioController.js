@@ -104,8 +104,4 @@ class JsonStudioController {
                     ))
             .setStateChanged(false);
     }
-
-    isOutOfRange(range) {
-        return !SpreadsheetHelper.isRangeWithinLimits(range);
-    }
 }

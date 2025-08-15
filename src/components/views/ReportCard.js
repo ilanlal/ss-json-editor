@@ -69,7 +69,7 @@ class ReportCard {
   getReportSection() {
     const section = CardService.newCardSection()
       .setCollapsible(true)
-      .setNumUncollapsibleWidgets((4 * 2)-1) // 4 columns, 3 divider widgets;
+      .setNumUncollapsibleWidgets((4 * 2)) // 4 columns, 3 divider widgets;
     // @see https://developers.google.com/apps-script/reference/card-service/grid
 
     // Iterate over the report items and add them to section
@@ -91,19 +91,25 @@ class ReportCard {
     return section;
   }
 
+
+  /**
+   * Get the decorated text widget for a report item.
+   * @param {ReportItem} item - The report item.
+   * @returns {CardService.DecoratedText} - The decorated text widget.
+   */
   getReportItemDecoratedTextWidget(item) {
     return CardService.newDecoratedText()
-      .setText(`${item.a1Notation}`)
+      .setText(`${item.getA1Notation()}`)
       .setWrapText(true)
-      .setBottomLabel(`${Static_Resources.emojis.warning} ${item.message}`)
+      .setBottomLabel(`${Static_Resources.emojis.warning} ${item.getMessage()}`)
       .setButton(
         CardService.newTextButton()
           .setDisabled(!this.isPremium)
-          .setText(`${!this.isPremium ? (Static_Resources.emojis.lock + ' ') : ''}${this.localization.actions.focus.replace('{0}', item.a1Notation)}`)
+          .setText(`${!this.isPremium ? (Static_Resources.emojis.lock + ' ') : ''}${this.localization.actions.focus.replace('{0}', item.getA1Notation())}`)
           .setOnClickAction(
             CardService.newAction()
               .setFunctionName('onReportItemClick')
-              .setParameters({ a1Notation: item.a1Notation })));
+              .setParameters({ a1Notation: item.getA1Notation(), sheetName: item.getSheetName() })));
   }
 
   getPremiumRequiredSection() {

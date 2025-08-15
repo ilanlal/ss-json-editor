@@ -1,14 +1,19 @@
 // Google Apps Script code for Google Workspace Add-ons
 class ReportItem {
-  /**
-   * @param {string} a1Notation - A1 notation of the cell
-   * @param {string} message - Error message, if any
-   * @param {string} status - Status of the report item
-   */
   constructor() {
     this.a1Notation = ''; // A1 notation of the cell
+    this.sheetName = ''; // Name of the sheet
     this.message = ''; // Error message, if any
     this.status = ReportItem.Status.VALID; // Status of the report item
+  }
+
+  getSheetName() {
+    return this.sheetName;
+  }
+
+  setSheetName(sheetName) {
+    this.sheetName = sheetName;
+    return this;
   }
 
   getEmoji() {

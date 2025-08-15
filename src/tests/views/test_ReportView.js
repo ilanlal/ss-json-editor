@@ -27,7 +27,7 @@ class test_ReportView {
 
             const rangeReport = ModelBuilder.newRangeReport()
                 .setRange(mockRange.build())
-                .addItem(ModelBuilder.newReportItem()
+                .addItem(ModelBuilder.newReportItem("TestSheet")
                     .setA1Notation("A1")
                     .setMessage('This is a test message')
                     .setStatus(ReportItem.Status.INVALID)

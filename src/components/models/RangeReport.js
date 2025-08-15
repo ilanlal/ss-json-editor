@@ -5,6 +5,17 @@ class RangeReport {
         /** @type {ReportItem[]} */
         this.items = new Array();
         this.effectedCells = 0; // Number of cells affected by the report
+        this.sheetName = null; // The sheet where the range is located
+        this.range = null; // The range object
+    }
+
+    setSheetName(sheetName) {
+        this.sheetName = sheetName;
+        return this;
+    }
+
+    getSheetName() {
+        return this.sheetName;
     }
 
     /**

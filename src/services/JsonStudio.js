@@ -36,6 +36,7 @@ class JsonStudio {
                     } catch (error) {
                         report.addItem(
                             ModelBuilder.newReportItem()
+                                .setSheetName(range.getSheet().getName())
                                 .setA1Notation(range.getCell(i + 1, j + 1).getA1Notation())
                                 .setMessage(`${error.message}`)
                                 .setStatus(ReportItem.Status.INVALID)
@@ -74,6 +75,7 @@ class JsonStudio {
                     } catch (error) {
                         report.addItem(
                             ModelBuilder.newReportItem()
+                                .setSheetName(range.getSheet().getName())
                                 .setA1Notation(range.getCell(i + 1, j + 1).getA1Notation())
                                 .setMessage(`${error.message}`)
                                 .setStatus(ReportItem.Status.INVALID)
