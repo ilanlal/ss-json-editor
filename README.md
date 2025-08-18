@@ -15,6 +15,28 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 - **Improvements**: Enhanced user interface, better performance, and more robust JSON parsing.
 - **About**: Added an "About" section with information about the add-on, including its version and build number.
 
+### Typical use cases
+
+If you have raw JSON in a cell like this:
+```json
+{"name": "John", 
+"age": 30, 
+"city": "New York"}
+```
+You can select the cell and click Prettify. It will transform it into:
+```json
+{
+  "name": "John",
+  "age": 30,
+  "city": "New York"
+}
+```
+
+Click Minify, and it will compress it into a single line:
+```json
+{"name":"John","age":30,"city":"New York"}
+```
+
 ### Screenshots
 
 | Home | Report |
