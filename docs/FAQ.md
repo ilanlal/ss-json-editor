@@ -6,13 +6,37 @@ This document contains frequently asked questions about this Google Sheets™ ad
 
 JSON Studio is a Google Sheets™ add-on that allows users to format JSON data directly within their spreadsheets. It provides a user-friendly interface for working with JSON data, making it easier to manage and manipulate structured data.
 
+## 2. How to install the add-on?
+
+> Note: The add-on did not pass the review process and is not available in the Google Workspace Marketplace.
+> This means that you cannot install it from the marketplace.
+> But you can still install it manually for your Google account.
+
+### Manual Installation Steps
+
+1. Clone the repository to your local machine.
+2. Open Google Sheets™ and create a new spreadsheet.
+3. Click on "Extensions" in the menu, then select "Apps Script".
+4. Push the cloned code to the Apps Script project. Use the following command:
+
+   ```
+   clasp push
+   ```
+
+5. Follow the prompts to authorize the deployment.
+6. Once the deployment is complete, you will receive a confirmation message.
+7. Refresh the spreadsheet Google Sheets™ page.
+8. You should now see the add-on icon in the side panel.
+
+Enjoy using the add-on!
+
 ## 2. How to activate free premium features?
 
 To activate free premium features, please follow these steps:
 
 1. Open the JSON Studio add-on in Google Sheets™.
-2. Navigate to the "Settings" tab.
-3. Click on "Activate Premium Features".
+2. Open the top right 3-dot menu, then navigate to the "Account" section. to open the Account card.
+3. Click on "Activate ...".
 4. Follow the prompts to complete the activation process.
 
 > Note: The premium features are available through a membership plan, which can be activated for free via the add-on's interface.

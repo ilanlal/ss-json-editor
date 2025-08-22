@@ -3,6 +3,8 @@
 [![GitHub repo size](https://img.shields.io/github/repo-size/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
 [![GitHub last commit](https://img.shields.io/github/last-commit/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
 [![GitHub issues](https://img.shields.io/github/issues/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor/issues)
+[![clasp](https://img.shields.io/badge/built%20with-clasp-4285f4.svg)](https://github.com/google/clasp)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ilanlal/ss-json-editor/blob/main/LICENSE.md)
 
 This Google Sheets™ add-on that allows users to format JSON data directly within their spreadsheets. It provides a user-friendly interface for working with JSON data, making it easier to manage and manipulate structured data.
 
@@ -14,6 +16,28 @@ If you are looking for a **simple way to prettify or minify JSON data** in your 
 - **Membership**: Introduced membership plans for premium features. The membership can be activated for free via the add-on's interface.
 - **Improvements**: Enhanced user interface, better performance, and more robust JSON parsing.
 - **About**: Added an "About" section with information about the add-on, including its version and build number.
+
+### Typical use cases
+
+If you have raw JSON in a cell like this:
+```json
+{"name": "John", 
+"age": 30, 
+"city": "New York"}
+```
+You can select the cell and click Prettify. It will transform it into:
+```json
+{
+  "name": "John",
+  "age": 30,
+  "city": "New York"
+}
+```
+
+Click Minify, and it will compress it into a single line:
+```json
+{"name":"John","age":30,"city":"New York"}
+```
 
 ### Screenshots
 
