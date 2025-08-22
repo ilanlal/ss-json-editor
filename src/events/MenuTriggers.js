@@ -21,6 +21,7 @@ function onMenuFormatRange(e) {
                     7);
         }
     } catch (error) {
+        console.log("Error in onMenuFormatRange:", error);
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
@@ -55,6 +56,7 @@ function onMenuMinifyRange(e) {
                     7);
         }
     } catch (error) {
+        console.log("Error in onMenuMinifyRange:", error);
         SpreadsheetApp
             .getActiveSpreadsheet()
             .toast(
