@@ -8,13 +8,15 @@ function onInstall(e) {
 
 /** 
  * @see https://developers.google.com/apps-script/guides/triggers
+ * @see https://docs.google.com/document/d/1v1wmNKzckcgCwe46gIytjaMdR04HaLLIwsj0idDNF-M/edit?tab=t.0
  */
 function onOpen(e) {
     // This function is called when the add-on is opened
+    // If an add-on only creates a basic menu, the mode doesn’t matter.
     if (e && e.authMode !== ScriptApp.AuthMode.NONE) {
         SpreadsheetApp
             .getUi()
-            .createMenu(Static_Resources.menuTitle)
+            .createAddonMenu()
             .addItem('Format', 'onMenuFormatRange')
             .addItem('Minify', 'onMenuMinifyRange')
             .addToUi();
@@ -33,6 +35,6 @@ function doGet(e) {
         // Handle any errors that occur during the execution
         Logger.log("Error in doGet: " + error.message);
         // Return an error message to the user
-        return HtmlService.createHtmlOutput("Error: " + error.message);
+        return HtmlService.createHtmlOutput("qUnit runner compilation error: " + error.toString());
     }
 }

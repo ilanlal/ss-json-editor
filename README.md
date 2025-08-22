@@ -3,6 +3,8 @@
 [![GitHub repo size](https://img.shields.io/github/repo-size/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
 [![GitHub last commit](https://img.shields.io/github/last-commit/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
 [![GitHub issues](https://img.shields.io/github/issues/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor/issues)
+[![clasp](https://img.shields.io/badge/built%20with-clasp-4285f4.svg)](https://github.com/google/clasp)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ilanlal/ss-json-editor/blob/main/LICENSE.md)
 
 This Google Sheets™ add-on that allows users to format JSON data directly within their spreadsheets. It provides a user-friendly interface for working with JSON data, making it easier to manage and manipulate structured data.
 

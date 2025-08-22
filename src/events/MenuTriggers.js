@@ -16,8 +16,8 @@ function onMenuFormatRange(e) {
             SpreadsheetApp
                 .getActiveSpreadsheet()
                 .toast(
+                    JSON.stringify(reportItems, null, 2),
                     localization.messages.totalCellFailed.replace('{0}', reportItems.length),
-                    localization.messages.failure,
                     7);
         }
     } catch (error) {
@@ -50,9 +50,9 @@ function onMenuMinifyRange(e) {
             SpreadsheetApp
                 .getActiveSpreadsheet()
                 .toast(
+                    JSON.stringify(reportItems, null, 2),
                     localization.messages.totalCellFailed.replace('{0}', reportItems.length),
-                    localization.messages.failure,
-                    15);
+                    7);
         }
     } catch (error) {
         SpreadsheetApp
@@ -60,19 +60,9 @@ function onMenuMinifyRange(e) {
             .toast(
                 error.toString(),
                 localization.messages.error,
-                7);
+                15);
     }
     // Return nothing to indicate the operation is complete
     // This is important for the add-on to function correctly
     return;
-}
-
-function onMenuOpenSidebarHome(e) {
-    console.log("onMenuOpenSidebarHome called with event:", e);
-    // This function is called when the user selects "Home" from the add-on menu
-
-    // Open the Home view of the Home controller
-    return ControllerBuilder.newHomeController()
-        .home()
-        .build();
 }
