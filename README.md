@@ -10,7 +10,7 @@ This Google Sheets™ add-on that allows users to format JSON data directly with
 
 If you are looking for a **simple way to prettify or minify JSON data** in your Google Sheets™ cell, this add-on is for you! 😉
 
-## Release Notes ```v9.mp.rev```
+## Release Notes ```v10.mp.rev```
 
 - **Validation**: Parse failures reporting, JSON validation, and improved error handling.
 - **Membership**: Introduced membership plans for premium features. The membership can be activated for free via the add-on's interface.
