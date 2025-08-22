@@ -11,15 +11,20 @@ function onInstall(e) {
  * @see https://docs.google.com/document/d/1v1wmNKzckcgCwe46gIytjaMdR04HaLLIwsj0idDNF-M/edit?tab=t.0
  */
 function onOpen(e) {
+    console.log("onOpen called with event:", e);
     // This function is called when the add-on is opened
     // If an add-on only creates a basic menu, the mode doesn’t matter.
     if (e && e.authMode !== ScriptApp.AuthMode.NONE) {
+        console.log("Menu created. Current auth mode:", e.authMode.toString());
         SpreadsheetApp
             .getUi()
             .createAddonMenu()
             .addItem('Format', 'onMenuFormatRange')
             .addItem('Minify', 'onMenuMinifyRange')
             .addToUi();
+    }
+    else {
+        console.log("NO MENU CREATED! Current auth mode:", e ? e.authMode.toString() : 'undefined');
     }
 }
 

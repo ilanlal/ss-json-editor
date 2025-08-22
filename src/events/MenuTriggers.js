@@ -5,7 +5,7 @@ function onMenuFormatRange(e) {
     const localization = AppManager.getLocalizationResources();
     try {
         const rangeReport = ServiceBuilder.newJsonStudio()
-            .formatRange(SpreadsheetApp
+            .prettifyRange(SpreadsheetApp
                 .getActiveSpreadsheet()
                 .getActiveRange());
 
