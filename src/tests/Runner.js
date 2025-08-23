@@ -83,3 +83,4 @@ class QUnitRunner {
         // set as active sheet
         SpreadsheetApp.getActiveSpreadsheet().setActiveSheet(sheet);
     }
+}
