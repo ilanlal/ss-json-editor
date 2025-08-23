@@ -23,7 +23,7 @@ JSON Studio is a Google Sheets™ add-on that allows users to format JSON data d
 1. Open this [Shared Json Studio Google Sheets™ spreadsheet](https://docs.google.com/spreadsheets/d/10KQrGvLF0A6glTYwo16pp3P0w8ZvMXD9ZPbLUKzfjBc/edit?usp=sharing).
 2. Click on "File" in the menu, then select "Make a copy".
 3. Choose a name and location for the copy, then click "OK".
-4. Wait for the add-on to load (it may take a few moments).
+4. Wait for the copy process to complete. The new spreadsheet will open automatically.
 5. Open the Apps Script editor by clicking on "Extensions" in the menu, then selecting "Apps Script".
 6. In the Apps Script editor, click on "Deploy" in the top right corner, then select "Test deployments".
 7. Click on "Install add-on" to install the add-on for your Google account.
