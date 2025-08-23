@@ -8,27 +8,42 @@ JSON Studio is a Google Sheets™ add-on that allows users to format JSON data d
 
 ## 2. How to install the add-on?
 
-> Note: The add-on did not pass the review process and is not available in the Google Workspace Marketplace.
-> This means that you cannot install it from the marketplace.
-> But you can still install it manually for your Google account.
+> Note: Due to Google Workspace Marketplace policies, the add-on is not publicly listed. You can install it using one of the methods below.
+
+### Using the Shared Spreadsheet (Easiest way)
+
+  > This method allows you to quickly access the add-on without going through the installation process.
+
+#### Prerequisites
+
+- Allow Apps Script API access
+
+#### Follow these steps
+
+1. Open this [Shared Json Studio Google Sheets™ spreadsheet](https://docs.google.com/spreadsheets/d/10KQrGvLF0A6glTYwo16pp3P0w8ZvMXD9ZPbLUKzfjBc/edit?usp=sharing).
+2. Click on "File" in the menu, then select "Make a copy".
+3. Choose a name and location for the copy, then click "OK".
+4. Wait for the copy process to complete. The new spreadsheet will open automatically.
+5. Open the Apps Script editor by clicking on "Extensions" in the menu, then selecting "Apps Script".
+6. In the Apps Script editor, click on "Deploy" in the top right corner, then select "Test deployments".
+7. Click on "Install add-on" to install the add-on for your Google account.
+8. Refresh the spreadsheet Google Sheets™ page.
+9. You should now see the add-on icon in the side panel.
+
+Enjoy using the add-on!
 
 ### Manual Installation Steps
 
-1. Clone the repository to your local machine.
-2. Open Google Sheets™ and create a new spreadsheet.
-3. Click on "Extensions" in the menu, then select "Apps Script".
-4. Push the cloned code to the Apps Script project. Use the following command:
+  1. Clone the repository to your local machine.
+  2. Open Google Sheets™ and create a new spreadsheet.
+  3. Click on "Extensions" in the menu, then select "Apps Script".
+  4. Push the `src` directory to the Apps Script project. Use the following command: `clasp push`
+  5. Follow the prompts to authorize the deployment.
+  6. Once the deployment is complete, you will receive a confirmation message.
+  7. Refresh the spreadsheet Google Sheets™ page.
+  8. You should now see the add-on icon in the side panel.
 
-   ```
-   clasp push
-   ```
-
-5. Follow the prompts to authorize the deployment.
-6. Once the deployment is complete, you will receive a confirmation message.
-7. Refresh the spreadsheet Google Sheets™ page.
-8. You should now see the add-on icon in the side panel.
-
-Enjoy using the add-on!
+  Enjoy using the add-on!
 
 ## 2. How to activate free premium features?
 
