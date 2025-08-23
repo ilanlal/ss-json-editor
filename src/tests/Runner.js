@@ -16,6 +16,7 @@ class QUnitRunner {
             hidepassed: JsonStudio_qUnit_Resources.hidepassed
         });
 
+        this.initTestSheet();
         //QUnit.config.hidepassed = true;
         QUnit.load(this.allTests.bind(this));
     }
@@ -71,4 +72,14 @@ class QUnitRunner {
     test_e2eTriggers() {
         new test_AddonTriggers();
     }
-}
+
+    initTestSheet() {
+        // Initialize the test sheet
+        let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TestSheet");
+        if (!sheet) {
+            sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet("TestSheet");
+        }
+        // Activate the sheet to ensure it's ready for testing
+        // set as active sheet
+        SpreadsheetApp.getActiveSpreadsheet().setActiveSheet(sheet);
+    }

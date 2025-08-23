@@ -51,12 +51,6 @@ Click Minify, and it will compress it into a single line:
 - **Bug Fixes**: Resolved various bugs and issues reported by Google Marketplace Team.
 - **Documentation**: Updated documentation to reflect new features and changes.
 
-## Screenshots
-
-  | Home | Report |
-  | --- | --- |
-  | ![Home Screenshot](https://lh3.googleusercontent.com/-WCx0wZsAP7E/aI3dvgckXII/AAAAAAAAB6U/029MQrH8L30UbGiat-NIUFCc4oNGzHiFACNcBGAsYHQ/Screenshot-1280x800-v9001.png) | ![Report Screenshot](https://lh3.googleusercontent.com/-DN8IkZ9oUlU/aJ-a5t22dcI/AAAAAAAAB6g/uWyzs_3n3QYl7_nAzDe7MtDwRj_YJ2UuQCNcBGAsYHQ/Screenshot-1280x800-v9002.png) |
-
 ## How to Install
 
   Due to Google Workspace Marketplace policies, the add-on is not publicly listed. You can install it using the method below.
@@ -85,9 +79,15 @@ Click Minify, and it will compress it into a single line:
 
   3. Click on "Install add-on" to install the add-on for your Google account.
 
-  4. Refresh the spreadsheet Google Sheets™ page.
+     ![Screenshot](https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/vnext/assets/480x346install.jpg)
 
-  5. You should now see the add-on icon in the side panel.
+  You should now see the add-on icon in the side panel in any Google Sheets™ document.
+
+## Screenshots
+
+  | Home | Report |
+  | --- | --- |
+  | ![Home Screenshot](https://lh3.googleusercontent.com/-WCx0wZsAP7E/aI3dvgckXII/AAAAAAAAB6U/029MQrH8L30UbGiat-NIUFCc4oNGzHiFACNcBGAsYHQ/Screenshot-1280x800-v9001.png) | ![Report Screenshot](https://lh3.googleusercontent.com/-DN8IkZ9oUlU/aJ-a5t22dcI/AAAAAAAAB6g/uWyzs_3n3QYl7_nAzDe7MtDwRj_YJ2UuQCNcBGAsYHQ/Screenshot-1280x800-v9002.png) |
 
 ### Membership Plans
 
