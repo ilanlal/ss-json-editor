@@ -9,7 +9,7 @@ const Static_Resources = {
     // build number. 
     // This is used to identify the version of the static resources.
     // It should be updated with each deployment 😉.
-    build: "20252208.173200",
+    build: "20252408.030200",
     // version of the Google Apps Script deployment (usually vnext)
     version: "v10.mp.rev",
     // Google Marketplace URL for the add-on.
