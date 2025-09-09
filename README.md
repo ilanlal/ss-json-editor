@@ -1,4 +1,4 @@
-# ![Logo](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/logo24.png) Json Studio ```v10.mp.rev```
+# ![Logo](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/logo24.png) Json Studio ```v11```
 
 [![GitHub repo size](https://img.shields.io/github/repo-size/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
 [![GitHub last commit](https://img.shields.io/github/last-commit/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
@@ -46,14 +46,27 @@ Click Minify, and it will compress it into a single line:
 
   3. **Educational Purposes:** Json Studio can be used as a teaching tool to help students understand JSON structure and data manipulation. It provides a hands-on approach to learning about APIs and data formats.
 
-## Release Notes ```v10.mp.rev```
+## Release Notes ```v11```
 
-- **Bug Fixes**: Resolved various bugs and issues reported by Google Marketplace Team.
-- **Documentation**: Updated documentation to reflect new features and changes.
+- **Marketplace Listing:** The add-on is now up and running in the Google Workspace Marketplace™.
 
 ## How to Install
 
-  Due to Google Workspace Marketplace policies, the add-on is not publicly listed. You can install it using the method below.
+### Installation via Google Workspace Marketplace™
+
+1. Open Google Sheets™ and create a new spreadsheet.
+
+2. Click on "Extensions" in the menu, then select "Add-ons" > "Get add-ons".
+
+3. Search for "Json Studio" in the Google Workspace Marketplace™.
+
+4. Click on the add-on and then click "Install" to add it to your Google Sheets™.
+
+5. Follow the prompts to authorize the add-on and complete the installation.
+
+6. Once installed, you can access the add-on by clicking on "Extensions" in the menu and selecting "Json Studio".
+
+### Manual Installation (for development and testing)
 
   **Prerequisites:**
 
