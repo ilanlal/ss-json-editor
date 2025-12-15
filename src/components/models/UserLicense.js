@@ -1,13 +1,5 @@
 // Google Apps Script code for Google Workspace Add-ons
 class UserLicense {
-    /**
-     * Create a user license.
-     * @param {string} userId - ID of the user associated with the license
-     * @param {string} planId - ID of the plan associated with the license
-     * @param {Date} createdOn - Creation date in ISO format
-     * @param {Date} expirationDate - Expiration date in ISO format
-     * @param {number} [amount=0] - Amount associated with the license, default is 0 (e.g., for tokens or credits)
-     */
     constructor(userId = '', planId = '', createdOn = null, expirationDate = null, amount = 0) {
         this.userId = userId;
         this.planId = planId;

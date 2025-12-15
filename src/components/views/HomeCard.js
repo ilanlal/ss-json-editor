@@ -86,7 +86,7 @@ class HomeCard {
 
         if (this.isPremium()) {
             // Create a selection input for indentation spaces
-            const spaceSelectionDropdown =
+            const indentationLevelSelector =
                 CardService.newSelectionInput()
                     .setType(CardService.SelectionInputType.DROPDOWN)
                     // Enable for premium users
@@ -102,7 +102,7 @@ class HomeCard {
                             .newAction()
                             .setFunctionName('onIndentSpacesSelectorChange'));
             // Add the selection input to the card section
-            section.addWidget(spaceSelectionDropdown);
+            section.addWidget(indentationLevelSelector);
         }
         else {
             section

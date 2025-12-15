@@ -1,0 +1,62 @@
+{
+  "name": "@ilanlal/ss-json-editor",
+  "version": "1.0.0",
+  "description": "A Google Sheets add-on to edit JSON data in a spreadsheet format.",
+  "main": "./src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "build": "webpack --mode development",
+    "start": "webpack-dev-server --mode development",
+    "publish": "npm publish --access public --tag latest --registry https://npm.pkg.github.com",
+    "prepublishOnly": "npm version patch && npm run test && npm run build",
+    "prepack": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ilanlal/ss-json-editor.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public",
+    "tag": "latest"
+  },
+  "keywords": [
+    "addon",
+    "spreadsheet",
+    "google apps script",
+    "google sheets",
+    "nodejs"
+  ],
+  "author": "Ilan Laloum <ilanlal@gmail.com> (https://github.com/ilanlal)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ilanlal/ss-json-editor/issues"
+  },
+  "homepage": "https://github.com/ilanlal/ss-json-editor#readme",
+  "devDependencies": {
+    "@babel/core": "^7.28.4",
+    "@babel/preset-env": "^7.28.3",
+    "@ilanlal/gasmocks": "github:ilanlal/gasmocks",
+    "babel-loader": "^10.0.0",
+    "baseline-browser-mapping": "^2.9.6",
+    "jest": "^29.7.0",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
+  },
+  "jest": {
+    "modulePaths": [
+      "<rootDir>/src/"
+    ],
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": false,
+    "testEnvironment": "node"
+  },
+  "files": [
+    "./dist/app.js",
+    "README.md",
+    "LICENSE"
+  ]
+}
