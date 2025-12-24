@@ -13,7 +13,7 @@ class AppModel {
         return this._activeSpreadsheet;
     }
 
-    constructor(userProperties, activeSpreadsheet) {
+    constructor(activeSpreadsheet, userProperties) {
         this._userProperties = userProperties;
         this._activeSpreadsheet = activeSpreadsheet;
         this.sheetModel = SheetModel.create(activeSpreadsheet);
@@ -21,10 +21,10 @@ class AppModel {
     }
 
     static create(
-        userProperties = PropertiesService.getUserProperties(),
-        activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()
+        activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet(),
+        userProperties = PropertiesService.getUserProperties()
     ) {
-        return new AppModel(userProperties, activeSpreadsheet);
+        return new AppModel(activeSpreadsheet, userProperties);
     }
 
     setLanguage(languageCode) {

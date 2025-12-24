@@ -7,7 +7,7 @@ class SheetModel {
         return new SheetModel(activeSpreadsheet);
     }
 
-    constructor(activeSpreadsheet) {
+    constructor(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()) {
         this._activeSpreadsheet = activeSpreadsheet;
         this._columns = [];
         this._sheetName = null;
@@ -53,10 +53,18 @@ class SheetModel {
         // merge existing values with sample data (existing values first)
         const mergedValues = existingValues.concat(sampleData);
 
+        // pad rows to match columns length
+        const columnsLength = this._columns.length;
+        for (let row = 0; row < mergedValues.length; row++) {
+            while (mergedValues[row].length < columnsLength) {
+                mergedValues[row].push('');
+            }
+        }
+
         // set the merged values back to the sheet
         sheet.getRange(1, 1, mergedValues.length, mergedValues[0].length)
             .setValues(mergedValues);
-            
+
         return sheet;
     }
 

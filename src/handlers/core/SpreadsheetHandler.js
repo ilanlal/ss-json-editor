@@ -1,4 +1,5 @@
 class SpreadsheetHandler {
+
     get documentProperties() {
         if (!this._documentProperties) {
             this._documentProperties = PropertiesService.getDocumentProperties();
@@ -20,30 +21,47 @@ class SpreadsheetHandler {
         return this._scriptProperties;
     }
 
+    get activeSpreadsheet() {
+        if (!this._activeSpreadsheet) {
+            this._activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+        }
+        return this._activeSpreadsheet;
+    }
+
     constructor() {
         this._documentProperties = null;
         this._userProperties = null;
         this._scriptProperties = null;
+        this._activeSpreadsheet = null;
     }
 }
 
 SpreadsheetHandler.Addon = {
     onActivateSheetClick: (e) => {
         return new SpreadsheetHandler
-            .AddonWrapper(
-                SpreadsheetHandler.prototype.documentProperties)
+            .ControllerWrapper(
+                SpreadsheetHandler.prototype.activeSpreadsheet,
+                SpreadsheetHandler.prototype.documentProperties,
+                SpreadsheetHandler.prototype.userProperties,
+                SpreadsheetHandler.prototype.scriptProperties
+            )
             .handleActivateSheet(e);
     },
     onInsertSampleDataClick: (e) => {
         return new SpreadsheetHandler
-            .AddonWrapper(
-                SpreadsheetHandler.prototype.documentProperties)
+            .ControllerWrapper(
+                SpreadsheetHandler.prototype.activeSpreadsheet,
+                SpreadsheetHandler.prototype.documentProperties,
+                SpreadsheetHandler.prototype.userProperties,
+                SpreadsheetHandler.prototype.scriptProperties
+            )
             .handleInsertSampleData(e);
     }
 }
 
-SpreadsheetHandler.AddonWrapper = class {
-    constructor(documentProperties, userProperties, scriptProperties) {
+SpreadsheetHandler.ControllerWrapper = class {
+    constructor(activeSpreadsheet, documentProperties, userProperties, scriptProperties) {
+        this._activeSpreadsheet = activeSpreadsheet;
         this._documentProperties = documentProperties;
         this._userProperties = userProperties;
         this._scriptProperties = scriptProperties;
@@ -77,12 +95,8 @@ SpreadsheetHandler.AddonWrapper = class {
             if (!emd_sheet) {
                 throw new Error(`Sheet configuration for '${sheet}' not found in EMD.`);
             }
-           
-            const rs = SpreadsheetController
-                .create(
-                    SpreadsheetApp.getActiveSpreadsheet(),
-                    this._documentProperties)
-                .bindSheetSampleData(emd_sheet({}));
+            const sheetModel = SheetModel.create(this.activeSpreadsheet);
+            const rs = sheetModel.bindSheetSampleData(sheetMeta);
 
             return this.handleOperationSuccess(`👍 Data inserted into sheet '${sheet}' successfully.`)
                 .build();
@@ -109,7 +123,6 @@ SpreadsheetHandler.AddonWrapper = class {
                         error.toString()));
     }
 };
-
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {

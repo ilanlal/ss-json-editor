@@ -1,37 +1,16 @@
-require('../../tests');
+require('../../../tests');
 
 const { EventHandler } = require('./EventHandler');
 
 describe('EventHandler', () => {
-    beforeEach(() => {
-        UrlFetchAppStubConfiguration.reset();
-    });
     it('should create an instance of EventHandler', () => {
         const handler = new EventHandler();
         expect(handler).toBeInstanceOf(EventHandler);
     });
 
     it('should onOpenHomeCard', () => {
-        /* @see https://core.telegram.org/bots/api#getwebhookinfo */
-        const token = '[FAKE_DUMMY_BOT_TOKEN]';
-        const contentText = `{
-            "result": {
-                "url": "https://example.com/webhook",
-                "has_custom_certificate": false,
-                "pending_update_count": 0,
-                "ip_address": "192.0.2.1",
-                "last_error_date": 0,
-                "last_error_message": "",
-                "max_connections": 40,
-                "allowed_updates": []
-            }
-        }`;
-
-        UrlFetchAppStubConfiguration.when(`https://api.telegram.org/bot${token}/getWebhookInfo`)
-            .return(new HttpResponse().setContentText(contentText));
-
         const event = {}; // Mock event object
-        const actionResponse = EventHandler.Addon.onOpenHomeCard(event);
+        const actionResponse = EventHandler.ViewModel.onOpenHomeCard(event);
         expect(actionResponse).toBeDefined();
         const data = actionResponse.getData();
         expect(data).toBeDefined();
@@ -45,7 +24,7 @@ describe('EventHandler', () => {
 
     it('should handle onAccountCardOpen', () => {
         const event = {}; // Mock event object
-        const actionResponse = EventHandler.Addon.onOpenAccountCard(event);
+        const actionResponse = EventHandler.ViewModel.onOpenAccountCard(event);
         expect(actionResponse).toBeDefined();
         const data = actionResponse.getData();
         expect(data).toBeDefined();
@@ -60,7 +39,7 @@ describe('EventHandler', () => {
 
     it('should handle onAboutCardOpen', () => {
         const event = {}; // Mock event object
-        const actionResponse = EventHandler.Addon.onOpenAboutCard(event);
+        const actionResponse = EventHandler.ViewModel.onOpenAboutCard(event);
         expect(actionResponse).toBeDefined();
         const data = actionResponse.getData();
         expect(data).toBeDefined();

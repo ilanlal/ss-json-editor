@@ -1,8 +1,10 @@
-const { CardHandler } = require('./CardHandler');
-const { EventHandler } = require('./EventHandler');
-const { SpreadsheetHandler } = require('./SpreadsheetHandler');
+const { NavigationHandler } = require('./core/NavigationHandler');
+const { EventHandler } = require('./core/EventHandler');
+const { SpreadsheetHandler } = require('./core/SpreadsheetHandler');
+const { AddonHandler } = require('./AddonHandler');
 
 // Expose globally for tests and other scripts
-global.CardHandler = CardHandler;
+global.NavigationHandler = NavigationHandler;
 global.EventHandler = EventHandler;
 global.SpreadsheetHandler = SpreadsheetHandler;
+global.AddonHandler = AddonHandler;

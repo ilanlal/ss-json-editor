@@ -1,6 +1,6 @@
-require('../../tests');
+require('../../../tests');
 const { SpreadsheetHandler } = require('./SpreadsheetHandler');
-const { EMD } = require('../config/EMD');
+const { EMD } = require('../../config/EMD');
 
 describe('SpreadsheetHandler', () => {
     beforeEach(() => {
