@@ -1,4 +1,4 @@
-.vscode/launch.json
+*launch.json
 .idea/
 .vscode
 .DS_store
@@ -13,4 +13,3 @@ coverage/
 dist/
 .npmrc
 .env
-.vscode/settings.json
