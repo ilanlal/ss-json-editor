@@ -41,11 +41,11 @@ describe('Addon Modules Sheet', () => {
         const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
         const range = 'A2:C2';
         const report = [
-            { cell: 'A2', error: 'Invalid ID' },
-            { cell: 'B2', error: 'Name too short' }
+            { a1n: 'A2', error: 'Invalid ID' },
+            { a1n: 'B2', error: 'Name too short' }
         ];
 
-        const sheet = Addon.Modules.Sheet.dumpObjectToSheet(activeSpreadsheet, range, report);
+        const sheet = Addon.Modules.Sheet.dumpObjectToSheet(activeSpreadsheet,null, range, report);
 
         expect(sheet).toBeDefined();
         expect(sheet.getName()).toBe(Addon.Modules.Sheet.DUMP_SHEET_NAME);

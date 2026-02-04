@@ -123,19 +123,20 @@ Addon.Modules = {
             return sheet;
         },
 
-        dumpObjectToSheet(activeSpreadsheet, range = 'A1', report = []) {
+        dumpObjectToSheet(activeSpreadsheet, sheetName, range = 'A1', report = []) {
             const sheetMeta = {
-                name: Addon.Modules.Sheet.DUMP_SHEET_NAME,
-                columns: ['Index', 'Range', 'Cell', 'Error', 'Details']
+                name: sheetName || Addon.Modules.Sheet.DUMP_SHEET_NAME,
+                columns: ['Timestamp', 'Index', 'Range', 'Cell', 'Error', 'Details']
             };
 
             const sheet = this.getSheet(activeSpreadsheet, sheetMeta);
 
             report.forEach((item, index) => {
                 const row = [
+                    new Date().toISOString(),
                     index,
                     range,
-                    item.cell || '',
+                    item.a1n || '',
                     item.error || '',
                     JSON.stringify(report)];
 
@@ -220,7 +221,8 @@ Addon.Modules = {
                     } catch (error) {
                         // Handle JSON parsing error if needed
                         report.push({
-                            cell: activeRange.getCell(i + 1, j + 1).getA1Notation(),
+                            a1n: activeRange.getCell(i + 1, j + 1).getA1Notation(),
+                            sheetName: activeSpreadsheet.getActiveSheet().getName(),
                             error: error.message
                         });
                     }
@@ -246,7 +248,8 @@ Addon.Modules = {
                     } catch (error) {
                         // Handle JSON parsing error if needed
                         report.push({
-                            cell: activeRange.getCell(i + 1, j + 1).getA1Notation(),
+                            a1n: activeRange.getCell(i + 1, j + 1).getA1Notation(),
+                            sheetName: activeSpreadsheet.getActiveSheet().getName(),
                             error: error.message
                         });
                     }
@@ -270,7 +273,8 @@ Addon.Modules = {
                         JSON.parse(cell);
                     } catch (error) {
                         report.push({
-                            cell: activeRange.getCell(i + 1, j + 1).getA1Notation(),
+                            a1n: activeRange.getCell(i + 1, j + 1).getA1Notation(),
+                            sheetName: activeSpreadsheet.getActiveSheet().getName(),
                             error: error.message
                         });
                     }
@@ -1207,18 +1211,19 @@ Addon.ResultWidget = {
 
             try {
                 // extract parameters
-                const range = e?.commonEventObject?.parameters?.range || 'A1';
+                const a1n = e?.commonEventObject?.parameters?.a1n || 'A1';
+                const sheetName = e?.commonEventObject?.parameters?.sheetName || activeSpreadsheet.getActiveSheet().getName();
                 const report = e?.commonEventObject?.parameters?.report || '[]';
 
                 // Dump data to sheet
                 Addon.Modules.Sheet
-                    .dumpObjectToSheet(activeSpreadsheet, range, JSON.parse(report));
+                    .dumpObjectToSheet(activeSpreadsheet, sheetName, a1n, JSON.parse(report));
 
                 // Return action response with notification
                 return CardService.newActionResponseBuilder()
                     .setNotification(
                         CardService.newNotification()
-                            .setText(`✅ Data dumped to sheet successfully at range "${range}".`))
+                            .setText(`✅ Data dumped to sheet "${sheetName}" successfully at range "${a1n}".`))
                     .build();
             }
             catch (error) {
@@ -1233,9 +1238,10 @@ Addon.ResultWidget = {
             const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
             try {
                 // extract parameters
-                const rangeA1 = e?.commonEventObject?.parameters?.range || 'A1';
-                const sheet = activeSpreadsheet.getActiveSheet();
-                const range = sheet.getRange(rangeA1);
+                const a1n = e?.commonEventObject?.parameters?.a1n || 'A1';
+                const sheetName = e?.commonEventObject?.parameters?.sheetName || activeSpreadsheet.getActiveSheet().getName();
+                const sheet = activeSpreadsheet.getSheetByName(sheetName);
+                const range = sheet.getRange(a1n);
                 // Highlight the range with a yellow background
                 range.setBackground('#FFFF00');
 
@@ -1243,14 +1249,14 @@ Addon.ResultWidget = {
                 return CardService.newActionResponseBuilder()
                     .setNotification(
                         CardService.newNotification()
-                            .setText(`✅ Range "${rangeA1}" highlighted successfully.`))
+                            .setText(`✅ Highlighted range "${a1n}" in sheet "${sheetName}".`))
                     .build();
             }
             catch (error) {
                 return CardService.newActionResponseBuilder()
                     .setNotification(
                         CardService.newNotification()
-                            .setText(`❌ Error highlighting range: ${error.toString()}`))
+                            .setText(`⚠️ Error highlighting range: ${error.toString()}`))
                     .build();
             }
         }
@@ -1314,7 +1320,8 @@ Addon.ResultWidget = {
                 .addWidget(
                     CardService.newDecoratedText()
                         .setTopLabel('Report Summary')
-                        .setText(report.length)
+                        .setText(`Total Items: ${range.getNumRows() * range.getNumColumns()} | Errors: ${report.filter(item => item.error).length}`)
+                        .setWrapText(true)
                         .setStartIcon(
                             CardService.newIconImage()
                                 .setMaterialIcon(
@@ -1324,7 +1331,7 @@ Addon.ResultWidget = {
         BuildResultWidget: (reportItem = {}) => {
             return CardService.newDecoratedText()
                 .setTopLabel('📝 Detail')
-                .setText(`Cell: ${reportItem.cell}`)
+                .setText(`Cell: ${reportItem.a1n}`)
                 .setWrapText(true)
                 .setBottomLabel(`Error: ${reportItem.error}`)
                 .setStartIcon(
@@ -1339,12 +1346,13 @@ Addon.ResultWidget = {
                             CardService.newAction()
                                 .setFunctionName('Addon.ResultWidget.Controller.HighlightRange')
                                 .setParameters({
-                                    range: JSON.stringify(reportItem.cell || 'A1')
+                                    a1n: reportItem.a1n,
+                                    sheetName: reportItem.sheetName || ''
                                 })
                         )
                 );
         },
-        BuildExportWidget: (range = '', report = {}) => {
+        BuildExportWidget: (range = '', report = []) => {
             return CardService.newDecoratedText()
                 .setTopLabel('📥 Export Data')
                 .setText('Export to Sheet')
@@ -1364,7 +1372,7 @@ Addon.ResultWidget = {
                                 .setParameters({
                                     sheetName: '📦 Dumps',
                                     report: JSON.stringify(report),
-                                    range: JSON.stringify(range.getA1Notation())
+                                    a1n: range.getA1Notation()
                                 })
                         )
                 );

@@ -90,7 +90,7 @@ describe('Addon.Modules.JsonStudio', () => {
         expect(result).toBeDefined();
         //expect(result.range.getA1Notation()).toBe('A1:A2');
         expect(result.report.length).toBe(1); // One error for invalid JSON
-        expect(result.report[0].cell).toBe('A2');
+        expect(result.report[0].a1n).toBe('A2');
         expect(result.report[0].error).toBeDefined();
     });
 });
