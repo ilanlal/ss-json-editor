@@ -135,7 +135,7 @@ describe('Addon.Home.Controller', () => {
             // notification
             expect(resultData.notification).toBeDefined();
             // Completed! with error(s): (1)
-            expect(resultData.notification.text).toContain('Completed! 1 error(s) found');
+            expect(resultData.notification.text).toContain('⚠️ Completed with 1 error(s). \n\nEnable "Show Errors" in Advanced Settings to view details.');
         });
     });
 });

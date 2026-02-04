@@ -354,22 +354,7 @@ Addon.Home = {
                 PropertiesService.getUserProperties().setProperty('show_errors_switch', showErrorsState);
 
                 const result = Addon.Modules.JsonStudio.beautifyActiveRange(activeSpreadsheet, parseInt(indentationSpaces, 10));
-                if (showErrorsState === 'ON' && result.report.length > 0) {
-                    // Build and return the result card
-                    return CardService.newActionResponseBuilder()
-                        .setNavigation(
-                            CardService.newNavigation()
-                                .pushCard(
-                                    Addon.ResultWidget.View
-                                        .BuildResultCard(result))
-                        ).build();
-                }
-
-                return CardService.newActionResponseBuilder()
-                    .setNotification(
-                        CardService.newNotification()
-                            .setText('Completed!' + (result.report.length > 0 ? ` ${result.report.length} error(s) found.` : ' successfully.')))
-                    .build();
+                return Addon.Home.Controller._HandleResultNavigation(e, result);
             }
             catch (error) {
                 return CardService.newActionResponseBuilder()
@@ -387,25 +372,13 @@ Addon.Home = {
                 // show_errors_switch
                 const showErrorsState = formInputs?.['show_errors_switch']?.stringInputs?.value[0] || "OFF";
                 PropertiesService.getUserProperties().setProperty('show_errors_switch', showErrorsState);
+
+                // Indentation spaces (not used in validate, but saved for consistency)
+                const indentationSpaces = formInputs?.['indentation_spaces']?.stringInputs?.value[0] || "2";
+                PropertiesService.getUserProperties().setProperty('indentation_spaces', indentationSpaces);
+
                 const result = Addon.Modules.JsonStudio.minifyActiveRange(activeSpreadsheet);
-
-                // show errors handling
-                if (showErrorsState === 'ON' && result.report.length > 0) {
-                    // Build and return the result card
-                    return CardService.newActionResponseBuilder()
-                        .setNavigation(
-                            CardService.newNavigation()
-                                .pushCard(
-                                    Addon.ResultWidget.View
-                                        .BuildResultCard(result))
-                        ).build();
-                }
-
-                return CardService.newActionResponseBuilder()
-                    .setNotification(
-                        CardService.newNotification()
-                            .setText('Completed!' + (result.report.length > 0 ? ` ${result.report.length} error(s) found.` : ' successfully.')))
-                    .build();
+                return Addon.Home.Controller._HandleResultNavigation(e, result);
             }
             catch (error) {
                 return CardService.newActionResponseBuilder()
@@ -420,10 +393,30 @@ Addon.Home = {
             const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
             try {
                 const formInputs = e?.commonEventObject?.formInputs || {};
+                // show_errors_switch
                 const showErrorsState = formInputs?.['show_errors_switch']?.stringInputs?.value[0] || "OFF";
                 PropertiesService.getUserProperties().setProperty('show_errors_switch', showErrorsState);
+
+                // Indentation spaces (not used in validate, but saved for consistency)
+                const indentationSpaces = formInputs?.['indentation_spaces']?.stringInputs?.value[0] || "2";
+                PropertiesService.getUserProperties().setProperty('indentation_spaces', indentationSpaces);
+
                 const result = Addon.Modules.JsonStudio.validateActiveRange(activeSpreadsheet);
-                if (showErrorsState === 'ON' && result.report.length > 0) {
+                return Addon.Home.Controller._HandleResultNavigation(e, result);
+            }
+            catch (error) {
+                return CardService.newActionResponseBuilder()
+                    .setNotification(
+                        CardService.newNotification()
+                            .setText(`Error during Validate: ${error.message}`))
+                    .build();
+            }
+        },
+        _HandleResultNavigation: (e, result) => {
+            const formInputs = e?.commonEventObject?.formInputs || {};
+            const showErrorsState = formInputs?.['show_errors_switch']?.stringInputs?.value[0] || "OFF";
+            if (result.report.length > 0) {
+                if (showErrorsState === 'ON') {
                     // Build and return the result card
                     return CardService.newActionResponseBuilder()
                         .setNavigation(
@@ -433,21 +426,21 @@ Addon.Home = {
                                         .BuildResultCard(result))
                         ).build();
                 }
+                else {
+                    return CardService.newActionResponseBuilder()
+                        .setNotification(
+                            CardService.newNotification()
+                                .setText('⚠️ Completed with ' + result.report.length + ' error(s). \n\nEnable "Show Errors" in Advanced Settings to view details.'))
+                        .build();
+                }
+            }
 
-                // show notification if no errors or if show errors is off
-                return CardService.newActionResponseBuilder()
-                    .setNotification(
-                        CardService.newNotification()
-                            .setText('Completed!' + (result.report.length > 0 ? ` ${result.report.length} error(s) found.` : ' successfully.')))
-                    .build();
-            }
-            catch (error) {
-                return CardService.newActionResponseBuilder()
-                    .setNotification(
-                        CardService.newNotification()
-                            .setText(`Error during Validate: ${error.message}`))
-                    .build();
-            }
+            // show notification if no errors or if show errors is off
+            return CardService.newActionResponseBuilder()
+                .setNotification(
+                    CardService.newNotification()
+                        .setText('✅ All JSON entries are valid!'))
+                .build();
         }
     },
     View: {
@@ -590,19 +583,24 @@ Addon.Home = {
                 .setHeader('🛠️ Available Tools')
                 .setCollapsible(false);
 
+            // Add divider
+            pluginHub.addWidget(CardService.newDivider());
+
+            // Add short how to use action
+            pluginHub.addWidget(
+                CardService.newTextParagraph()
+                    .setText('Select a range of cells containing JSON data in your sheet, then use the tools below to edit or validate the JSON.'));
+            // Add divider
+            pluginHub.addWidget(CardService.newDivider());
+
             // Add a tool - Beautify JSON
             const beautifyJson = CardService.newDecoratedText()
-                .setText('Beautify')
+                .setTopLabel('🚀 Beautify')
                 .setBottomLabel('Format your JSON data for better readability.')
-                .setStartIcon(
-                    CardService.newIconImage().setMaterialIcon(
-                        CardService.newMaterialIcon()
-                            .setName('format_indent_increase')
-                            .setFill(false)))
                 .setWrapText(true)
                 .setButton(
                     CardService.newTextButton()
-                        //.setText('Beautify')
+                        .setText('Format')
                         .setAltText('Beautify JSON within selected cells')
                         .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
                         .setMaterialIcon(
@@ -620,16 +618,12 @@ Addon.Home = {
 
             // Add another tool - Minify JSON
             const minifyJson = CardService.newDecoratedText()
-                .setText('Minify')
+                .setTopLabel('🗜️ Minify')
                 .setBottomLabel('Compress your JSON data for efficient storage.')
-                .setStartIcon(
-                    CardService.newIconImage()
-                        .setMaterialIcon(
-                            CardService.newMaterialIcon().setName('compress')))
                 .setWrapText(true)
                 .setButton(
                     CardService.newTextButton()
-                        //.setText('Minify')
+                        .setText('Minify')
                         .setAltText('Minify JSON within selected cells')
                         .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
                         .setMaterialIcon(
@@ -644,16 +638,12 @@ Addon.Home = {
 
             // Add another tool - Validate JSON
             const validateJson = CardService.newDecoratedText()
-                .setText('Validate')
+                .setTopLabel('✅ Validate')
                 .setBottomLabel('Check your JSON data for errors.')
-                .setStartIcon(
-                    CardService.newIconImage()
-                        .setMaterialIcon(
-                            CardService.newMaterialIcon().setName('check_circle')))
                 .setWrapText(true)
                 .setButton(
                     CardService.newTextButton()
-                        //.setText('Validate')
+                        .setText('Validate')
                         .setAltText('Validate JSON within selected cells')
                         .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
                         .setMaterialIcon(
@@ -696,43 +686,15 @@ Addon.Home = {
                 .setCollapsible(true)
                 .setNumUncollapsibleWidgets(0);
 
-            // create show errors card decorated text with switch widget
-            const showErrorsDecoratedText = CardService.newDecoratedText()
-                .setTopLabel('Show errors in results card')
-                .setWrapText(true)
-                .setStartIcon(
-                    CardService.newIconImage()
-                        .setIconUrl(Addon.Media.I_AM_THINKING_IMG_URL))
-                .setSwitchControl(
-                    CardService.newSwitch()
-                        .setFieldName('show_errors_switch')
-                        .setValue('ON')
-                        .setSelected(data.show_errors_switch === 'ON')
-                        .setControlType(CardService.SwitchControlType.CHECK_BOX)
-                );
-
-            // Add informative text paragraph
-            advancedSection.addWidget(CardService.newTextParagraph()
-                .setText('Enable this option to display a detailed results card after performing JSON operations. This card will summarize any errors encountered during the operation.'));
-
-            advancedSection.addWidget(showErrorsDecoratedText);
-
-            // add divider
+            // Add a divider
             advancedSection.addWidget(CardService.newDivider());
 
-            // Add informative text paragraph
-            advancedSection.addWidget(
-                CardService.newTextParagraph()
-                    .setText('Select your preferred number of spaces for JSON indentation. This setting will be applied when beautifying JSON data.')
-            );
-
-
-            // Create a selection input for indentation spaces
+            // Create a selection input for indentation levels
             const indentationLevelSelector =
                 CardService.newSelectionInput()
                     .setType(CardService.SelectionInputType.DROPDOWN)
                     // Enable for premium users
-                    .setTitle('Indentation Spaces')
+                    .setTitle('Code Indentation Spaces')
                     .setFieldName('indentation_spaces')
                     .addItem('1 {.}', '1', data.indentation_spaces === 1)
                     .addItem('2 {..} (default)', '2', data.indentation_spaces === 2) // Default selected
@@ -743,6 +705,33 @@ Addon.Home = {
             // Add the selection input to the card section
             advancedSection.addWidget(indentationLevelSelector);
 
+            // add short info about indentation spaces
+            advancedSection.addWidget(CardService.newTextParagraph()
+                .setText('Select the number of spaces to use for JSON indentation when beautifying.'));
+
+            // add divider
+            advancedSection.addWidget(CardService.newDivider());
+
+            // Create a decorated text with a switch for "Show Errors After Validation"
+            const showErrorsDecoratedText = CardService.newDecoratedText()
+                .setTopLabel('Show Errors After Validation')
+                .setBottomLabel('Toggle to display detailed error reports after action.')
+                .setWrapText(true)
+                .setStartIcon(
+                    CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon()
+                            .setName('error_outline')
+                    )
+                )
+                .setSwitchControl(
+                    CardService.newSwitch()
+                        .setFieldName('show_errors_switch')
+                        .setValue('ON')
+                        .setSelected(data.show_errors_switch === 'ON')
+                        .setControlType(CardService.SwitchControlType.CHECK_BOX)
+                );
+
+            advancedSection.addWidget(showErrorsDecoratedText);
             return advancedSection;
         },
         _BuildPremiumMembershipSection: (data = {}) => {
