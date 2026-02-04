@@ -1,0 +1,57 @@
+{
+  "timeZone": "Asia/Jerusalem",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "webapp": {
+    "executeAs": "USER_ACCESSING",
+    "access": "ANYONE"
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/script.locale",
+    "https://www.googleapis.com/auth/spreadsheets.currentonly"
+  ],
+  "addOns": {
+    "common": {
+      "name": "Json Studio",
+      "logoUrl": "https://raw.githubusercontent.com/ilanlal/ss-json-editor/refs/heads/main/assets/logo24.png",
+      "layoutProperties": {
+        "primaryColor": "#88001b",
+        "secondaryColor": "#1010ff"
+      },
+      "openLinkUrlPrefixes": [
+        "https://raw.githubusercontent.com/ilanlal/",
+        "https://www.github.com/ilanlal/",
+        "https://github.com/ilanlal/",
+        "https://www.easyadm.com",
+        "https://easyadm.com"
+      ],
+      "homepageTrigger": {
+        "runFunction": "Addon.Home.Controller.Load"
+      },
+      "useLocaleFromApp": true,
+      "universalActions": [
+        {
+          "label": "Profile",
+          "runFunction": "Addon.UserProfile.Controller.Load"
+        },
+        {
+          "label": "Settings",
+          "runFunction": "Addon.Settings.Controller.Load"
+        },
+        {
+          "label": "Help",
+          "runFunction": "Addon.Home.Controller.Help"
+        },
+        {
+          "label": "About",
+          "runFunction": "Addon.Home.Controller.About"
+        },
+        {
+          "label": "Visit Website",
+          "openLink": "https://www.easyadm.com/add-ons/json-studio"
+        }
+      ]
+    },
+    "sheets": {}
+  }
+}

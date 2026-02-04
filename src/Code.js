@@ -3,7 +3,6 @@
  * @see https://developers.google.com/apps-script/guides/triggers#oninstalle
  **/
 function onInstall(e) {
-    console.log("onInstall called with event:", JSON.stringify(e));
     onOpen(e);
 }
 
@@ -12,7 +11,6 @@ function onInstall(e) {
  * @see https://docs.google.com/document/d/1v1wmNKzckcgCwe46gIytjaMdR04HaLLIwsj0idDNF-M/edit?tab=t.0
  */
 function onOpen(e) {
-    console.log("Menu created. Current auth mode:", e && e.authMode.toString());
     SpreadsheetApp
         .getUi()
         .createAddonMenu()
@@ -25,14 +23,22 @@ function onOpen(e) {
  * @see https://developers.google.com/apps-script/guides/web
  */
 function doGet(e) {
-    console.log("doGet called with event:", e);
-    try {
-        // Call the QUnit runner to execute tests
-        const runner = new QUnitRunner(e);
-        return runner.getHtml();
-    } catch (error) {
-        console.error("Error in doGet:", error);
-        // Return an error message to the user
-        return HtmlService.createHtmlOutput("qUnit runner compilation error: " + error.toString());
+    // return html content
+    let htmlContent = '<h1>Json Studio</h1>';
+    htmlContent += '<p>Welcome to Json Studio Google Workspace Add-on!</p>';
+    htmlContent += '<p>This add-on helps you format and minify JSON data directly within your Google Sheets.</p>';
+    if (typeof HtmlService !== 'undefined') {
+        return HtmlService.createHtmlOutput(htmlContent);
+    } else {
+        return null;
     }
+}
+
+// Export the functions for testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        onInstall,
+        onOpen,
+        doGet
+    };
 }

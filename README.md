@@ -1,4 +1,4 @@
-# ![Logo](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/logo24.png) Json Studio ```v11```
+# ![Logo](https://raw.githubusercontent.com/ilanlal/ss-json-editor/main/assets/logo24.png) Json Studio
 
 [![GitHub repo size](https://img.shields.io/github/repo-size/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
 [![GitHub last commit](https://img.shields.io/github/last-commit/ilanlal/ss-json-editor)](https://github.com/ilanlal/ss-json-editor)
@@ -36,6 +36,10 @@ Click Minify, and it will compress it into a single line:
 {"name":"John","age":30,"city":"New York"}
 ```
 
+## Update dependencies
+
+`npm i https://github.com/ilanlal/gasmocks --save-dev`
+
 ## Use Cases for Json Studio
 
   Here are some common use cases for web developers and API consumers:
@@ -45,10 +49,6 @@ Click Minify, and it will compress it into a single line:
   2. **Collaborative Data Editing:** Json Studio enables multiple users to collaborate on JSON data within a Google Sheets™ environment. This is particularly useful for teams working on API integrations or data analysis projects.
 
   3. **Educational Purposes:** Json Studio can be used as a teaching tool to help students understand JSON structure and data manipulation. It provides a hands-on approach to learning about APIs and data formats.
-
-## Release Notes ```v11```
-
-- **Marketplace Listing:** The add-on is now up and running in the Google Workspace Marketplace™.
 
 ## How to Install
 

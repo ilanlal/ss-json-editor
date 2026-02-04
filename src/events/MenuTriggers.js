@@ -68,3 +68,10 @@ function onMenuMinifyRange(e) {
     // This is important for the add-on to function correctly
     return;
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        onMenuFormatRange,
+        onMenuMinifyRange
+    };
+}
