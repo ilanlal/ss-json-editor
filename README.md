@@ -109,8 +109,8 @@ Click Minify, and it will compress it into a single line:
 | Free | Premium |
 | --- | --- |
 | **Prettify JSON**: Format JSON data to make it more readable. | **All the free Features**: Includes all features available in the free version. |
-| **Validation**: Validate JSON data for syntax errors.  | **Minify JSON**: Remove unnecessary whitespace and line breaks from JSON data. |
-|  | **Select Indentation**: Choose the indentation level for prettified JSON data. (1, 2, 4, 6 or 8 spaces) |
+| **Validation**: Validate JSON data for syntax errors. | **Minify JSON**: Remove unnecessary whitespace and line breaks from JSON data. |
+| | **Select Indentation**: Choose the indentation level for prettified JSON data. (1, 2, 4, 6 or 8 spaces) |
 
 > Note: Until the add-on will support billing, the premium features are available for free.
 
