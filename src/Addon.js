@@ -51,8 +51,8 @@ Addon.Modules = {
             const showErrorsSwitch = PropertiesService.getUserProperties().getProperty('show_errors_switch') || 'ON';
 
             return {
-                indentationSpaces: parseInt(indentationSpaces, 10),
-                showErrorsSwitch: showErrorsSwitch === 'ON',
+                indentation_spaces: parseInt(indentationSpaces, 10),
+                show_errors_switch: showErrorsSwitch,
                 // Membership Info
                 isPremium: isPremium,
                 balance: balance,
@@ -199,10 +199,8 @@ Addon.Modules = {
         }
     },
     JsonStudio: class {
-        static beautifyActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()) {
-            const indent = PropertiesService.getUserProperties().getProperty('indentation_spaces') || '2';
+        static beautifyActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet(), indentationSpaces = 2) {
             const activeRange = activeSpreadsheet.getActiveSheet().getActiveRange();
-            const indentationLevel = parseInt(indent, 10);
             const report = [];
 
             // for each cell in range, beautify JSON
@@ -216,7 +214,7 @@ Addon.Modules = {
                         const beautifiedJson = JSON.stringify(
                             JSON.parse(cell),
                             null,
-                            indentationLevel
+                            indentationSpaces
                         );
                         activeRange.getCell(i + 1, j + 1).setValue(beautifiedJson);
                     } catch (error) {
@@ -338,24 +336,36 @@ Addon.Home = {
                 ).build();
         },
         Beautify: (e) => {
+            const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+
             try {
-                const showResultCard = PropertiesService.getUserProperties().getProperty('show_errors_switch');
-                const result = Addon.Modules.JsonStudio.beautifyActiveRange();
-                if (showResultCard !== 'ON') {
+                const formInputs = e?.commonEventObject?.formInputs || {};
+
+                // Read settings from properties
+                const indentationSpaces = formInputs?.['indentation_spaces']?.stringInputs?.value[0] || "2";
+                PropertiesService.getUserProperties().setProperty('indentation_spaces', indentationSpaces);
+
+                // show_errors_switch
+                const showErrorsState = formInputs?.['show_errors_switch']?.stringInputs?.value[0] || "OFF";
+                PropertiesService.getUserProperties().setProperty('show_errors_switch', showErrorsState);
+
+                const result = Addon.Modules.JsonStudio.beautifyActiveRange(activeSpreadsheet, parseInt(indentationSpaces, 10));
+                if (showErrorsState === 'ON' && result.report.length > 0) {
+                    // Build and return the result card
                     return CardService.newActionResponseBuilder()
-                        .setNotification(
-                            CardService.newNotification()
-                                .setText('Completed!' + (result.report.length > 0 ? ` ${result.report.length} error(s) found.` : ' successfully.')))
-                        .build();
+                        .setNavigation(
+                            CardService.newNavigation()
+                                .pushCard(
+                                    Addon.ResultWidget.View
+                                        .BuildResultCard(result))
+                        ).build();
                 }
-                // Build and return the result card
+
                 return CardService.newActionResponseBuilder()
-                    .setNavigation(
-                        CardService.newNavigation()
-                            .pushCard(
-                                Addon.ResultWidget.View
-                                    .BuildResultCard(result))
-                    ).build();
+                    .setNotification(
+                        CardService.newNotification()
+                            .setText('Completed!' + (result.report.length > 0 ? ` ${result.report.length} error(s) found.` : ' successfully.')))
+                    .build();
             }
             catch (error) {
                 return CardService.newActionResponseBuilder()
@@ -366,24 +376,32 @@ Addon.Home = {
             }
         },
         Minify: (e) => {
+            const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
             try {
-                const showResultCard = PropertiesService.getUserProperties().getProperty('show_errors_switch');
-                const result = Addon.Modules.JsonStudio.minifyActiveRange();
-                if (showResultCard !== 'ON') {
+                const formInputs = e?.commonEventObject?.formInputs || {};
+
+                // show_errors_switch
+                const showErrorsState = formInputs?.['show_errors_switch']?.stringInputs?.value[0] || "OFF";
+                PropertiesService.getUserProperties().setProperty('show_errors_switch', showErrorsState);
+                const result = Addon.Modules.JsonStudio.minifyActiveRange(activeSpreadsheet);
+
+                // show errors handling
+                if (showErrorsState === 'ON' && result.report.length > 0) {
+                    // Build and return the result card
                     return CardService.newActionResponseBuilder()
-                        .setNotification(
-                            CardService.newNotification()
-                                .setText('Completed!' + (result.report.length > 0 ? ` ${result.report.length} error(s) found.` : ' successfully.')))
-                        .build();
+                        .setNavigation(
+                            CardService.newNavigation()
+                                .pushCard(
+                                    Addon.ResultWidget.View
+                                        .BuildResultCard(result))
+                        ).build();
                 }
-                // Build and return the result card
+
                 return CardService.newActionResponseBuilder()
-                    .setNavigation(
-                        CardService.newNavigation()
-                            .pushCard(
-                                Addon.ResultWidget.View
-                                    .BuildResultCard(result))
-                    ).build();
+                    .setNotification(
+                        CardService.newNotification()
+                            .setText('Completed!' + (result.report.length > 0 ? ` ${result.report.length} error(s) found.` : ' successfully.')))
+                    .build();
             }
             catch (error) {
                 return CardService.newActionResponseBuilder()
@@ -395,24 +413,29 @@ Addon.Home = {
         },
         Validate: (e) => {
             // Implement validate logic
+            const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
             try {
-                const showResultCard = PropertiesService.getUserProperties().getProperty('show_errors_switch');
-                const result = Addon.Modules.JsonStudio.validateActiveRange();
-                if (showResultCard !== 'ON') {
+                const formInputs = e?.commonEventObject?.formInputs || {};
+                const showErrorsState = formInputs?.['show_errors_switch']?.stringInputs?.value[0] || "OFF";
+                PropertiesService.getUserProperties().setProperty('show_errors_switch', showErrorsState);
+                const result = Addon.Modules.JsonStudio.validateActiveRange(activeSpreadsheet);
+                if (showErrorsState === 'ON' && result.report.length > 0) {
+                    // Build and return the result card
                     return CardService.newActionResponseBuilder()
-                        .setNotification(
-                            CardService.newNotification()
-                                .setText('Completed!' + (result.report.length > 0 ? ` ${result.report.length} error(s) found.` : ' successfully.')))
-                        .build();
+                        .setNavigation(
+                            CardService.newNavigation()
+                                .pushCard(
+                                    Addon.ResultWidget.View
+                                        .BuildResultCard(result))
+                        ).build();
                 }
-                // Build and return the result card
+
+                // show notification if no errors or if show errors is off
                 return CardService.newActionResponseBuilder()
-                    .setNavigation(
-                        CardService.newNavigation()
-                            .pushCard(
-                                Addon.ResultWidget.View
-                                    .BuildResultCard(result))
-                    ).build();
+                    .setNotification(
+                        CardService.newNotification()
+                            .setText('Completed!' + (result.report.length > 0 ? ` ${result.report.length} error(s) found.` : ' successfully.')))
+                    .build();
             }
             catch (error) {
                 return CardService.newActionResponseBuilder()
@@ -434,101 +457,18 @@ Addon.Home = {
                     .setImageUrl(Addon.Package.imageUrl)
                     .setImageAltText('Json Studio Logo'));
 
-            // 1. Main Plugin Hub - Professional Grid-like feel
-            const pluginHub = CardService.newCardSection()
-                .setHeader('🛠️ Available Tools')
-                .setCollapsible(false);
+            // Plugin Hub Section
+            cardBuilder.addSection(Addon.Home.View._BuildPluginHubSection(data));
 
-            // Add a tool - Beautify JSON
-            const beautifyJson = CardService.newDecoratedText()
-                .setText('🪄 Beautify JSON')
-                .setBottomLabel('Edit and manage your JSON data with ease.')
-                .setStartIcon(
-                    CardService.newIconImage()
-                        .setIconUrl(Addon.Package.imageUrl))
-                .setWrapText(true)
-                .setButton(
-                    CardService.newTextButton()
-                        .setText('Beautify JSON')
-                        .setOnClickAction(
-                            CardService.newAction()
-                                .setFunctionName(`Addon.Home.Controller.Beautify`)
-                        )
-                );
+            // Advanced Sections
+            cardBuilder.addSection(Addon.Home.View._BuildAdvancedSettingsSection(data));
 
-            pluginHub.addWidget(beautifyJson);
+            // Quick Access Section
+            cardBuilder.addSection(Addon.Home.View._BuildQuickAccessSection(data));
 
-            // Add another tool - Minify JSON
-            const minifyJson = CardService.newDecoratedText()
-                .setText('🗜️ Minify JSON')
-                .setBottomLabel('Compress your JSON data for efficient storage.')
-                .setStartIcon(
-                    CardService.newIconImage()
-                        .setIconUrl(Addon.Package.imageUrl))
-                .setWrapText(true)
-                .setButton(
-                    CardService.newTextButton()
-                        .setText('Minify JSON')
-                        .setOnClickAction(
-                            CardService.newAction()
-                                .setFunctionName(`Addon.Home.Controller.Minify`)
-                        )
-                );
-
-            pluginHub.addWidget(minifyJson);
-
-            // Add another tool - Validate JSON
-            const validateJson = CardService.newDecoratedText()
-                .setText('✅ Validate JSON')
-                .setBottomLabel('Check your JSON data for errors.')
-                .setStartIcon(
-                    CardService.newIconImage()
-                        .setIconUrl(Addon.Package.imageUrl))
-                .setWrapText(true)
-                .setButton(
-                    CardService.newTextButton()
-                        .setText('Validate JSON')
-                        .setOnClickAction(
-                            CardService.newAction()
-                                .setFunctionName(`Addon.Home.Controller.Validate`)
-                        )
-                );
-
-            pluginHub.addWidget(validateJson);
-
-            cardBuilder.addSection(pluginHub);
-
-            // 2. System Quick Actions (Professional Footer Section)
-            cardBuilder.addSection(CardService.newCardSection()
-                .setHeader('⚙️ Quick Access')
-                .setCollapsible(true)
-                .addWidget(CardService.newButtonSet()
-                    .addButton(CardService.newTextButton()
-                        .setText('Settings')
-                        .setOnClickAction(CardService.newAction()
-                            .setFunctionName('Addon.Settings.Controller.Load')))
-                    .addButton(CardService.newTextButton()
-                        .setText('Help')
-                        .setOnClickAction(CardService.newAction()
-                            .setFunctionName('Addon.Home.Controller.Help')))
-                    .addButton(CardService.newTextButton()
-                        .setText('About')
-                        .setOnClickAction(CardService.newAction()
-                            .setFunctionName('Addon.Home.Controller.About')))
-                ));
-
-            // 3. Premium Call-to-Action (Only if not premium)
+            // Premium Membership Section
             if (!data.isPremium) {
-                const premiumSection = CardService.newCardSection()
-                    .addWidget(CardService.newDecoratedText()
-                        .setTopLabel('Premium Status')
-                        .setText('Free Membership')
-                        .setStartIcon(CardService.newIconImage().setMaterialIcon(
-                            CardService.newMaterialIcon().setName('workspace_premium')))
-                        .setBottomLabel('Upgrade to unlock advanced JSON tools.'));
-
-                cardBuilder.addSection(premiumSection);
-
+                cardBuilder.addSection(Addon.Home.View._BuildPremiumMembershipSection(data));
                 cardBuilder.setFixedFooter(CardService.newFixedFooter()
                     .setPrimaryButton(CardService.newTextButton()
                         .setText('💎 Upgrade to Premium')
@@ -640,6 +580,180 @@ Addon.Home = {
                     .setOpenLink(CardService.newOpenLink()
                         .setUrl(`${Addon.Package.gitRepository}/issues`))));
             return cardBuilder.build();
+        },
+        _BuildPluginHubSection: (data = {}) => {
+            const pluginHub = CardService.newCardSection()
+                .setHeader('🛠️ Available Tools')
+                .setCollapsible(false);
+
+            // Add a tool - Beautify JSON
+            const beautifyJson = CardService.newDecoratedText()
+                .setText('Beautify')
+                .setBottomLabel('Format your JSON data for better readability.')
+                .setStartIcon(
+                    CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon()
+                            .setName('format_indent_increase')
+                            .setFill(false)))
+                .setWrapText(true)
+                .setButton(
+                    CardService.newTextButton()
+                        //.setText('Beautify')
+                        .setAltText('Beautify JSON within selected cells')
+                        .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
+                        .setMaterialIcon(
+                            CardService.newMaterialIcon()
+                                .setName('format_indent_increase')
+                                .setFill(false)
+                        )
+                        .setOnClickAction(
+                            CardService.newAction()
+                                .setFunctionName(`Addon.Home.Controller.Beautify`)
+                        )
+                );
+
+            pluginHub.addWidget(beautifyJson);
+
+            // Add another tool - Minify JSON
+            const minifyJson = CardService.newDecoratedText()
+                .setText('Minify')
+                .setBottomLabel('Compress your JSON data for efficient storage.')
+                .setStartIcon(
+                    CardService.newIconImage()
+                        .setMaterialIcon(
+                            CardService.newMaterialIcon().setName('compress')))
+                .setWrapText(true)
+                .setButton(
+                    CardService.newTextButton()
+                        //.setText('Minify')
+                        .setAltText('Minify JSON within selected cells')
+                        .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
+                        .setMaterialIcon(
+                            CardService.newMaterialIcon().setName('compress'))
+                        .setOnClickAction(
+                            CardService.newAction()
+                                .setFunctionName(`Addon.Home.Controller.Minify`)
+                        )
+                );
+
+            pluginHub.addWidget(minifyJson);
+
+            // Add another tool - Validate JSON
+            const validateJson = CardService.newDecoratedText()
+                .setText('Validate')
+                .setBottomLabel('Check your JSON data for errors.')
+                .setStartIcon(
+                    CardService.newIconImage()
+                        .setMaterialIcon(
+                            CardService.newMaterialIcon().setName('check_circle')))
+                .setWrapText(true)
+                .setButton(
+                    CardService.newTextButton()
+                        //.setText('Validate')
+                        .setAltText('Validate JSON within selected cells')
+                        .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
+                        .setMaterialIcon(
+                            CardService.newMaterialIcon().setName('check_circle'))
+                        .setOnClickAction(
+                            CardService.newAction()
+                                .setFunctionName(`Addon.Home.Controller.Validate`)
+                        )
+                );
+
+            pluginHub.addWidget(validateJson);
+
+            // Return the completed plugin hub section
+            return pluginHub;
+        },
+        _BuildQuickAccessSection: (data = {}) => {
+            return CardService.newCardSection()
+                .setHeader('⚙️ Quick Access')
+                .setCollapsible(true)
+                // add divider
+                .addWidget(CardService.newDivider())
+                .addWidget(CardService.newButtonSet()
+                    .addButton(CardService.newTextButton()
+                        .setText('Settings')
+                        .setOnClickAction(CardService.newAction()
+                            .setFunctionName('Addon.Settings.Controller.Load')))
+                    .addButton(CardService.newTextButton()
+                        .setText('Help & Support')
+                        .setOnClickAction(CardService.newAction()
+                            .setFunctionName('Addon.Help.Controller.Load')))
+                    .addButton(CardService.newTextButton()
+                        .setText('About')
+                        .setOnClickAction(CardService.newAction()
+                            .setFunctionName('Addon.About.Controller.Load')))
+                );
+        },
+        _BuildAdvancedSettingsSection: (data = {}) => {
+            const advancedSection = CardService.newCardSection()
+                .setHeader('🔧 Advanced Settings')
+                .setCollapsible(true)
+                .setNumUncollapsibleWidgets(0);
+
+            // create show errors card decorated text with switch widget
+            const showErrorsDecoratedText = CardService.newDecoratedText()
+                .setTopLabel('Show errors in results card')
+                .setWrapText(true)
+                .setStartIcon(
+                    CardService.newIconImage()
+                        .setIconUrl(Addon.Media.I_AM_THINKING_IMG_URL))
+                .setSwitchControl(
+                    CardService.newSwitch()
+                        .setFieldName('show_errors_switch')
+                        .setValue('ON')
+                        .setSelected(data.show_errors_switch === 'ON')
+                        .setControlType(CardService.SwitchControlType.CHECK_BOX)
+                );
+
+            // Add informative text paragraph
+            advancedSection.addWidget(CardService.newTextParagraph()
+                .setText('Enable this option to display a detailed results card after performing JSON operations. This card will summarize any errors encountered during the operation.'));
+
+            advancedSection.addWidget(showErrorsDecoratedText);
+
+            // add divider
+            advancedSection.addWidget(CardService.newDivider());
+
+            // Add informative text paragraph
+            advancedSection.addWidget(
+                CardService.newTextParagraph()
+                    .setText('Select your preferred number of spaces for JSON indentation. This setting will be applied when beautifying JSON data.')
+            );
+
+
+            // Create a selection input for indentation spaces
+            const indentationLevelSelector =
+                CardService.newSelectionInput()
+                    .setType(CardService.SelectionInputType.DROPDOWN)
+                    // Enable for premium users
+                    .setTitle('Indentation Spaces')
+                    .setFieldName('indentation_spaces')
+                    .addItem('1 {.}', '1', data.indentation_spaces === 1)
+                    .addItem('2 {..} (default)', '2', data.indentation_spaces === 2) // Default selected
+                    .addItem('4 {....}', '4', data.indentation_spaces === 4)
+                    .addItem('6 {......}', '6', data.indentation_spaces === 6)
+                    .addItem('8 {........}', '8', data.indentation_spaces === 8);
+
+            // Add the selection input to the card section
+            advancedSection.addWidget(indentationLevelSelector);
+
+            return advancedSection;
+        },
+        _BuildPremiumMembershipSection: (data = {}) => {
+            const membershipSection = CardService.newCardSection()
+                .setHeader('💎 Premium Membership')
+                .setCollapsible(false)
+                .addWidget(CardService.newDecoratedText()
+                    .setTopLabel('Membership Status')
+                    .setText(data.isPremium ? 'Premium Member' : 'Free Member')
+                    .setStartIcon(CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon().setName('workspace_premium')))
+                    .setBottomLabel(data.isPremium
+                        ? `Expires on: ${data.expiresAt ? data.expiresAt.toDateString() : 'N/A'} | Balance: $${data.balance.toFixed(2)}`
+                        : 'Upgrade to unlock advanced JSON tools.'));
+            return membershipSection;
         }
     }
 };
@@ -732,25 +846,37 @@ Addon.Settings = {
 
             // Indentation Level Selector (only for premium users)
             const devSection = CardService.newCardSection()
-                .setHeader('⚙️ Indentation Settings')
-                .setCollapsible(true)
-                .setNumUncollapsibleWidgets(1);
+                .setHeader('⚙️ General Settings');
 
-            // create show errors caard decorator text with switch widget
+            // create show errors card decorated text with switch widget
             const showErrorsDecoratedText = CardService.newDecoratedText()
                 .setTopLabel('Show errors in results card')
                 .setWrapText(true)
                 .setStartIcon(
                     CardService.newIconImage()
                         .setIconUrl(Addon.Media.I_AM_THINKING_IMG_URL))
-                .setButton(
+                .setSwitchControl(
                     CardService.newSwitch()
                         .setFieldName('show_errors_switch')
-                        .setValue(data.show_errors_switch === 'ON' ? 'ON' : 'OFF')
+                        .setValue('ON')
                         .setSelected(data.show_errors_switch === 'ON')
+                        .setControlType(CardService.SwitchControlType.CHECK_BOX)
                 );
 
+            // Add informative text paragraph
+            devSection.addWidget(CardService.newTextParagraph()
+                .setText('Enable this option to display a detailed results card after performing JSON operations. This card will summarize any errors encountered during the operation.'));
+
             devSection.addWidget(showErrorsDecoratedText);
+
+            // add divider
+            devSection.addWidget(CardService.newDivider());
+
+            // Add informative text paragraph
+            devSection.addWidget(
+                CardService.newTextParagraph()
+                    .setText('Select your preferred number of spaces for JSON indentation. This setting will be applied when beautifying JSON data.')
+            );
 
 
             // Create a selection input for indentation spaces
@@ -1011,7 +1137,7 @@ Addon.ConfirmationCard = {
             const functionPathParts = onClickFunctionName.split('.');
             let actionResult = null;
             try {
-                let func = Plugins;
+                let func = Addon;
                 for (let i = 1; i < functionPathParts.length; i++) {
                     func = func[functionPathParts[i]];
                 }
@@ -1102,31 +1228,31 @@ Addon.ResultWidget = {
                             .setText(`❌ Error dumping data to sheet: ${error.toString()}`))
                     .build();
             }
-        }
-    },
-    HighlightRange: (e) => {
-        const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-        try {
-            // extract parameters
-            const rangeA1 = e?.commonEventObject?.parameters?.range || 'A1';
-            const sheet = activeSpreadsheet.getActiveSheet();
-            const range = sheet.getRange(rangeA1);
-            // Highlight the range with a yellow background
-            range.setBackground('#FFFF00');
+        },
+        HighlightRange: (e) => {
+            const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+            try {
+                // extract parameters
+                const rangeA1 = e?.commonEventObject?.parameters?.range || 'A1';
+                const sheet = activeSpreadsheet.getActiveSheet();
+                const range = sheet.getRange(rangeA1);
+                // Highlight the range with a yellow background
+                range.setBackground('#FFFF00');
 
-            // Return action response with notification
-            return CardService.newActionResponseBuilder()
-                .setNotification(
-                    CardService.newNotification()
-                        .setText(`✅ Range "${rangeA1}" highlighted successfully.`))
-                .build();
-        }
-        catch (error) {
-            return CardService.newActionResponseBuilder()
-                .setNotification(
-                    CardService.newNotification()
-                        .setText(`❌ Error highlighting range: ${error.toString()}`))
-                .build();
+                // Return action response with notification
+                return CardService.newActionResponseBuilder()
+                    .setNotification(
+                        CardService.newNotification()
+                            .setText(`✅ Range "${rangeA1}" highlighted successfully.`))
+                    .build();
+            }
+            catch (error) {
+                return CardService.newActionResponseBuilder()
+                    .setNotification(
+                        CardService.newNotification()
+                            .setText(`❌ Error highlighting range: ${error.toString()}`))
+                    .build();
+            }
         }
     },
     View: {
@@ -1171,7 +1297,7 @@ Addon.ResultWidget = {
                             .BuildExportWidget(result.range, result.report)
                     )
             );
-            return cardBuilder;
+            return cardBuilder.build();
         },
         BuildResultSummarySection: (range, report) => {
             return CardService.newCardSection()
@@ -1213,7 +1339,7 @@ Addon.ResultWidget = {
                             CardService.newAction()
                                 .setFunctionName('Addon.ResultWidget.Controller.HighlightRange')
                                 .setParameters({
-                                    range: JSON.stringify(reportItem.cell)
+                                    range: JSON.stringify(reportItem.cell || 'A1')
                                 })
                         )
                 );
