@@ -454,6 +454,12 @@ Addon.Home = {
                     .setImageUrl(Addon.Package.imageUrl)
                     .setImageAltText('Json Studio Logo'));
 
+
+            cardBuilder.addSection(CardService.newCardSection()
+                .addWidget(
+                    CardService.newTextParagraph()
+                        .setText('Select a range of cells containing JSON data in your sheet, then use the tools below to parse or validate the JSON.')));
+
             // Plugin Hub Section
             cardBuilder.addSection(Addon.Home.View._BuildPluginHubSection(data));
 
@@ -586,16 +592,9 @@ Addon.Home = {
             // Add divider
             pluginHub.addWidget(CardService.newDivider());
 
-            // Add short how to use action
-            pluginHub.addWidget(
-                CardService.newTextParagraph()
-                    .setText('Select a range of cells containing JSON data in your sheet, then use the tools below to edit or validate the JSON.'));
-            // Add divider
-            pluginHub.addWidget(CardService.newDivider());
-
             // Add a tool - Beautify JSON
             const beautifyJson = CardService.newDecoratedText()
-                .setTopLabel('🚀 Beautify')
+                .setTopLabel('🎨 Beautify')
                 .setBottomLabel('Format your JSON data for better readability.')
                 .setWrapText(true)
                 .setButton(
@@ -673,11 +672,11 @@ Addon.Home = {
                     .addButton(CardService.newTextButton()
                         .setText('Help & Support')
                         .setOnClickAction(CardService.newAction()
-                            .setFunctionName('Addon.Help.Controller.Load')))
+                            .setFunctionName('Addon.Home.Controller.Help')))
                     .addButton(CardService.newTextButton()
                         .setText('About')
                         .setOnClickAction(CardService.newAction()
-                            .setFunctionName('Addon.About.Controller.Load')))
+                            .setFunctionName('Addon.Home.Controller.About')))
                 );
         },
         _BuildAdvancedSettingsSection: (data = {}) => {
@@ -688,6 +687,9 @@ Addon.Home = {
 
             // Add a divider
             advancedSection.addWidget(CardService.newDivider());
+            // add short info about indentation spaces
+            advancedSection.addWidget(CardService.newTextParagraph()
+                .setText('Select the number of spaces to use for JSON indentation when beautifying.'));
 
             // Create a selection input for indentation levels
             const indentationLevelSelector =
@@ -704,10 +706,6 @@ Addon.Home = {
 
             // Add the selection input to the card section
             advancedSection.addWidget(indentationLevelSelector);
-
-            // add short info about indentation spaces
-            advancedSection.addWidget(CardService.newTextParagraph()
-                .setText('Select the number of spaces to use for JSON indentation when beautifying.'));
 
             // add divider
             advancedSection.addWidget(CardService.newDivider());
