@@ -29,7 +29,7 @@ Addon.Package = {
     short_description: 'JSON editing tools for Sheets',
     description: 'A comprehensive tool for parsing, formatting, and managing JSON data directly within Google Sheets. Enhance your productivity with easy-to-use JSON editing features.',
     version: '1.0.0',
-    build: '20260202.01190',
+    build: '20260205.040400',
     author: 'Ilan Laloum',
     license: 'MIT',
     imageUrl: Addon.Media.LOGO_PNG_URL,
@@ -42,17 +42,20 @@ Addon.Modules = {
             return 'membership';
         },
         getData() {
-            const rawData = PropertiesService.getUserProperties().getProperty(Addon.Modules.App.MEMBERSHIP_PROPERTY_KEY);
+            const properties = PropertiesService.getUserProperties();
+            const rawData = properties.getProperty(Addon.Modules.App.MEMBERSHIP_PROPERTY_KEY);
             const membershipInfo = rawData ? JSON.parse(rawData) : {};
             const expiresAt = membershipInfo.expiresAt ? new Date(membershipInfo.expiresAt) : null;
             const balance = membershipInfo.balance || 0;
             const isPremium = (expiresAt && expiresAt > new Date()) || balance > 0;
-            const indentationSpaces = PropertiesService.getUserProperties().getProperty('indentation_spaces') || '2';
-            const showErrorsSwitch = PropertiesService.getUserProperties().getProperty('show_errors_switch') || 'ON';
+            const indentationSpaces = properties.getProperty('indentation_spaces') || '2';
+            const showErrorsSwitch = properties.getProperty('show_errors_switch') || 'ON';
+            const highlightColor = properties.getProperty('highlight_color') || '#FF0000';
 
             return {
                 indentation_spaces: parseInt(indentationSpaces, 10),
                 show_errors_switch: showErrorsSwitch,
+                highlight_color: highlightColor,
                 // Membership Info
                 isPremium: isPremium,
                 balance: balance,
@@ -787,15 +790,19 @@ Addon.Settings = {
             const selectedSpaces = e?.commonEventObject
                 ?.formInputs?.['indentation_spaces']
                 ?.stringInputs?.value[0] || "2";
-
             PropertiesService.getUserProperties().setProperty('indentation_spaces', selectedSpaces);
 
             // show_errors_switch
             const showErrorsState = e?.commonEventObject
                 ?.formInputs?.['show_errors_switch']
                 ?.stringInputs?.value[0] || "OFF";
-
             PropertiesService.getUserProperties().setProperty('show_errors_switch', showErrorsState);
+
+            // highlight_color
+            const highlightColor = e?.commonEventObject
+                ?.formInputs?.['highlight_color']
+                ?.stringInputs?.value[0] || "#FF0000";
+            PropertiesService.getUserProperties().setProperty('highlight_color', highlightColor);
 
             // Build and return the Home Card
             const appModelData = Addon.Modules.App.getData();
@@ -831,18 +838,7 @@ Addon.Settings = {
     },
     View: {
         HomeCard: (data = {}) => {
-            // Data Initialization
-            // Create a random demo key if none exists (for display purposes)
-            const privateKeyDemo = Array(65).fill(0).map(() => String.fromCharCode(97 + Math.floor(Math.random() * 26))).join('');
-
             // Fetch properties with robust fallbacks
-            data.terminal_output_switch = PropertiesService.getUserProperties().getProperty('terminal_output_switch') || 'OFF';
-            data.focus_terminal_output = PropertiesService.getUserProperties().getProperty('focus_terminal_output') || 'OFF';
-            data.praittfy_json = PropertiesService.getUserProperties().getProperty('praittfy_json') || 'OFF';
-            data.txt_secret_private_key = PropertiesService.getUserProperties().getProperty('txt_secret_private_key') || privateKeyDemo;
-            data.indentationLevel = parseInt(PropertiesService.getUserProperties().getProperty('indentation_spaces') || '2', 10);
-            data.show_errors_switch = PropertiesService.getUserProperties().getProperty('show_errors_switch') || 'ON';
-
             const cardBuilder = CardService.newCardBuilder()
                 .setName(Addon.Settings.name + '-Home')
                 .setHeader(CardService.newCardHeader()
@@ -853,16 +849,19 @@ Addon.Settings = {
                     .setImageAltText('Settings Logo'));
 
             // Indentation Level Selector (only for premium users)
-            const devSection = CardService.newCardSection()
-                .setHeader('⚙️ General Settings');
+            const advancedSettingsSection = CardService.newCardSection()
+                .setHeader('⚙️ Advanced Settings');
 
             // create show errors card decorated text with switch widget
             const showErrorsDecoratedText = CardService.newDecoratedText()
-                .setTopLabel('Show errors in results card')
+                .setText('Show Errors After JSON Operations')
+                .setBottomLabel('Display detailed error reports after performing JSON operations.')
                 .setWrapText(true)
                 .setStartIcon(
-                    CardService.newIconImage()
-                        .setIconUrl(Addon.Media.I_AM_THINKING_IMG_URL))
+                    CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon()
+                            .setName('error_outline')
+                    ))
                 .setSwitchControl(
                     CardService.newSwitch()
                         .setFieldName('show_errors_switch')
@@ -871,21 +870,9 @@ Addon.Settings = {
                         .setControlType(CardService.SwitchControlType.CHECK_BOX)
                 );
 
-            // Add informative text paragraph
-            devSection.addWidget(CardService.newTextParagraph()
-                .setText('Enable this option to display a detailed results card after performing JSON operations. This card will summarize any errors encountered during the operation.'));
-
-            devSection.addWidget(showErrorsDecoratedText);
-
+            advancedSettingsSection.addWidget(showErrorsDecoratedText);
             // add divider
-            devSection.addWidget(CardService.newDivider());
-
-            // Add informative text paragraph
-            devSection.addWidget(
-                CardService.newTextParagraph()
-                    .setText('Select your preferred number of spaces for JSON indentation. This setting will be applied when beautifying JSON data.')
-            );
-
+            advancedSettingsSection.addWidget(CardService.newDivider());
 
             // Create a selection input for indentation spaces
             const indentationLevelSelector =
@@ -894,16 +881,33 @@ Addon.Settings = {
                     // Enable for premium users
                     .setTitle('Indentation Spaces')
                     .setFieldName('indentation_spaces')
-                    .addItem('1 {.}', '1', data.indentationLevel === 1)
-                    .addItem('2 {..} (default)', '2', data.indentationLevel === 2) // Default selected
-                    .addItem('4 {....}', '4', data.indentationLevel === 4)
-                    .addItem('6 {......}', '6', data.indentationLevel === 6)
-                    .addItem('8 {........}', '8', data.indentationLevel === 8);
+                    .addItem('1 {.}', '1', data.indentation_spaces === 1)
+                    .addItem('2 {..} (default)', '2', data.indentation_spaces === 2) // Default selected
+                    .addItem('4 {....}', '4', data.indentation_spaces === 4)
+                    .addItem('6 {......}', '6', data.indentation_spaces === 6)
+                    .addItem('8 {........}', '8', data.indentation_spaces === 8);
 
             // Add the selection input to the card section
-            devSection.addWidget(indentationLevelSelector);
+            advancedSettingsSection.addWidget(indentationLevelSelector);
+            // add divider
+            advancedSettingsSection.addWidget(CardService.newDivider());
+            // Create a selection input for indentation spaces
+            const highlightColor =
+                CardService.newSelectionInput()
+                    .setType(CardService.SelectionInputType.DROPDOWN)
+                    // Enable for premium users
+                    .setTitle('Highlight Color')
+                    .setFieldName('highlight_color')
+                    .addItem('🔴 Red', '#FF0000', data.highlight_color === '#FF0000')
+                    .addItem('🟢 Green', '#00FF00', data.highlight_color === '#00FF00')
+                    .addItem('🔵 Blue', '#0000FF', data.highlight_color === '#0000FF')
+                    .addItem('🟡 Yellow', '#FFFF00', data.highlight_color === '#FFFF00')
+                    .addItem('🟣 Purple', '#800080', data.highlight_color === '#800080');
+            // Add the selection input to the card section
+            advancedSettingsSection.addWidget(highlightColor);
 
-            cardBuilder.addSection(devSection);
+            // Add the advanced settings section to the card
+            cardBuilder.addSection(advancedSettingsSection);
 
             // Professional Fixed Footer
             // High-contrast primary button for the "Save" action
@@ -1247,7 +1251,8 @@ Addon.ResultWidget = {
                 const sheet = activeSpreadsheet.getSheetByName(sheetName);
                 const range = sheet.getRange(a1n);
                 // Highlight the range with a yellow background
-                range.setBackground('#FFFF00');
+                const hightlightColor = PropertiesService.getUserProperties().getProperty('highlight_color') || '#FF0000';
+                range.setBackground(hightlightColor);
 
                 // Return action response with notification
                 return CardService.newActionResponseBuilder()
