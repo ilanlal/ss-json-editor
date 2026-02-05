@@ -50,7 +50,7 @@ Addon.Modules = {
             const isPremium = (expiresAt && expiresAt > new Date()) || balance > 0;
             const indentationSpaces = properties.getProperty('indentation_spaces') || '2';
             const showErrorsSwitch = properties.getProperty('show_errors_switch') || 'ON';
-            const highlightColor = properties.getProperty('highlight_color') || '#FF0000';
+            const highlightColor = properties.getProperty('highlight_color') || '#FFFF00';
 
             return {
                 indentation_spaces: parseInt(indentationSpaces, 10),
@@ -1251,7 +1251,7 @@ Addon.ResultWidget = {
                 const sheet = activeSpreadsheet.getSheetByName(sheetName);
                 const range = sheet.getRange(a1n);
                 // Highlight the range with a yellow background
-                const hightlightColor = PropertiesService.getUserProperties().getProperty('highlight_color') || '#FF0000';
+                const hightlightColor = PropertiesService.getUserProperties().getProperty('highlight_color') || '#FFFF00';
                 range.setBackground(hightlightColor);
 
                 // Return action response with notification
@@ -1339,18 +1339,16 @@ Addon.ResultWidget = {
         },
         BuildResultWidget: (reportItem = {}) => {
             return CardService.newDecoratedText()
-                .setTopLabel('📝 Detail')
-                .setText(`Cell: ${reportItem.a1n}`)
+                //.setTopLabel(`${reportItem.a1n}`)
+                .setText(`⚠️ ${reportItem.a1n}`)
                 .setWrapText(true)
-                .setBottomLabel(`Error: ${reportItem.error}`)
-                .setStartIcon(
-                    CardService.newIconImage()
-                        .setMaterialIcon(
-                            CardService.newMaterialIcon()
-                                .setName('description')))
+                .setBottomLabel(`${reportItem.error}`)
                 .setButton(
                     CardService.newTextButton()
-                        .setText('Highlight')
+                        .setAltText('Highlight')
+                        .setMaterialIcon(
+                            CardService.newMaterialIcon()
+                                .setName('highlight'))
                         .setOnClickAction(
                             CardService.newAction()
                                 .setFunctionName('Addon.ResultWidget.Controller.HighlightRange')
