@@ -148,6 +148,8 @@ Addon.Modules = {
             };
 
             const sheet = this.getSheet(activeSpreadsheet, sheetMeta);
+            // Activate the target sheet
+            activeSpreadsheet.setActiveSheet(activeSpreadsheet.getSheetByName(sheetMeta.name));
 
             report.forEach((item, index) => {
                 const row = [
@@ -1237,9 +1239,6 @@ Addon.ResultWidget = {
                 const sheetName = e?.commonEventObject?.parameters?.sheetName || activeSpreadsheet.getActiveSheet().getName();
                 const report = e?.commonEventObject?.parameters?.report || '[]';
 
-                // Activate the target sheet
-                activeSpreadsheet.setActiveSheet(activeSpreadsheet.getSheetByName(Addon.Modules.Sheet.DUMP_SHEET_NAME));
-                
                 // Dump data to sheet
                 Addon.Modules.Sheet
                     .dumpObjectToSheet(activeSpreadsheet, sheetName, a1n, JSON.parse(report));
