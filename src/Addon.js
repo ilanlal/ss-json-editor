@@ -1289,9 +1289,9 @@ Addon.ResultWidget = {
 
             // Add Detailed Result Widgets
             const detailSection = CardService.newCardSection()
-                .setHeader('Detailed Results')
+                .setHeader('📋 Detailed Results')
                 .setCollapsible(true)
-                .setNumUncollapsibleWidgets(1);
+                .setNumUncollapsibleWidgets(4);
 
             // Iterate over each report item and add a widget
             result.report.forEach(reportItem => {
