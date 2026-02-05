@@ -200,9 +200,18 @@ Addon.Modules = {
         }
     },
     JsonStudio: class {
+        static get MAX_PROCESS_CELLS() {
+            return 1000;
+        }
+
         static beautifyActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet(), indentationSpaces = 2) {
             const activeRange = activeSpreadsheet.getActiveSheet().getActiveRange();
             const report = [];
+
+            // Ensure we do not exceed max process cells
+            if (activeRange.getNumRows() * activeRange.getNumColumns() > this.MAX_PROCESS_CELLS) {
+                throw new Error(`Selected range exceeds the maximum allowed cells (${this.MAX_PROCESS_CELLS}). Please select a smaller range.`);
+            }
 
             // for each cell in range, beautify JSON
             activeRange.getValues().forEach((row, i) => {
@@ -235,6 +244,10 @@ Addon.Modules = {
         static minifyActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()) {
             const activeRange = activeSpreadsheet.getActiveSheet().getActiveRange();
             const report = [];
+            // Ensure we do not exceed max process cells
+            if (activeRange.getNumRows() * activeRange.getNumColumns() > this.MAX_PROCESS_CELLS) {
+                throw new Error(`Selected range exceeds the maximum allowed cells (${this.MAX_PROCESS_CELLS}). Please select a smaller range.`);
+            }
             // for each cell in range, minify JSON
             activeRange.getValues().forEach((row, i) => {
                 row.forEach((cell, j) => {
@@ -262,6 +275,10 @@ Addon.Modules = {
         static validateActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()) {
             const activeRange = activeSpreadsheet.getActiveSheet().getActiveRange();
             const report = [];
+            // Ensure we do not exceed max process cells
+            if (activeRange.getNumRows() * activeRange.getNumColumns() > this.MAX_PROCESS_CELLS) {
+                throw new Error(`Selected range exceeds the maximum allowed cells (${this.MAX_PROCESS_CELLS}). Please select a smaller range.`);
+            }
             // for each cell in range, validate JSON
             activeRange.getValues().forEach((row, i) => {
                 row.forEach((cell, j) => {
