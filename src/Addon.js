@@ -36,21 +36,36 @@ Addon.Package = {
     gitRepository: 'https://github.com/ilanlal/ss-json-editor'
 };
 
+Addon.INPUT_PARAMETERS = {
+    get indentation_spaces() {
+        return 'indentation_spaces';
+    },
+    get show_errors_switch() {
+        return 'show_errors_switch';
+    },
+    get highlight_color() {
+        return 'highlight_color';
+    }
+};
+
 Addon.Modules = {
     App: {
+        get DEFAULT_INDENTATION_SPACES() {
+            return '2';
+        },
         get MEMBERSHIP_PROPERTY_KEY() {
             return 'membership';
         },
         getData() {
             const properties = PropertiesService.getUserProperties();
-            const rawData = properties.getProperty(Addon.Modules.App.MEMBERSHIP_PROPERTY_KEY);
+            const rawData = properties.getProperty(this.MEMBERSHIP_PROPERTY_KEY);
             const membershipInfo = rawData ? JSON.parse(rawData) : {};
             const expiresAt = membershipInfo.expiresAt ? new Date(membershipInfo.expiresAt) : null;
             const balance = membershipInfo.balance || 0;
             const isPremium = (expiresAt && expiresAt > new Date()) || balance > 0;
-            const indentationSpaces = properties.getProperty('indentation_spaces') || '2';
-            const showErrorsSwitch = properties.getProperty('show_errors_switch') || 'ON';
-            const highlightColor = properties.getProperty('highlight_color') || '#FFFF00';
+            const indentationSpaces = properties.getProperty(Addon.INPUT_PARAMETERS.indentation_spaces) || Addon.Modules.App.DEFAULT_INDENTATION_SPACES;
+            const showErrorsSwitch = properties.getProperty(Addon.INPUT_PARAMETERS.show_errors_switch) || 'ON';
+            const highlightColor = properties.getProperty(Addon.INPUT_PARAMETERS.highlight_color) || '#FFFF00';
 
             return {
                 indentation_spaces: parseInt(indentationSpaces, 10),
@@ -71,7 +86,7 @@ Addon.Modules = {
     },
     Sheet: {
         INVALID_MODEL_ERROR: 'Sheet model must have a valid name property',
-        DUMP_SHEET_NAME: 'JSON Tools Report',
+        DUMP_SHEET_NAME: '📥 Data',
 
         initializeSheet(activeSpreadsheet, sheetMeta = {}) {
             if (!sheetMeta.name) {
@@ -141,7 +156,7 @@ Addon.Modules = {
                     range,
                     item.a1n || '',
                     item.error || '',
-                    JSON.stringify(report)];
+                    JSON.stringify(item)];
 
                 sheet.appendRow(row);
             });
@@ -204,7 +219,7 @@ Addon.Modules = {
     },
     JsonStudio: class {
         static get MAX_PROCESS_CELLS() {
-            return 1000;
+            return 100;
         }
 
         static beautifyActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet(), indentationSpaces = 2) {
@@ -366,12 +381,12 @@ Addon.Home = {
                 const formInputs = e?.commonEventObject?.formInputs || {};
 
                 // Read settings from properties
-                const indentationSpaces = formInputs?.['indentation_spaces']?.stringInputs?.value[0] || "2";
-                PropertiesService.getUserProperties().setProperty('indentation_spaces', indentationSpaces);
+                const indentationSpaces = formInputs?.[Addon.INPUT_PARAMETERS.indentation_spaces]?.stringInputs?.value[0] || "2";
+                PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.indentation_spaces, indentationSpaces);
 
                 // show_errors_switch
-                const showErrorsState = formInputs?.['show_errors_switch']?.stringInputs?.value[0] || "OFF";
-                PropertiesService.getUserProperties().setProperty('show_errors_switch', showErrorsState);
+                const showErrorsState = formInputs?.[Addon.INPUT_PARAMETERS.show_errors_switch]?.stringInputs?.value[0] || "OFF";
+                PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.show_errors_switch, showErrorsState);
 
                 const result = Addon.Modules.JsonStudio.beautifyActiveRange(activeSpreadsheet, parseInt(indentationSpaces, 10));
                 return Addon.Home.Controller._HandleResultNavigation(e, result);
@@ -390,13 +405,12 @@ Addon.Home = {
                 const formInputs = e?.commonEventObject?.formInputs || {};
 
                 // show_errors_switch
-                const showErrorsState = formInputs?.['show_errors_switch']?.stringInputs?.value[0] || "OFF";
-                PropertiesService.getUserProperties().setProperty('show_errors_switch', showErrorsState);
+                const showErrorsState = formInputs?.[Addon.INPUT_PARAMETERS.show_errors_switch]?.stringInputs?.value[0] || "OFF";
+                PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.show_errors_switch, showErrorsState);
 
                 // Indentation spaces (not used in validate, but saved for consistency)
-                const indentationSpaces = formInputs?.['indentation_spaces']?.stringInputs?.value[0] || "2";
-                PropertiesService.getUserProperties().setProperty('indentation_spaces', indentationSpaces);
-
+                const indentationSpaces = formInputs?.[Addon.INPUT_PARAMETERS.indentation_spaces]?.stringInputs?.value[0] || "2";
+                PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.indentation_spaces, indentationSpaces);
                 const result = Addon.Modules.JsonStudio.minifyActiveRange(activeSpreadsheet);
                 return Addon.Home.Controller._HandleResultNavigation(e, result);
             }
@@ -414,13 +428,12 @@ Addon.Home = {
             try {
                 const formInputs = e?.commonEventObject?.formInputs || {};
                 // show_errors_switch
-                const showErrorsState = formInputs?.['show_errors_switch']?.stringInputs?.value[0] || "OFF";
-                PropertiesService.getUserProperties().setProperty('show_errors_switch', showErrorsState);
+                const showErrorsState = formInputs?.[Addon.INPUT_PARAMETERS.show_errors_switch]?.stringInputs?.value[0] || "OFF";
+                PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.show_errors_switch, showErrorsState);
 
                 // Indentation spaces (not used in validate, but saved for consistency)
-                const indentationSpaces = formInputs?.['indentation_spaces']?.stringInputs?.value[0] || "2";
-                PropertiesService.getUserProperties().setProperty('indentation_spaces', indentationSpaces);
-
+                const indentationSpaces = formInputs?.[Addon.INPUT_PARAMETERS.indentation_spaces]?.stringInputs?.value[0] || "2";
+                PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.indentation_spaces, indentationSpaces);
                 const result = Addon.Modules.JsonStudio.validateActiveRange(activeSpreadsheet);
                 return Addon.Home.Controller._HandleResultNavigation(e, result);
             }
@@ -434,7 +447,7 @@ Addon.Home = {
         },
         _HandleResultNavigation: (e, result) => {
             const formInputs = e?.commonEventObject?.formInputs || {};
-            const showErrorsState = formInputs?.['show_errors_switch']?.stringInputs?.value[0] || "OFF";
+            const showErrorsState = formInputs?.[Addon.INPUT_PARAMETERS.show_errors_switch]?.stringInputs?.value[0] || "OFF";
             if (result.report.length > 0) {
                 if (showErrorsState === 'ON') {
                     // Build and return the result card
@@ -717,7 +730,7 @@ Addon.Home = {
                     .setType(CardService.SelectionInputType.DROPDOWN)
                     // Enable for premium users
                     .setTitle('Code Indentation Spaces')
-                    .setFieldName('indentation_spaces')
+                    .setFieldName(Addon.INPUT_PARAMETERS.indentation_spaces)
                     .addItem('1 {.}', '1', data.indentation_spaces === 1)
                     .addItem('2 {..} (default)', '2', data.indentation_spaces === 2) // Default selected
                     .addItem('4 {....}', '4', data.indentation_spaces === 4)
@@ -743,7 +756,7 @@ Addon.Home = {
                 )
                 .setSwitchControl(
                     CardService.newSwitch()
-                        .setFieldName('show_errors_switch')
+                        .setFieldName(Addon.INPUT_PARAMETERS.show_errors_switch)
                         .setValue('ON')
                         .setSelected(data.show_errors_switch === 'ON')
                         .setControlType(CardService.SwitchControlType.CHECK_BOX)
@@ -788,21 +801,21 @@ Addon.Settings = {
         },
         SaveSettings: (e) => {
             const selectedSpaces = e?.commonEventObject
-                ?.formInputs?.['indentation_spaces']
+                ?.formInputs?.[Addon.INPUT_PARAMETERS.indentation_spaces]
                 ?.stringInputs?.value[0] || "2";
-            PropertiesService.getUserProperties().setProperty('indentation_spaces', selectedSpaces);
+            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.indentation_spaces, selectedSpaces);
 
             // show_errors_switch
             const showErrorsState = e?.commonEventObject
-                ?.formInputs?.['show_errors_switch']
+                ?.formInputs?.[Addon.INPUT_PARAMETERS.show_errors_switch]
                 ?.stringInputs?.value[0] || "OFF";
-            PropertiesService.getUserProperties().setProperty('show_errors_switch', showErrorsState);
+            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.show_errors_switch, showErrorsState);
 
             // highlight_color
             const highlightColor = e?.commonEventObject
-                ?.formInputs?.['highlight_color']
-                ?.stringInputs?.value[0] || "#FF0000";
-            PropertiesService.getUserProperties().setProperty('highlight_color', highlightColor);
+                ?.formInputs?.[Addon.INPUT_PARAMETERS.highlight_color]
+                ?.stringInputs?.value[0] || "#FFFF00";
+            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.highlight_color, highlightColor);
 
             // Build and return the Home Card
             const appModelData = Addon.Modules.App.getData();
@@ -864,7 +877,7 @@ Addon.Settings = {
                     ))
                 .setSwitchControl(
                     CardService.newSwitch()
-                        .setFieldName('show_errors_switch')
+                        .setFieldName(Addon.INPUT_PARAMETERS.show_errors_switch)
                         .setValue('ON')
                         .setSelected(data.show_errors_switch === 'ON')
                         .setControlType(CardService.SwitchControlType.CHECK_BOX)
@@ -880,7 +893,7 @@ Addon.Settings = {
                     .setType(CardService.SelectionInputType.DROPDOWN)
                     // Enable for premium users
                     .setTitle('Indentation Spaces')
-                    .setFieldName('indentation_spaces')
+                    .setFieldName(Addon.INPUT_PARAMETERS.indentation_spaces)
                     .addItem('1 {.}', '1', data.indentation_spaces === 1)
                     .addItem('2 {..} (default)', '2', data.indentation_spaces === 2) // Default selected
                     .addItem('4 {....}', '4', data.indentation_spaces === 4)
@@ -897,7 +910,7 @@ Addon.Settings = {
                     .setType(CardService.SelectionInputType.DROPDOWN)
                     // Enable for premium users
                     .setTitle('Highlight Color')
-                    .setFieldName('highlight_color')
+                    .setFieldName(Addon.INPUT_PARAMETERS.highlight_color)
                     .addItem('🔴 Red', '#FF0000', data.highlight_color === '#FF0000')
                     .addItem('🟢 Green', '#00FF00', data.highlight_color === '#00FF00')
                     .addItem('🔵 Blue', '#0000FF', data.highlight_color === '#0000FF')
@@ -1251,7 +1264,7 @@ Addon.ResultWidget = {
                 const sheet = activeSpreadsheet.getSheetByName(sheetName);
                 const range = sheet.getRange(a1n);
                 // Highlight the range with a yellow background
-                const hightlightColor = PropertiesService.getUserProperties().getProperty('highlight_color') || '#FFFF00';
+                const hightlightColor = PropertiesService.getUserProperties().getProperty(Addon.INPUT_PARAMETERS.highlight_color) || '#FFFF00';
                 range.setBackground(hightlightColor);
 
                 // Return action response with notification
@@ -1377,7 +1390,7 @@ Addon.ResultWidget = {
                             CardService.newAction()
                                 .setFunctionName('Addon.ResultWidget.Controller.DumpResultToSheet')
                                 .setParameters({
-                                    sheetName: '📦 Dumps',
+                                    sheetName: Addon.Modules.Sheet.DUMP_SHEET_NAME,
                                     report: JSON.stringify(report),
                                     a1n: range.getA1Notation()
                                 })

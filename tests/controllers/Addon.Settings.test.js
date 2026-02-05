@@ -28,12 +28,12 @@ describe('Addon.Settings.Controller', () => {
             const e = {
                 commonEventObject: {
                     formInputs: {
-                        indentation_spaces: {
+                        [Addon.INPUT_PARAMETERS.indentation_spaces]: {
                             stringInputs: {
                                 value: ['4']
                             }
                         },
-                        show_errors_switch: {
+                        [Addon.INPUT_PARAMETERS.show_errors_switch]: {
                             stringInputs: {
                                 value: ['ON']
                             }
@@ -52,8 +52,8 @@ describe('Addon.Settings.Controller', () => {
 
             // verify properties were saved
             const userProperties = PropertiesService.getUserProperties();
-            expect(userProperties.getProperty('indentation_spaces')).toBe('4');
-            expect(userProperties.getProperty('show_errors_switch')).toBe('ON');
+            expect(userProperties.getProperty(Addon.INPUT_PARAMETERS.indentation_spaces)).toBe('4');
+            expect(userProperties.getProperty(Addon.INPUT_PARAMETERS.show_errors_switch)).toBe('ON');
         });
 
 
