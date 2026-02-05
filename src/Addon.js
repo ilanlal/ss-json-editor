@@ -143,8 +143,8 @@ Addon.Modules = {
 
         dumpObjectToSheet(activeSpreadsheet, sheetName, range = 'A1', report = []) {
             const sheetMeta = {
-                name: sheetName || Addon.Modules.Sheet.DUMP_SHEET_NAME,
-                columns: ['Timestamp', 'Index', 'Range', 'Cell', 'Error', 'Details']
+                name: Addon.Modules.Sheet.DUMP_SHEET_NAME,
+                columns: ['Timestamp', 'Index', 'Sheet', 'Range', 'Cell', 'Error', 'Details']
             };
 
             const sheet = this.getSheet(activeSpreadsheet, sheetMeta);
@@ -153,6 +153,7 @@ Addon.Modules = {
                 const row = [
                     new Date().toISOString(),
                     index,
+                    sheetName || '',
                     range,
                     item.a1n || '',
                     item.error || '',
@@ -1236,6 +1237,9 @@ Addon.ResultWidget = {
                 const sheetName = e?.commonEventObject?.parameters?.sheetName || activeSpreadsheet.getActiveSheet().getName();
                 const report = e?.commonEventObject?.parameters?.report || '[]';
 
+                // Activate the target sheet
+                activeSpreadsheet.setActiveSheet(activeSpreadsheet.getSheetByName(Addon.Modules.Sheet.DUMP_SHEET_NAME));
+                
                 // Dump data to sheet
                 Addon.Modules.Sheet
                     .dumpObjectToSheet(activeSpreadsheet, sheetName, a1n, JSON.parse(report));
@@ -1322,7 +1326,7 @@ Addon.ResultWidget = {
                 CardService.newCardSection()
                     .addWidget(
                         Addon.ResultWidget.View
-                            .BuildExportWidget(result.range, result.report)
+                            .BuildExportWidget(result.range.getSheet().getName(), result.range, result.report)
                     )
             );
             return cardBuilder.build();
@@ -1372,7 +1376,7 @@ Addon.ResultWidget = {
                         )
                 );
         },
-        BuildExportWidget: (range = '', report = []) => {
+        BuildExportWidget: (sheetName = '', range = '', report = []) => {
             return CardService.newDecoratedText()
                 .setTopLabel('📥 Export Data')
                 .setText('Export to Sheet')
@@ -1390,7 +1394,7 @@ Addon.ResultWidget = {
                             CardService.newAction()
                                 .setFunctionName('Addon.ResultWidget.Controller.DumpResultToSheet')
                                 .setParameters({
-                                    sheetName: Addon.Modules.Sheet.DUMP_SHEET_NAME,
+                                    sheetName: sheetName,
                                     report: JSON.stringify(report),
                                     a1n: range.getA1Notation()
                                 })
