@@ -45,6 +45,15 @@ Addon.INPUT_PARAMETERS = {
     },
     get highlight_color() {
         return 'highlight_color';
+    },
+    get terminal_output_switch() {
+        return 'terminal_output_switch';
+    },
+    get focus_terminal_output() {
+        return 'focus_terminal_output';
+    },
+    get ignore_whitespace_switch() {
+        return 'ignore_whitespace_switch';
     }
 };
 
@@ -66,11 +75,17 @@ Addon.Modules = {
             const indentationSpaces = properties.getProperty(Addon.INPUT_PARAMETERS.indentation_spaces) || Addon.Modules.App.DEFAULT_INDENTATION_SPACES;
             const showErrorsSwitch = properties.getProperty(Addon.INPUT_PARAMETERS.show_errors_switch) || 'ON';
             const highlightColor = properties.getProperty(Addon.INPUT_PARAMETERS.highlight_color) || '#FFFF00';
+            const terminalOutputSwitch = properties.getProperty(Addon.INPUT_PARAMETERS.terminal_output_switch) || 'OFF';
+            const focusTerminalOutput = properties.getProperty(Addon.INPUT_PARAMETERS.focus_terminal_output) || 'OFF';
+            const ignoreWhitespaceSwitch = properties.getProperty(Addon.INPUT_PARAMETERS.ignore_whitespace_switch) || 'ON';
 
             return {
                 indentation_spaces: parseInt(indentationSpaces, 10),
                 show_errors_switch: showErrorsSwitch,
                 highlight_color: highlightColor,
+                terminal_output_switch: terminalOutputSwitch,
+                focus_terminal_output: focusTerminalOutput,
+                ignore_whitespace_switch: ignoreWhitespaceSwitch,
                 // Membership Info
                 isPremium: isPremium,
                 balance: balance,
@@ -225,7 +240,7 @@ Addon.Modules = {
             return 100;
         }
 
-        static beautifyActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet(), indentationSpaces = 2) {
+        static beautifyActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet(), indentationSpaces = 2, ignoreWhitespace = true) {
             const activeRange = activeSpreadsheet.getActiveSheet().getActiveRange();
             const report = [];
 
@@ -239,7 +254,7 @@ Addon.Modules = {
                 row.forEach((cell, j) => {
                     try {
                         // if cell is empty after cleaning, skip
-                        if (this.trimValue(cell) === '') {
+                        if (ignoreWhitespace && this.trimValue(cell) === '') {
                             return; // Skip empty cells
                         }
                         const beautifiedJson = JSON.stringify(
@@ -262,7 +277,7 @@ Addon.Modules = {
             return { range: activeRange, report };
         }
 
-        static minifyActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()) {
+        static minifyActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet(), ignoreWhitespace = true) {
             const activeRange = activeSpreadsheet.getActiveSheet().getActiveRange();
             const report = [];
             // Ensure we do not exceed max process cells
@@ -274,7 +289,7 @@ Addon.Modules = {
                 row.forEach((cell, j) => {
                     try {
                         // if cell is empty after cleaning, skip
-                        if (this.trimValue(cell) === '') {
+                        if (ignoreWhitespace && this.trimValue(cell) === '') {
                             return; // Skip empty cells
                         }
                         const minifiedJson = JSON.stringify(JSON.parse(cell));
@@ -293,7 +308,7 @@ Addon.Modules = {
             return { range: activeRange, report };
         }
 
-        static validateActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()) {
+        static validateActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet(), ignoreWhitespace = true) {
             const activeRange = activeSpreadsheet.getActiveSheet().getActiveRange();
             const report = [];
             // Ensure we do not exceed max process cells
@@ -305,7 +320,7 @@ Addon.Modules = {
                 row.forEach((cell, j) => {
                     try {
                         // if cell is empty after cleaning, skip
-                        if (this.trimValue(cell) === '') {
+                        if (ignoreWhitespace && this.trimValue(cell) === '') {
                             return; // Skip empty cells
                         }
                         JSON.parse(cell);
@@ -324,7 +339,10 @@ Addon.Modules = {
 
         static trimValue(value) {
             if (typeof value === 'string') {
-                return value.trim();
+                return value.trim()
+                    .replace(/^\uFEFF/, '') // Remove BOM if present
+                    .replace(/\n/g, '') // Remove newlines
+                    .replace(/\s+/g, ''); // Remove all whitespace
             }
             return value;
         }
@@ -391,7 +409,10 @@ Addon.Home = {
                 const showErrorsState = formInputs?.[Addon.INPUT_PARAMETERS.show_errors_switch]?.stringInputs?.value[0] || "OFF";
                 PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.show_errors_switch, showErrorsState);
 
-                const result = Addon.Modules.JsonStudio.beautifyActiveRange(activeSpreadsheet, parseInt(indentationSpaces, 10));
+                // ignore_whitespace_switch
+                const ignoreWhitespaceState = PropertiesService.getUserProperties().getProperty(Addon.INPUT_PARAMETERS.ignore_whitespace_switch) || 'ON';
+
+                const result = Addon.Modules.JsonStudio.beautifyActiveRange(activeSpreadsheet, parseInt(indentationSpaces, 10), ignoreWhitespaceState === 'ON');
                 return Addon.Home.Controller._HandleResultNavigation(e, result);
             }
             catch (error) {
@@ -414,7 +435,11 @@ Addon.Home = {
                 // Indentation spaces (not used in validate, but saved for consistency)
                 const indentationSpaces = formInputs?.[Addon.INPUT_PARAMETERS.indentation_spaces]?.stringInputs?.value[0] || "2";
                 PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.indentation_spaces, indentationSpaces);
-                const result = Addon.Modules.JsonStudio.minifyActiveRange(activeSpreadsheet);
+
+                // ignore_whitespace_switch
+                const ignoreWhitespaceState = PropertiesService.getUserProperties().getProperty(Addon.INPUT_PARAMETERS.ignore_whitespace_switch) || 'ON';
+
+                const result = Addon.Modules.JsonStudio.minifyActiveRange(activeSpreadsheet, ignoreWhitespaceState === 'ON');
                 return Addon.Home.Controller._HandleResultNavigation(e, result);
             }
             catch (error) {
@@ -428,16 +453,20 @@ Addon.Home = {
         Validate: (e) => {
             // Implement validate logic
             const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+            const properties = PropertiesService.getUserProperties();
             try {
                 const formInputs = e?.commonEventObject?.formInputs || {};
                 // show_errors_switch
                 const showErrorsState = formInputs?.[Addon.INPUT_PARAMETERS.show_errors_switch]?.stringInputs?.value[0] || "OFF";
-                PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.show_errors_switch, showErrorsState);
+                properties.setProperty(Addon.INPUT_PARAMETERS.show_errors_switch, showErrorsState);
 
                 // Indentation spaces (not used in validate, but saved for consistency)
                 const indentationSpaces = formInputs?.[Addon.INPUT_PARAMETERS.indentation_spaces]?.stringInputs?.value[0] || "2";
-                PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.indentation_spaces, indentationSpaces);
-                const result = Addon.Modules.JsonStudio.validateActiveRange(activeSpreadsheet);
+                properties.setProperty(Addon.INPUT_PARAMETERS.indentation_spaces, indentationSpaces);
+
+                // ignore_whitespace_switch
+                const ignoreWhitespaceState = properties.getProperty(Addon.INPUT_PARAMETERS.ignore_whitespace_switch) || 'ON';
+                const result = Addon.Modules.JsonStudio.validateActiveRange(activeSpreadsheet, ignoreWhitespaceState === 'ON');
                 return Addon.Home.Controller._HandleResultNavigation(e, result);
             }
             catch (error) {
@@ -820,6 +849,12 @@ Addon.Settings = {
                 ?.stringInputs?.value[0] || "#FFFF00";
             PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.highlight_color, highlightColor);
 
+            // ignore_whitespace_switch
+            const ignoreWhitespaceState = e?.commonEventObject
+                ?.formInputs?.[Addon.INPUT_PARAMETERS.ignore_whitespace_switch]
+                ?.stringInputs?.value[0] || "OFF";
+            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.ignore_whitespace_switch, ignoreWhitespaceState);
+
             // Build and return the Home Card
             const appModelData = Addon.Modules.App.getData();
             return CardService.newActionResponseBuilder()
@@ -887,6 +922,28 @@ Addon.Settings = {
                 );
 
             advancedSettingsSection.addWidget(showErrorsDecoratedText);
+            // add divider
+            advancedSettingsSection.addWidget(CardService.newDivider());
+
+            // add ignore whitespace decorated text with switch widget
+            const ignoreWhitespaceDecoratedText = CardService.newDecoratedText()
+                .setText('Ignore Whitespace')
+                .setBottomLabel('Ignore empty cells or cells with only whitespace during JSON operations.')
+                .setWrapText(true)
+                .setStartIcon(
+                    CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon()
+                            .setName('format_indent_increase')
+                    ))
+                .setSwitchControl(
+                    CardService.newSwitch()
+                        .setFieldName(Addon.INPUT_PARAMETERS.ignore_whitespace_switch)
+                        .setValue('ON')
+                        .setSelected(data.ignore_whitespace_switch === 'ON')
+                        .setControlType(CardService.SwitchControlType.CHECK_BOX)
+                );
+
+            advancedSettingsSection.addWidget(ignoreWhitespaceDecoratedText);
             // add divider
             advancedSettingsSection.addWidget(CardService.newDivider());
 
