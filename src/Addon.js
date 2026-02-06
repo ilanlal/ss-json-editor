@@ -26,10 +26,10 @@ Addon.Media = {
 
 Addon.Package = {
     name: 'Json Studio',
-    short_description: 'JSON editing tools for Sheets',
-    description: 'A comprehensive tool for parsing, formatting, and managing JSON data directly within Google Sheets. Enhance your productivity with easy-to-use JSON editing features.',
-    version: '1.0.0',
-    build: '20260205.040400',
+    short_description: 'Productivity tools for JSON in Sheets',
+    description: 'A collection of tools for editing and managing JSON data in Google Sheets.',
+    version: '1.11.0',
+    build: '20260206.211700',
     author: 'Ilan Laloum',
     license: 'MIT',
     imageUrl: Addon.Media.LOGO_PNG_URL,
@@ -1281,12 +1281,28 @@ Addon.ConfirmationCard = {
 
 Addon.ResultWidget = {
     id: 'ResultWidget',
-    name: 'Export Widget',
-    short_description: 'Widget to export result data to Google Sheets',
+    name: 'Result Exporter',
+    short_description: 'Export operation results to Google Sheets',
     description: 'A widget that allows users to export JSON operation results directly to a Google Sheets spreadsheet for further analysis and record-keeping.',
     version: '1.0.0',
     imageUrl: Addon.Media.YOU_GOT_IT_IMG_URL,
     Controller: {
+        Load: (e) => {
+            try {
+                const result = e?.commonEventObject?.parameters?.result ? JSON.parse(e.commonEventObject.parameters.result) : {};
+                return CardService.newActionResponseBuilder()
+                    .setNavigation(
+                        CardService.newNavigation()
+                            .pushCard(Addon.ResultWidget.View.BuildResultCard(result))
+                    ).build();
+            } catch (error) {
+                return CardService.newActionResponseBuilder()
+                    .setNotification(
+                        CardService.newNotification()
+                            .setText(`❌ Error loading result card: ${error.toString()}`))
+                    .build();
+            }
+        },
         DumpResultToSheet: (e) => {
             const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
 
@@ -1344,7 +1360,7 @@ Addon.ResultWidget = {
         }
     },
     View: {
-        BuildResultCard: (result = {}) => {
+        HomeCard: (result = {}) => {
             const cardBuilder = CardService.newCardBuilder()
                 .setName(Addon.ResultWidget.id + '-ResultCard')
                 .setHeader(CardService.newCardHeader()
@@ -1387,9 +1403,12 @@ Addon.ResultWidget = {
             );
             return cardBuilder.build();
         },
+        BuildResultCard: (result = {}) => {
+            return Addon.ResultWidget.View.HomeCard(result);
+        },
         BuildResultSummarySection: (range, report) => {
             return CardService.newCardSection()
-                .setHeader('📊 Operation Result Summary')
+                .setHeader('📊 Failures Report')
                 .addWidget(
                     CardService.newDecoratedText()
                         .setTopLabel('Affected Range')
@@ -1401,8 +1420,10 @@ Addon.ResultWidget = {
                                         .setName('grid_on'))))
                 .addWidget(
                     CardService.newDecoratedText()
-                        .setTopLabel('Report Summary')
-                        .setText(`Total Items: ${range.getNumRows() * range.getNumColumns()} | Errors: ${report.filter(item => item.error).length}`)
+                        .setTopLabel('Summary')
+                        .setText(`Total: ${range.getNumRows() * range.getNumColumns()}`
+                            + ` | Successes: ${report.filter(item => !item.error).length}`
+                            + ` | Failures: ${report.filter(item => item.error).length}`)
                         .setWrapText(true)
                         .setStartIcon(
                             CardService.newIconImage()
