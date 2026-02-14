@@ -1,9 +1,8 @@
-// Google Apps Script file for handling add-on triggers and events
 /**
- * Callback for the add-on homepage.
- * This function is called when the user opens the add-on.
- * It returns the home card to be displayed in the sidebar.
- * @see appsscript.json -->homepageTrigger
+ * Deprecated: These functions are no longer used in the current implementation of the add-on.
+ * They are retained here for reference and may be removed in future versions. 
+ * The add-on now uses a more modular and event-driven architecture, 
+ * and these functions have been replaced by more specific event handlers within the respective controllers.
  */
 function onDefaultHomePageOpen(e) {
     return Addon.Home.Controller.Load(e);
