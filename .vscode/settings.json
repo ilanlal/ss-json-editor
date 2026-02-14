@@ -1,4 +1,15 @@
 {
+    "gitlens.codeLens.recentChange.enabled": false,
+    "gitlens.hovers.currentLine.changes": false,
+    "gitlens.hovers.annotations.changes": false,
+    "gitlens.views.openChangesInMultiDiffEditor": false,
+    "gitlens.views.repositories.autoRefresh": true,
+    "github.copilot.nextEditSuggestions.allowWhitespaceOnlyChanges": true,
+    "accessibility.debugWatchVariableAnnouncements": true,
+    "accessibility.verbosity.diffEditor": false,
+    "accessibility.verbosity.keybindingsEditor": false,
+    "diffEditor.hideUnchangedRegions.contextLineCount": 6,
+    "diffEditor.hideUnchangedRegions.minimumLineCount": 6,
     "spellright.language": [
         "en"
     ],
