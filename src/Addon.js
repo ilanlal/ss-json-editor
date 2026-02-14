@@ -26,10 +26,10 @@ Addon.Media = {
 
 Addon.Package = {
     name: 'Json Studio',
-    short_description: 'Productivity tools for JSON in Sheets',
-    description: 'A collection of tools for editing and managing JSON data in Google Sheets.',
+    short_description: 'JSON editing tools for Sheets',
+    description: 'A collection of tools for working with JSON data in Google Sheets, including beautification, minification, validation, and more.',
     version: '1.11.0',
-    build: '20260206.211700',
+    build: '20260214.125400',
     author: 'Ilan Laloum',
     license: 'MIT',
     imageUrl: Addon.Media.LOGO_PNG_URL,
