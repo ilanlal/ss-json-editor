@@ -1,2 +1,15 @@
 .clasp.json
+*.clasp.json
+.vscode
 .vscode/launch.json
+node_modules/
+coverage/
+dist/
+.idea/
+*.iml
+*.log
+.*.swp
+package-lock.json
+
+.npmrc
+.env
