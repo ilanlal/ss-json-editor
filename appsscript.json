@@ -26,25 +26,25 @@
         "https://easyadm.com"
       ],
       "homepageTrigger": {
-        "runFunction": "Addon.Home.Controller.Load"
+        "runFunction": "Addon.Home.Controller.PushHomeCard"
       },
       "useLocaleFromApp": true,
       "universalActions": [
         {
           "label": "Profile",
-          "runFunction": "Addon.UserProfile.Controller.Load"
+          "runFunction": "Addon.UserProfile.Controller.PushHomeCard"
         },
         {
           "label": "Settings",
-          "runFunction": "Addon.Settings.Controller.Load"
+          "runFunction": "Addon.Settings.Controller.PushHomeCard"
         },
         {
           "label": "Help",
-          "runFunction": "Addon.Home.Controller.Help"
+          "runFunction": "Addon.Home.Controller.PushHelpCard"
         },
         {
           "label": "About",
-          "runFunction": "Addon.Home.Controller.About"
+          "runFunction": "Addon.Home.Controller.PushAboutCard"
         },
         {
           "label": "Visit Website",

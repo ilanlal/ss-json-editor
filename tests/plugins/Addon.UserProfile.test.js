@@ -19,7 +19,7 @@ describe('Addon.UserProfile', () => {
         it('should handle Load', () => {
             const e = { parameters: {} };
             // Call the controller method expecte no errors and the response to contain the expected data
-            let actionResponse = Controller.Load(e);
+            let actionResponse = Controller.PushHomeCard(e);
             expect(actionResponse).toBeDefined();
             // Verify that the response contains the expected data (e.g., user profile information)
             let data = actionResponse.getData();

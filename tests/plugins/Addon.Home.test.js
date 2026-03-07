@@ -1,19 +1,22 @@
 require('..');
 const { Addon } = require('../../src/Addon');
 
-const controller = Addon.Home.Controller;
-
-describe('Addon.Home.Controller', () => {
+describe('Addon.Home tests', () => {
     beforeEach(() => {
         // UrlFetchAppStubConfiguration.reset();
     });
 
-    describe('Actions', () => {
-        // Load test
-        it('should handle Load', () => {
+    describe('Controller', () => {
+        const Controller = Addon.Home.Controller;
+        beforeEach(() => {
+            // UrlFetchAppStubConfiguration.reset();
+        });
+
+        // PushHomeCard test
+        it('should handle PushHomeCard', () => {
             // mock event parameters
             const e = { parameters: {} };
-            const homeCard = controller.Load(e);
+            const homeCard = Controller.PushHomeCard(e);
             expect(homeCard).toBeDefined();
             const cardData = homeCard.getData();
             expect(cardData).toBeDefined();
@@ -27,11 +30,11 @@ describe('Addon.Home.Controller', () => {
             expect(pushCardData.name).toBe(Addon.Home.id + '-Home');
         });
 
-        // OnHelp test
-        it('should handle OnHelp', () => {
+        // PushHelpCard test
+        it('should handle PushHelpCard', () => {
             // mock event parameters
             const e = { parameters: {} };
-            const helpCard = controller.Help(e);
+            const helpCard = Controller.PushHelpCard(e);
             expect(helpCard).toBeDefined();
             const cardData = helpCard.getData();
             expect(cardData).toBeDefined();
@@ -39,11 +42,11 @@ describe('Addon.Home.Controller', () => {
             expect(cardData.notification).toBeUndefined();
         });
 
-        // OnAbout test
-        it('should handle OnAbout', () => {
+        // PushAboutCard test
+        it('should handle PushAboutCard', () => {
             // mock event parameters
             const e = { parameters: {} };
-            const aboutCard = controller.About(e);
+            const aboutCard = Controller.PushAboutCard(e);
             expect(aboutCard).toBeDefined();
             const cardData = aboutCard.getData();
             expect(cardData).toBeDefined();
@@ -64,7 +67,7 @@ describe('Addon.Home.Controller', () => {
             );
             // mock event parameters
             const e = { parameters: {} };
-            const beautifyResult = controller.Beautify(e);
+            const beautifyResult = Controller.Beautify(e);
             expect(beautifyResult).toBeDefined();
             const resultData = beautifyResult.getData();
             expect(resultData).toBeDefined();
@@ -95,7 +98,7 @@ describe('Addon.Home.Controller', () => {
 
             // mock event parameters
             const e = { parameters: {} };
-            const minifyResult = controller.Minify(e);
+            const minifyResult = Controller.Minify(e);
             expect(minifyResult).toBeDefined();
             const resultData = minifyResult.getData();
             expect(resultData).toBeDefined();
@@ -127,7 +130,7 @@ describe('Addon.Home.Controller', () => {
 
             // mock event parameters
             const e = { parameters: {} };
-            const validateResult = controller.Validate(e);
+            const validateResult = Controller.Validate(e);
             expect(validateResult).toBeDefined();
             const resultData = validateResult.getData();
             expect(resultData).toBeDefined();
@@ -138,59 +141,46 @@ describe('Addon.Home.Controller', () => {
             expect(resultData.notification.text).toContain('⚠️ Completed with 1 error(s). \n\nEnable "Show Errors" in Advanced Settings to view details.');
         });
     });
-});
 
-describe('Addon.Home', () => {
-    beforeEach(() => {
-        // UrlFetchAppStubConfiguration.reset();
-    });
+    describe('View', () => {
+        const View = Addon.Home.View;
 
-    describe('Home Plugin', () => {
-        // Load test
-        it('should handle Load', () => {
-            // mock event parameters
-            const e = { parameters: {} };
-            const homeCard = Addon.Home.Controller.Load(e);
+        beforeEach(() => {
+            // UrlFetchAppStubConfiguration.reset();
+        });
+
+        // HomeCard test
+        it('should build Home Card', () => {
+            const data = Addon.Modules.App.getData();
+
+            const homeCard = View.HomeCard(data);
             expect(homeCard).toBeDefined();
             const cardData = homeCard.getData();
             expect(cardData).toBeDefined();
-            expect(cardData.cardNavigations).toBeDefined();
-            expect(cardData.cardNavigations.length).toBeGreaterThan(0);
-            expect(cardData.cardNavigations[0].pushCard).toBeDefined();
-            // No notification
-            expect(cardData.notification).toBeUndefined();
-
-            // pushCard data
-            const pushCardData = cardData.cardNavigations[0].pushCard;
-            expect(pushCardData.name).toBe(Addon.Home.id + '-Home');
-
+            expect(cardData.name).toBe(Addon.Home.id + '-Home');
         });
 
-        // OnHelp test
-        it('should handle OnHelp', () => {
+        // HelpCard test
+        it('should handle HelpCard', () => {
             // mock event parameters
-            const e = { parameters: {} };
-            const helpCard = Addon.Home.Controller.Help(e);
+            const data = {};
+            const helpCard = View.HelpCard(data);
+
             expect(helpCard).toBeDefined();
             const cardData = helpCard.getData();
             expect(cardData).toBeDefined();
-            // no notification
-            expect(cardData.notification).toBeUndefined();
         });
 
-        // OnAbout test
-        it('should handle OnAbout', () => {
+        // AboutCard test
+        it('should handle AboutCard', () => {
             // mock event parameters
-            const e = { parameters: {} };
-            const aboutCard = Addon.Home.Controller.About(e);
+            const data = {};
+            const aboutCard = View.AboutCard(data);
             expect(aboutCard).toBeDefined();
             const cardData = aboutCard.getData();
             expect(cardData).toBeDefined();
-
-            // no notification
-            expect(cardData.notification).toBeUndefined();
+            // check for mor than 1 sections
+            expect(cardData.sections.length).toBeGreaterThan(1);
         });
-
-
     });
 });

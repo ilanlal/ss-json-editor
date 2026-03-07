@@ -4,17 +4,17 @@ const { Addon } = require('../../src/Addon');
 const controller = Addon.Settings.Controller;
 const view = Addon.Settings.View;
 
-describe('Addon.Settings.Controller', () => {
+describe('Addon.Settings', () => {
     beforeEach(() => {
         PropertiesService.getUserProperties().deleteAllProperties();
     });
 
-    describe('Actions', () => {
+    describe('Controller', () => {
         // Load test
         it('should handle Load', () => {
             // mock event parameters
             const e = { parameters: {} };
-            const settingsCard = controller.Load(e);
+            const settingsCard = controller.PushHomeCard(e);
 
             expect(settingsCard).toBeDefined();
             const cardData = settingsCard.getData();
@@ -59,16 +59,17 @@ describe('Addon.Settings.Controller', () => {
 
 
     });
-});
 
-describe('Addon.Settings.View', () => {
-    // Home card test
-    it('should build Settings Card', () => {
-    const data = Addon.Modules.App.getData();
-        const settingsCard = view.HomeCard(data);
-        expect(settingsCard).toBeDefined();
-        const cardData = settingsCard.getData();
-        expect(cardData).toBeDefined();
-        expect(cardData.name).toBe(Addon.Settings.name + '-Home');
+    describe('View', () => {
+        // Home card test
+        it('should build Settings Card', () => {
+            const data = Addon.Modules.App.getData();
+            const settingsCard = view.HomeCard(data);
+            expect(settingsCard).toBeDefined();
+            const cardData = settingsCard.getData();
+            expect(cardData).toBeDefined();
+            expect(cardData.name).toBe(Addon.Settings.name + '-Home');
+        });
     });
 });
+

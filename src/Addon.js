@@ -30,8 +30,9 @@ Addon.Package = {
     description: 'A collection of tools for working with JSON data in Google Sheets, including beautification, minification, validation, and more.',
     version: '1.12.0',
     build: '20260307.094300',
-    author: 'Ilan Laloum',
-    license: 'MIT',
+    author: 'Easy ADM (by Ilan Laloum)',
+    website: 'https://www.easyadm.com',
+    license: 'MIT License - see LICENSE file',
     imageUrl: Addon.Media.LOGO_PNG_URL,
     gitRepository: 'https://github.com/ilanlal/ss-json-editor'
 };
@@ -545,31 +546,28 @@ Addon.Home = {
             emoji: '✅',
             description: 'Verify selected JSON.',
             icon: 'check',
-            action: 'Addon.Home.Controller.Validate',
-            premium: false
+            action: 'Addon.Home.Controller.Validate'
         },
         {   // Beautify Tool
             name: 'Beautify',
             emoji: '🎨',
             description: 'Format your JSON data for better readability.',
             icon: 'brush',
-            action: 'Addon.Home.Controller.Beautify',
-            premium: false
+            action: 'Addon.Home.Controller.Beautify'
         },
         {   // Minify Tool
             name: 'Minify',
             emoji: '💬',
             description: 'Minify your JSON data for compact representation.',
             icon: 'compress',
-            action: 'Addon.Home.Controller.Minify',
-            premium: false
+            action: 'Addon.Home.Controller.Minify'
         },
         {   // Fix Syntax Tool - Premium
             name: 'Fix Syntax',
             emoji: '💫',
             description: 'Automatically fix JSON syntax errors using AI.',
             icon: 'build', action: 'Addon.GeminiAssistant.Controller.FixJsonInActiveCell',
-            premium: true
+            requires: [Addon.INPUT_PARAMETERS.isPremium, Addon.INPUT_PARAMETERS.gemini_api_key]
         },
         {   // Generate JSON Tool - Premium
             name: 'Generate JSON',
@@ -577,11 +575,11 @@ Addon.Home = {
             description: 'Generate JSON content using AI based on sheet data.',
             icon: 'flash_on',
             action: 'Addon.GeminiAssistant.Controller.GenerateJsonContent',
-            premium: true
+            requires: [Addon.INPUT_PARAMETERS.isPremium, Addon.INPUT_PARAMETERS.gemini_api_key]
         }
     ],
     Controller: {
-        Load: (e) => {
+        PushHomeCard: (e) => {
             // Build and return the Home Card
             const appModelData = Addon.Modules.App.getData();
 
@@ -602,7 +600,7 @@ Addon.Home = {
                 .setNavigation(cardNavigation)
                 .build();
         },
-        About: (e) => {
+        PushAboutCard: (e) => {
             // Build and return the About Card
             const appModelData = Addon.Modules.App.getData();
             return CardService.newActionResponseBuilder()
@@ -611,7 +609,7 @@ Addon.Home = {
                         .pushCard(Addon.Home.View.AboutCard({ ...appModelData }))
                 ).build();
         },
-        Help: (e) => {
+        PushHelpCard: (e) => {
             // Build and return the Help Card
             const appModelData = Addon.Modules.App.getData();
             return CardService.newActionResponseBuilder()
@@ -750,8 +748,12 @@ Addon.Home = {
                     CardService.newTextParagraph()
                         .setText('Select a range of cells containing JSON data in your sheet, then use the tools below to parse or validate the JSON.')));
 
-            // Plugin Hub Section
-            cardBuilder.addSection(Addon.Home.View._BuildPluginHubSection(data));
+
+            // Add section for available tools
+            Addon.Home.listOfTools.forEach(tool => {
+                cardBuilder.addSection(
+                    Addon.Home.View._BuildToolSection(data, tool));
+            });
 
             // Advanced Sections
             cardBuilder.addSection(Addon.Home.View._BuildAdvancedSettingsSection(data));
@@ -804,12 +806,21 @@ Addon.Home = {
             cardBuilder.addSection(
                 CardService.newCardSection()
                     .setHeader('🔗 Useful Links')
+                    // Add website link
+                    .addWidget(
+                        CardService.newTextButton()
+                            .setText('🌐 Visit Website')
+                            .setOpenLink(
+                                CardService.newOpenLink()
+                                    .setUrl(Addon.Package.website)))
+                    // Documentation link
                     .addWidget(
                         CardService.newTextButton()
                             .setText('📄 Documentation')
                             .setOpenLink(
                                 CardService.newOpenLink()
                                     .setUrl(`${Addon.Package.gitRepository}#readme`)))
+                    // GitHub link
                     .addWidget(
                         CardService.newTextButton()
                             .setText('📢 Report Issues')
@@ -872,47 +883,69 @@ Addon.Home = {
                     .setText('📢 Report a Bug')
                     .setOpenLink(CardService.newOpenLink()
                         .setUrl(`${Addon.Package.gitRepository}/issues`))));
+
+            // 4. Website & Contact Section
+            cardBuilder.addSection(CardService.newCardSection()
+                .setHeader('📞 Contact & Website')
+                .addWidget(CardService.newTextButton()
+                    .setText('🌐 Visit Website')
+                    .setOpenLink(CardService.newOpenLink()
+                        .setUrl(Addon.Package.website))));
+
             return cardBuilder.build();
         },
-        _BuildPluginHubSection: (data = {}) => {
-            // List of tools with name, emoji, description, icon, and action function name
+        _BuildToolSection: (data = {}, tool = {}) => {
+            // Check if tool has requirements and if they are met
+            const requirementsMet = !tool.requires || tool.requires.every(req => data[req]);
 
-            // Build the plugin hub section
-            const pluginHub = CardService.newCardSection()
-                .setHeader('🛠️ Available Tools')
-                .setCollapsible(false);
+            const section = CardService.newCardSection()
+                .setHeader(`${tool.emoji} ${tool.name}`)
+                .setCollapsible(true)
+                .setNumUncollapsibleWidgets(0);
 
-            // Add divider
-            pluginHub.addWidget(CardService.newDivider());
-
-            // Add each tool as a decorated text with an action button
-            Addon.Home.listOfTools.forEach(tool => {
-                const decoratedText = CardService.newDecoratedText()
-                    .setText(`${tool.emoji} ${tool.name}`)
-                    .setBottomLabel(tool.description)
+            // If requirements are not met, show a warning and disable the button
+            if (!requirementsMet) {
+                // Determine which requirements are not met for the warning message
+                const unmetRequirements = tool.requires.filter(req => !data[req]);
+                const requirementMessages = {
+                    [Addon.INPUT_PARAMETERS.isPremium]: 'Premium Membership required',
+                    [Addon.INPUT_PARAMETERS.gemini_api_key]: 'Gemini API Key required'
+                };
+                const unmetMessages = unmetRequirements.map(req => requirementMessages[req] || 'Unknown requirement').join(' & ');
+                section.addWidget(CardService.newDecoratedText()
+                    .setText(`⚠️ ${unmetMessages}`)
                     .setWrapText(true)
-                    .setButton(
-                        CardService.newTextButton()
-                            .setDisabled(tool.premium && !data.isPremium)
-                            .setText(tool.name)
-                            .setAltText(`${tool.name} JSON within selected cells`)
-                            .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
-                            .setMaterialIcon(
-                                CardService.newMaterialIcon()
-                                    .setName(tool.icon)
-                                    .setFill(false)
-                            )
-                            .setOnClickAction(
-                                CardService.newAction()
-                                    .setFunctionName(`${tool.action}`)
-                            )
-                    );
+                    .setStartIcon(CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon().setName('warning')
+                    )));
+            }
 
-                pluginHub.addWidget(decoratedText);
-            });
+            // Build the decorated text with a button for the tool
+            const decoratedText = CardService.newDecoratedText()
+                .setText(`${tool.emoji} ${tool.name}`)
+                .setBottomLabel(tool.description)
+                .setWrapText(true)
+                .setButton(
+                    CardService.newTextButton()
+                        // Disable button if requirements are not met
+                        .setDisabled(!requirementsMet)
+                        .setText(tool.name)
+                        .setAltText(`${tool.name} JSON within selected cells`)
+                        .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
+                        .setMaterialIcon(
+                            CardService.newMaterialIcon()
+                                .setName(tool.icon)
+                                .setFill(false)
+                        )
+                        .setOnClickAction(
+                            CardService.newAction()
+                                .setFunctionName(`${tool.action}`)
+                        )
+                );
 
-            // Return the completed plugin hub section
-            return pluginHub;
+            // Add the decorated text to the section
+            section.addWidget(decoratedText);
+            return section;
         },
         _BuildQuickAccessSection: (data = {}) => {
             return CardService.newCardSection()
@@ -1013,7 +1046,7 @@ Addon.Settings = {
     version: '1.0.0',
     imageUrl: Addon.Media.WELCOME_IMG_URL,
     Controller: {
-        Load: (e) => {
+        PushHomeCard: (e) => {
             // Build and return the Settings Home Card
             const appModelData = Addon.Modules.App.getData();
             return CardService.newActionResponseBuilder()
@@ -1606,7 +1639,7 @@ Addon.UserProfile = {
     version: '1.0.0',
     imageUrl: Addon.Media.YOU_GOT_IT_IMG_URL,
     Controller: {
-        Load(e) {
+        PushHomeCard(e) {
             try {
                 const membershipStr = PropertiesService.getUserProperties().getProperty('membership') || null;
                 const membership = membershipStr ? JSON.parse(membershipStr) : null;
