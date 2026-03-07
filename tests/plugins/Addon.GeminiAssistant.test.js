@@ -116,11 +116,7 @@ describe('Addon.GeminiAssistant', () => {
             );
 
             // Mock the UrlFetchApp response for the Gemini API generateContent call
-            const expectedResponse = JSON.stringify({
-                name: 'John',
-                age: 30,
-                city: 'New York'
-            });
+            const expectedResponse = '\"{\\n  \\\"name\\\": \\\"Sol\\\",\\n  \\\"species\\\": \\\"Fish\\\",\\n  \\\"poem\\\": \\\"Gliding through the crystal blue,\\\\nBubbles rise and start anew.\\\\nSilver scales in morning light,\\\\nDarting quickly out of sight.\\\" \\n}\"';
             const model = MDL.GeminiAPI.MODELS['gemini-3-flash-preview'];
             const url = MDL.GeminiAPI.API_ENDPOINT_URL + model + ':generateContent';
             UrlFetchAppStubConfiguration.when(url)
@@ -128,10 +124,10 @@ describe('Addon.GeminiAssistant', () => {
                     .setContentText(
                         JSON.stringify({
                             candidates: [{
-                                    content: {
-                                        parts: [{ 'text': expectedResponse }]
-                                    }
-                                }]
+                                content: {
+                                    parts: [{ 'text': expectedResponse }]
+                                }
+                            }]
                         })
                     )
                 );
@@ -145,7 +141,11 @@ describe('Addon.GeminiAssistant', () => {
             expect(data.notification.text.toLowerCase()).not.toContain('error');
             // Verify that the active cell value has been updated with the generated JSON content
             const activeCellValue = activeSpreadsheet.getActiveSheet().getCurrentCell().getValue();
-            expect(activeCellValue).toEqual(JSON.stringify(JSON.parse(expectedResponse), null, 2));
+            let parsedExpectedResponse = JSON.parse(expectedResponse);
+            if (typeof parsedExpectedResponse === 'string') {
+                parsedExpectedResponse = JSON.parse(parsedExpectedResponse);
+            }
+            expect(activeCellValue).toEqual(JSON.stringify(parsedExpectedResponse, null, 2));
         });
 
         afterEach(() => {

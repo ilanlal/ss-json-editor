@@ -508,11 +508,33 @@ Addon.Modules = {
                 payload: JSON.stringify(payload)
             };
 
-            const response = UrlFetchApp.fetch(url, options);
-            if (response.getResponseCode() === 200) {
+            let response;
+            try {
+                response = UrlFetchApp.fetch(url, options);
+                // Log the full response for debugging purposes
+                Addon.Modules.TerminalOutput.write(
+                    SpreadsheetApp.getActiveSpreadsheet(),
+                    'GeminiAPI.generateContent',
+                    payload,
+                    response.getContentText(),
+                    model, url, options);
+            } catch (error) {
+                // Log the error for debugging purposes
+                Addon.Modules.TerminalOutput.write(
+                    SpreadsheetApp.getActiveSpreadsheet(),
+                    'GeminiAPI.generateContent - Error',
+                    error.message,
+                    payload,
+                    model, url, options);
+                throw error;
+            }
+
+            if (response && response.getResponseCode() === 200) {
                 return JSON.parse(response.getContentText());
-            } else {
+            } else if (response) {
                 throw new Error(`Gemini API request failed with status ${response.getResponseCode()}: ${response.getContentText()}`);
+            } else {
+                throw new Error('Gemini API request failed with no response');
             }
         }
 
@@ -1416,7 +1438,10 @@ Addon.GeminiAssistant = {
                 };
                 const result = Addon.Modules.GeminiAPI.generateContent(apiKey, model, payload);
 
-                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+                let generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+                // Remove any leading/trailing quotes
+                generatedText = generatedText.trim().replace(/^"+|"+$/g, '');
+
                 // const fixedJsonSyntax = JSON.stringify(JSON.parse(generatedText), null, 2);
 
                 activeCell.setValue(JSON.parse(generatedText));
@@ -1469,11 +1494,11 @@ Addon.GeminiAssistant = {
                         "responseMimeType": "application/json",
                         "thinkingConfig": {
                             "includeThoughts": false,
-                            "thinkingLevel": "MINIMAL"
+                            "thinkingLevel": "LOW"
                         },
                         // Optional. Controls the randomness of the output.
                         // When using Gemini 3 models, we strongly recommend keeping the temperature at its default value of 1.0 to maintain the quality and relevance of the generated suggestions. Adjusting the temperature can lead to less coherent or less useful responses, as Gemini 3 models are optimized for a balanced output at this setting. If you choose to experiment with different temperature values, please do so with caution and thoroughly evaluate the results to ensure they meet your expectations for accuracy and usefulness in analyzing JSON data.
-                        "temperature": 1.0,
+                        "temperature": 0.8,
                         // The maximum cumulative probability of tokens to consider when sampling.
                         //"topP": 0.9,
                         // The maximum number of tokens to consider when sampling.
@@ -1505,9 +1530,13 @@ Addon.GeminiAssistant = {
                 };
                 const result = Addon.Modules.GeminiAPI.generateContent(apiKey, model, payload);
 
-                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-                const parsedJson = JSON.parse(generatedText);
-                //const fixedJsonSyntax = JSON.stringify(parsedJson, null, 2);
+                let generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+
+                let parsedJson = JSON.parse(generatedText);
+                // If the parsed JSON is a string, attempt to parse it again to handle double-encoded JSON scenarios.
+                if (typeof parsedJson === 'string') {
+                    parsedJson = JSON.parse(parsedJson);
+                }
 
                 activeCell.setValue(JSON.stringify(parsedJson, null, 2));
 
