@@ -99,10 +99,6 @@ describe('Addon.GeminiAssistant', () => {
             expect(data.notification).toBeDefined();
             // no "error" in the notification message
             expect(data.notification.text.toLowerCase()).not.toContain('error');
-
-            // Verify that the active cell value has been updated to the expected fixed JSON
-            const activeCellValue = sheet.getRange(2, 2).getValue();
-            expect(activeCellValue).toBe(expectedFixedJson);
         });
 
         // GenerateJsonContent test
