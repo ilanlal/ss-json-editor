@@ -159,6 +159,4 @@ describe('Addon.GeminiAssistant', () => {
     it('should be defined', () => {
         expect(Addon.GeminiAssistant).toBeDefined();
     });
-
-
 });
