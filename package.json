@@ -46,6 +46,10 @@
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.2"
   },
+  "overrides": {
+    "minimatch": "^10.2.1",
+    "glob": "^10.4.0"
+  },
   "jest": {
     "modulePaths": [
       "<rootDir>/src/"
