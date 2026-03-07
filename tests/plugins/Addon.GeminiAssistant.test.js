@@ -12,7 +12,7 @@ describe('Addon.GeminiAssistant', () => {
         const apiKey = 'test-api-key';
         beforeEach(() => {
             // Set up any necessary mocks or spies
-            PropertiesService.getScriptProperties().setProperty(INP.gemini_api_key, apiKey);
+            PropertiesService.getScriptProperties().setProperty(INP.GEMINI_API_KEY, apiKey);
             // Reset UrlFetchApp mock if necessary
             UrlFetchAppStubConfiguration.reset();
 

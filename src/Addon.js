@@ -62,10 +62,10 @@ Addon.INPUT_PARAMETERS = {
     get ignore_whitespace_switch() {
         return 'ignore_whitespace_switch';
     },
-    get gemini_api_key() {
+    get GEMINI_API_KEY() {
         return 'GEMINI_API_KEY';
     },
-    get gemini_model() {
+    get GEMINI_MODEL() {
         return 'GEMINI_MODEL';
     },
     get isPremium() {
@@ -112,8 +112,8 @@ Addon.Modules = {
                 terminal_output_switch: terminalOutputSwitch,
                 focus_terminal_output: focusTerminalOutput,
                 ignore_whitespace_switch: ignoreWhitespaceSwitch,
-                gemini_api_key: geminiApiKey,
-                gemini_model: apiResponseModel,
+                GEMINI_API_KEY: geminiApiKey,
+                GEMINI_MODEL: apiResponseModel,
                 membership: membershipInfo,
                 isPremium: isPremium,
                 // Membership Info
@@ -517,19 +517,19 @@ Addon.Modules = {
         }
 
         static saveApiKey(apiKey) {
-            PropertiesService.getScriptProperties().setProperty(Addon.INPUT_PARAMETERS.gemini_api_key, apiKey);
+            PropertiesService.getScriptProperties().setProperty(Addon.INPUT_PARAMETERS.GEMINI_API_KEY, apiKey);
         }
 
         static getApiKey() {
-            return PropertiesService.getScriptProperties().getProperty(Addon.INPUT_PARAMETERS.gemini_api_key);
+            return PropertiesService.getScriptProperties().getProperty(Addon.INPUT_PARAMETERS.GEMINI_API_KEY);
         }
 
         static saveModel(model = this.DEFAULT_MODEL) {
-            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.gemini_model, model);
+            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.GEMINI_MODEL, model);
         }
 
         static getModel() {
-            return PropertiesService.getUserProperties().getProperty(Addon.INPUT_PARAMETERS.gemini_model) || this.DEFAULT_MODEL;
+            return PropertiesService.getUserProperties().getProperty(Addon.INPUT_PARAMETERS.GEMINI_MODEL) || this.DEFAULT_MODEL;
         }
     }
 };
@@ -567,7 +567,7 @@ Addon.Home = {
             emoji: '💫',
             description: 'Automatically fix JSON syntax errors using AI.',
             icon: 'build', action: 'Addon.GeminiAssistant.Controller.FixJsonInActiveCell',
-            requires: [Addon.INPUT_PARAMETERS.isPremium, Addon.INPUT_PARAMETERS.gemini_api_key]
+            requires: [Addon.INPUT_PARAMETERS.isPremium, Addon.INPUT_PARAMETERS.GEMINI_API_KEY]
         },
         {   // Generate JSON Tool - Premium
             name: 'Generate JSON',
@@ -575,7 +575,7 @@ Addon.Home = {
             description: 'Generate JSON content using AI based on sheet data.',
             icon: 'flash_on',
             action: 'Addon.GeminiAssistant.Controller.GenerateJsonContent',
-            requires: [Addon.INPUT_PARAMETERS.isPremium, Addon.INPUT_PARAMETERS.gemini_api_key]
+            requires: [Addon.INPUT_PARAMETERS.isPremium, Addon.INPUT_PARAMETERS.GEMINI_API_KEY]
         }
     ],
     Controller: {
@@ -751,7 +751,7 @@ Addon.Home = {
                     CardService.newTextParagraph()
                         .setText('Select a range of cells containing JSON data in your sheet, then use the tools below to parse or validate the JSON.')));
 
-            if (!data[Addon.INPUT_PARAMETERS.gemini_api_key.toLowerCase()]) {
+            if (!data[Addon.INPUT_PARAMETERS.GEMINI_API_KEY]) {
                 cardBuilder.addSection(
                     Addon.GeminiAssistant.View.BuildWelcomeSection(data));
             }
@@ -916,7 +916,7 @@ Addon.Home = {
                 const unmetRequirements = tool.requires.filter(req => !data[req]);
                 const requirementMessages = {
                     [Addon.INPUT_PARAMETERS.isPremium]: 'Premium Membership required',
-                    [Addon.INPUT_PARAMETERS.gemini_api_key]: 'Gemini API Key required'
+                    [Addon.INPUT_PARAMETERS.GEMINI_API_KEY]: 'Gemini API Key required'
                 };
                 const unmetMessages = unmetRequirements.map(req => requirementMessages[req] || 'Unknown requirement').join(' & ');
                 section.addWidget(CardService.newDecoratedText()
@@ -1284,9 +1284,7 @@ Addon.GeminiAssistant = {
             try {
                 // Extract any necessary data from the event object if needed
                 // const formInputs = e?.commonEventObject?.formInputs || {};
-                const geminiApiKey = Addon.Modules.GeminiAPI.getApiKey();
                 let data = Addon.Modules.App.getData();
-                data[Addon.INPUT_PARAMETERS.gemini_api_key] = geminiApiKey;
 
                 return CardService.newActionResponseBuilder()
                     .setNavigation(
@@ -1304,11 +1302,7 @@ Addon.GeminiAssistant = {
         },
         PushSetupCard(e) {
             try {
-                const apiKey = Addon.Modules.GeminiAPI.getApiKey();
-                const model = Addon.Modules.GeminiAPI.getModel();
                 let data = Addon.Modules.App.getData();
-                data[Addon.INPUT_PARAMETERS.gemini_api_key] = apiKey;
-                data[Addon.INPUT_PARAMETERS.gemini_model] = model;
 
                 return CardService.newActionResponseBuilder()
                     .setNavigation(
@@ -1328,9 +1322,9 @@ Addon.GeminiAssistant = {
             try {
                 const formInputs = e?.commonEventObject?.formInputs || {};
                 // Extract the Gemini API key from the form inputs
-                const apiKey = formInputs?.[Addon.INPUT_PARAMETERS.gemini_api_key]?.stringInputs?.value[0];
+                const apiKey = formInputs?.[Addon.INPUT_PARAMETERS.GEMINI_API_KEY]?.stringInputs?.value[0];
                 // Extract the Gemini model from the form inputs
-                const model = formInputs?.[Addon.INPUT_PARAMETERS.gemini_model]?.stringInputs?.value[0];
+                const model = formInputs?.[Addon.INPUT_PARAMETERS.GEMINI_MODEL]?.stringInputs?.value[0];
 
                 // Save the Gemini model selection
                 Addon.Modules.GeminiAPI.saveApiKey(apiKey);
@@ -1560,8 +1554,8 @@ Addon.GeminiAssistant = {
                         .setText('Save Gemini API Settings')
                         .setOnClickAction(CardService.newAction()
                             .setFunctionName('Plugins.GeminiAssistant.Controller.SaveSettings')
-                            .addRequiredWidget(Addon.INPUT_PARAMETERS.gemini_api_key)
-                            .addRequiredWidget(Addon.INPUT_PARAMETERS.gemini_model))));
+                            .addRequiredWidget(Addon.INPUT_PARAMETERS.GEMINI_API_KEY)
+                            .addRequiredWidget(Addon.INPUT_PARAMETERS.GEMINI_MODEL))));
 
             return cardBuilder.build();
         },
@@ -1576,10 +1570,10 @@ Addon.GeminiAssistant = {
             // Add a text input for the gemini API key.
             section.addWidget(CardService.newTextInput()
                 .setVisibility(hasApiKey ? CardService.Visibility.HIDDEN : CardService.Visibility.VISIBLE)
-                .setFieldName(Addon.INPUT_PARAMETERS.gemini_api_key)
+                .setFieldName(Addon.INPUT_PARAMETERS.GEMINI_API_KEY)
                 .setTitle('Gemini API Key')
                 .setHint('Enter your Gemini API key')
-                .setValue(data[Addon.INPUT_PARAMETERS.gemini_api_key] || ''));
+                .setValue(data[Addon.INPUT_PARAMETERS.GEMINI_API_KEY] || ''));
 
             // Add divider
             section.addWidget(CardService.newDivider());
@@ -1600,13 +1594,13 @@ Addon.GeminiAssistant = {
             const geminiModelSelector = CardService.newSelectionInput()
                 .setType(CardService.SelectionInputType.DROPDOWN)
                 .setTitle('Select Gemini Model')
-                .setFieldName(Addon.INPUT_PARAMETERS.gemini_model);
+                .setFieldName(Addon.INPUT_PARAMETERS.GEMINI_MODEL);
 
             // Loop through the available Gemini models and add them as options to the selector
             const geminiModels = Addon.Modules.GeminiAPI.MODELS;
             for (const modelKey in geminiModels) {
                 const model = geminiModels[modelKey];
-                geminiModelSelector.addItem(model, modelKey, data[Addon.INPUT_PARAMETERS.gemini_model] === modelKey);
+                geminiModelSelector.addItem(model, modelKey, data[Addon.INPUT_PARAMETERS.GEMINI_MODEL] === modelKey);
             }
 
             section.addWidget(geminiModelSelector);
@@ -1620,10 +1614,10 @@ Addon.GeminiAssistant = {
                 .addWidget(CardService.newDivider())
                 // Add text input for Gemini API key
                 .addWidget(CardService.newTextInput()
-                    .setFieldName(Addon.INPUT_PARAMETERS.gemini_api_key)
+                    .setFieldName(Addon.INPUT_PARAMETERS.GEMINI_API_KEY)
                     .setTitle('Gemini API Key')
                     .setHint('Enter your Gemini API key')
-                    .setValue(data[Addon.INPUT_PARAMETERS.gemini_api_key] || '[YOUR GEMINI API KEY]'));
+                    .setValue(data[Addon.INPUT_PARAMETERS.GEMINI_API_KEY] || '[YOUR GEMINI API KEY]'));
         }
     }
 };
