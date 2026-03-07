@@ -751,6 +751,10 @@ Addon.Home = {
                     CardService.newTextParagraph()
                         .setText('Select a range of cells containing JSON data in your sheet, then use the tools below to parse or validate the JSON.')));
 
+            if (!data[Addon.INPUT_PARAMETERS.gemini_api_key]) {
+                cardBuilder.addSection(
+                    Addon.GeminiAssistant.View.BuildWelcomeSection(data));
+            }
 
             // Add section for available tools
             Addon.Home.listOfTools.forEach(tool => {
@@ -1323,24 +1327,24 @@ Addon.GeminiAssistant = {
         SaveSettings(e) {
             try {
                 const formInputs = e?.commonEventObject?.formInputs || {};
+                // Extract the Gemini API key from the form inputs
                 const apiKey = formInputs?.[Addon.INPUT_PARAMETERS.gemini_api_key]?.stringInputs?.value[0];
+                // Extract the Gemini model from the form inputs
+                const model = formInputs?.[Addon.INPUT_PARAMETERS.gemini_model]?.stringInputs?.value[0];
 
-                if (apiKey) {
-                    Addon.Modules.GeminiAPI.saveApiKey(apiKey);
-                    return CardService.newActionResponseBuilder()
-                        .setNotification(CardService.newNotification()
-                            .setText('Gemini API key saved successfully.'))
-                        .build();
-                } else {
-                    return CardService.newActionResponseBuilder()
-                        .setNotification(CardService.newNotification()
-                            .setText('Please enter a valid Gemini API key.'))
-                        .build();
-                }
+                // Save the Gemini model selection
+                Addon.Modules.GeminiAPI.saveApiKey(apiKey);
+                // Save the Gemini model selection
+                Addon.Modules.GeminiAPI.saveModel(model);
+
+                return CardService.newActionResponseBuilder()
+                    .setNotification(CardService.newNotification()
+                        .setText('Settings saved successfully.'))
+                    .build();
             } catch (error) {
                 return CardService.newActionResponseBuilder()
                     .setNotification(CardService.newNotification()
-                        .setText('An error occurred while saving Gemini API key.'))
+                        .setText('An error occurred while saving settings.' + error.toString()))
                     .build();
             }
         },
@@ -1555,12 +1559,15 @@ Addon.GeminiAssistant = {
                     .addWidget(CardService.newTextButton()
                         .setText('Save Gemini API Settings')
                         .setOnClickAction(CardService.newAction()
-                            .setFunctionName('Plugins.GeminiAssistant.Controller.SaveSettings'))));
+                            .setFunctionName('Plugins.GeminiAssistant.Controller.SaveSettings')
+                            .addRequiredWidget(Addon.INPUT_PARAMETERS.gemini_api_key)
+                            .addRequiredWidget(Addon.INPUT_PARAMETERS.gemini_model))));
 
             return cardBuilder.build();
         },
         BuildWelcomeSection(data = {}, hasApiKey = false) {
-            const section = CardService.newCardSection();
+            const section = CardService.newCardSection()
+                .setHeader('Welcome to Gemini Assistant!');
 
             // Add a welcoming message prompting the user to enter their Gemini API key in the settings
             section.addWidget(CardService.newTextParagraph()
@@ -1582,8 +1589,7 @@ Addon.GeminiAssistant = {
                 .setText('Launch Gemini Assistant')
                 .setMaterialIcon(CardService.newMaterialIcon().setName('rocket_launch'))
                 .setOnClickAction(CardService.newAction()
-                    .setFunctionName('Plugins.GeminiAssistant.Controller.PushHomeCard')
-                    .addRequiredWidget(Addon.INPUT_PARAMETERS.gemini_api_key)));
+                    .setFunctionName('Plugins.GeminiAssistant.Controller.PushSetupCard')));
 
             return section;
         },

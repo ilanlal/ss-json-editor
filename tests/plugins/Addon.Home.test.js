@@ -149,15 +149,22 @@ describe('Addon.Home tests', () => {
             // UrlFetchAppStubConfiguration.reset();
         });
 
-        // HomeCard test
-        it('should build Home Card', () => {
-            const data = Addon.Modules.App.getData();
+        describe('HomeCard', () => {
+            // default
+            it('should build Home Card with no Gemini API key and welcome section', () => {
+                const data = Addon.Modules.App.getData();
 
-            const homeCard = View.HomeCard(data);
-            expect(homeCard).toBeDefined();
-            const cardData = homeCard.getData();
-            expect(cardData).toBeDefined();
-            expect(cardData.name).toBe(Addon.Home.id + '-Home');
+                const homeCard = View.HomeCard(data);
+                expect(homeCard).toBeDefined();
+                const cardData = homeCard.getData();
+                expect(cardData).toBeDefined();
+                expect(cardData.name).toBe(Addon.Home.id + '-Home');
+
+                // Expect the welcome section to be present
+                //console.log(JSON.stringify(cardData, null, 2));
+                const welcomeSection = cardData.sections.find(section => section.header === 'Welcome to Gemini Assistant!');
+                expect(welcomeSection).toBeDefined();
+            });
         });
 
         // HelpCard test
