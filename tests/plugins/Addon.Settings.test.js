@@ -2,6 +2,7 @@ require('..');
 const { Addon } = require('../../src/Addon');
 
 const controller = Addon.Settings.Controller;
+const view = Addon.Settings.View;
 
 describe('Addon.Settings.Controller', () => {
     beforeEach(() => {
@@ -57,5 +58,17 @@ describe('Addon.Settings.Controller', () => {
         });
 
 
+    });
+});
+
+describe('Addon.Settings.View', () => {
+    // Home card test
+    it('should build Settings Card', () => {
+    const data = Addon.Modules.App.getData();
+        const settingsCard = view.HomeCard(data);
+        expect(settingsCard).toBeDefined();
+        const cardData = settingsCard.getData();
+        expect(cardData).toBeDefined();
+        expect(cardData.name).toBe(Addon.Settings.name + '-Home');
     });
 });

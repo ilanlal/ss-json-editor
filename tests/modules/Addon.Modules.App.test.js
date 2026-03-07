@@ -33,12 +33,7 @@ describe('Addon.Modules.App', () => {
 
     // getData test
     it('should retrieve correct data from App module', () => {
-        const userProperties = PropertiesService.getUserProperties();
-        const membershipInfo = {
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-            balance: 10
-        };
-        userProperties.setProperty(Addon.Modules.App.MEMBERSHIP_PROPERTY_KEY, JSON.stringify(membershipInfo));
+        Addon.Modules.Membership.activate(10, 10, 'TEST_LICENSE_KEY');
         const data = Addon.Modules.App.getData();
         expect(data).toBeDefined();
         expect(data.isPremium).toBe(true);

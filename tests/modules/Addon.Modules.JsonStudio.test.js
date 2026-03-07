@@ -78,7 +78,7 @@ describe('Addon.Modules.JsonStudio', () => {
         activeSpreadsheet.getActiveSheet().appendRow([validJson]);
         // set A2 value to invalid JSON
         activeSpreadsheet.getActiveSheet().appendRow([invalidJson]);
-        
+
         // set A1:A2 as active range
         activeSpreadsheet.getActiveSheet().setActiveRange(
             activeSpreadsheet.getActiveSheet().getRange('A1:A2')
@@ -92,5 +92,26 @@ describe('Addon.Modules.JsonStudio', () => {
         expect(result.report.length).toBe(1); // One error for invalid JSON
         expect(result.report[0].a1n).toBe('A2');
         expect(result.report[0].error).toBeDefined();
+    });
+
+    // validateActiveCell method test
+    it('should validate active cell correctly', () => {
+        const invalidJson = '{"name":"John","age":30,"city":"New York"'; // Missing closing brace
+        // set up active spreadsheet
+        const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+        // set A1 value to valid JSON
+        activeSpreadsheet.getActiveSheet().appendRow([invalidJson]);
+        // set A1 as active cell
+        activeSpreadsheet.getActiveSheet().setCurrentCell(
+            activeSpreadsheet.getActiveSheet().getRange('A1')
+        );
+
+        // call validateActiveCell
+        let result = Addon.Modules.JsonStudio.validateActiveCell(activeSpreadsheet);
+        expect(result).toBeDefined();
+        expect(result.a1n).toBe('A1');
+        expect(result.isValid).toBe(false);
+        expect(result.cellValue).toBe(invalidJson);
+        expect(result.error).toBeDefined();
     });
 });

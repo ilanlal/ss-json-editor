@@ -37,6 +37,12 @@ Addon.Package = {
 };
 
 Addon.INPUT_PARAMETERS = {
+    get MEMBERSHIP_PROPERTY_KEY() {
+        return 'membership';
+    },
+    get format_indent_increase() {
+        return 'format_indent_increase';
+    },
     get indentation_spaces() {
         return 'indentation_spaces';
     },
@@ -54,6 +60,24 @@ Addon.INPUT_PARAMETERS = {
     },
     get ignore_whitespace_switch() {
         return 'ignore_whitespace_switch';
+    },
+    get gemini_api_key() {
+        return 'GEMINI_API_KEY';
+    },
+    get gemini_model() {
+        return 'GEMINI_MODEL';
+    },
+    get isPremium() {
+        return 'isPremium';
+    },
+    get balance() {
+        return 'balance';
+    },
+    get expiresAt() {
+        return 'expiresAt';
+    },
+    get createdOn() {
+        return 'createdOn';
     }
 };
 
@@ -62,22 +86,23 @@ Addon.Modules = {
         get DEFAULT_INDENTATION_SPACES() {
             return '2';
         },
-        get MEMBERSHIP_PROPERTY_KEY() {
-            return 'membership';
-        },
         getData() {
-            const properties = PropertiesService.getUserProperties();
-            const rawData = properties.getProperty(this.MEMBERSHIP_PROPERTY_KEY);
+            const INP = Addon.INPUT_PARAMETERS;
+            const MDL = Addon.Modules;
+            const userProperties = PropertiesService.getUserProperties();
+            const rawData = userProperties.getProperty(INP.MEMBERSHIP_PROPERTY_KEY);
             const membershipInfo = rawData ? JSON.parse(rawData) : {};
             const expiresAt = membershipInfo.expiresAt ? new Date(membershipInfo.expiresAt) : null;
             const balance = membershipInfo.balance || 0;
             const isPremium = (expiresAt && expiresAt > new Date()) || balance > 0;
-            const indentationSpaces = properties.getProperty(Addon.INPUT_PARAMETERS.indentation_spaces) || Addon.Modules.App.DEFAULT_INDENTATION_SPACES;
-            const showErrorsSwitch = properties.getProperty(Addon.INPUT_PARAMETERS.show_errors_switch) || 'ON';
-            const highlightColor = properties.getProperty(Addon.INPUT_PARAMETERS.highlight_color) || '#FFFF00';
-            const terminalOutputSwitch = properties.getProperty(Addon.INPUT_PARAMETERS.terminal_output_switch) || 'OFF';
-            const focusTerminalOutput = properties.getProperty(Addon.INPUT_PARAMETERS.focus_terminal_output) || 'OFF';
-            const ignoreWhitespaceSwitch = properties.getProperty(Addon.INPUT_PARAMETERS.ignore_whitespace_switch) || 'ON';
+            const indentationSpaces = userProperties.getProperty(INP.indentation_spaces) || MDL.App.DEFAULT_INDENTATION_SPACES;
+            const showErrorsSwitch = userProperties.getProperty(INP.show_errors_switch) || 'ON';
+            const highlightColor = userProperties.getProperty(INP.highlight_color) || '#FFFF00';
+            const terminalOutputSwitch = userProperties.getProperty(INP.terminal_output_switch) || 'OFF';
+            const focusTerminalOutput = userProperties.getProperty(INP.focus_terminal_output) || 'OFF';
+            const ignoreWhitespaceSwitch = userProperties.getProperty(INP.ignore_whitespace_switch) || 'ON';
+            const geminiApiKey = MDL.GeminiAPI.getApiKey();
+            const apiResponseModel = MDL.GeminiAPI.getModel();
 
             return {
                 indentation_spaces: parseInt(indentationSpaces, 10),
@@ -86,8 +111,11 @@ Addon.Modules = {
                 terminal_output_switch: terminalOutputSwitch,
                 focus_terminal_output: focusTerminalOutput,
                 ignore_whitespace_switch: ignoreWhitespaceSwitch,
-                // Membership Info
+                gemini_api_key: geminiApiKey,
+                gemini_model: apiResponseModel,
+                membership: membershipInfo,
                 isPremium: isPremium,
+                // Membership Info
                 balance: balance,
                 expiresAt: expiresAt,
                 // Package Info
@@ -182,6 +210,67 @@ Addon.Modules = {
             return sheet;
         }
     },
+    Membership: class {
+        static get DEFAULT_LICENSE_KEY() {
+            return "TRIAL";
+        }
+
+        static get DEFAULT_TRIAL_DAYS() {
+            return 90;
+        }
+
+        static get DEFAULT_TRIAL_BALANCE() {
+            return 5000;
+        }
+
+        static get MEMBERSHIP_PROPERTY_KEY() {
+            return Addon.INPUT_PARAMETERS.MEMBERSHIP_PROPERTY_KEY;
+        }
+
+        static activate(days = this.DEFAULT_TRIAL_DAYS, balance = this.DEFAULT_TRIAL_BALANCE, licenseKey = this.DEFAULT_LICENSE_KEY) {
+            // Create membership info with specified parameters
+            const membershipInfo = this.createMembershipInfo(days, balance, licenseKey);
+            // Save membership info to user properties
+            this.setMembershipInfo(membershipInfo);
+            return membershipInfo;
+        }
+
+        static revoke() {
+            // Simulate revocation logic
+            PropertiesService.getUserProperties().deleteProperty(this.MEMBERSHIP_PROPERTY_KEY);
+            return true;
+        }
+
+        static createMembershipInfo(days = this.DEFAULT_TRIAL_DAYS, balance = this.DEFAULT_TRIAL_BALANCE, licenseKey = this.DEFAULT_LICENSE_KEY) {
+            const membership = {
+                createdOn: new Date().toISOString(),
+                licenseKey: licenseKey,
+                // Add the specified number of days to the current date
+                expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString(),
+                balance: balance
+            }
+            return membership;
+        }
+
+        static getMembershipInfo() {
+            const membershipData = PropertiesService.getUserProperties().getProperty(this.MEMBERSHIP_PROPERTY_KEY);
+            if (!membershipData) {
+                return null;
+            }
+
+            try {
+                const { licenseKey, type, createdOn, expiresAt, balance = 0 } = JSON.parse(membershipData);
+                return { licenseKey, type, createdOn, expiresAt, balance };
+            } catch (error) {
+                return null;
+            }
+        }
+
+        static setMembershipInfo(membershipInfo = {}) {
+            PropertiesService.getUserProperties().setProperty(this.MEMBERSHIP_PROPERTY_KEY, JSON.stringify(membershipInfo));
+            return membershipInfo;
+        }
+    },
     TerminalOutput: class {
         static get SHEET_META() {
             return {
@@ -237,7 +326,7 @@ Addon.Modules = {
     },
     JsonStudio: class {
         static get MAX_PROCESS_CELLS() {
-            return 100;
+            return 10;
         }
 
         static beautifyActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet(), indentationSpaces = 2, ignoreWhitespace = true) {
@@ -310,6 +399,7 @@ Addon.Modules = {
 
         static validateActiveRange(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet(), ignoreWhitespace = true) {
             const activeRange = activeSpreadsheet.getActiveSheet().getActiveRange();
+            const sheetName = activeSpreadsheet.getActiveSheet().getName();
             const report = [];
             // Ensure we do not exceed max process cells
             if (activeRange.getNumRows() * activeRange.getNumColumns() > this.MAX_PROCESS_CELLS) {
@@ -327,14 +417,49 @@ Addon.Modules = {
                     } catch (error) {
                         report.push({
                             a1n: activeRange.getCell(i + 1, j + 1).getA1Notation(),
-                            sheetName: activeSpreadsheet.getActiveSheet().getName(),
-                            error: error.message
+                            sheetName: sheetName,
+                            error: error.message,
+                            cellValue: cell
                         });
                     }
                 });
             });
 
             return { range: activeRange, report };
+        }
+
+        static validateActiveCell(activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet(), ignoreWhitespace = false) {
+            const selectedCell = activeSpreadsheet.getActiveSheet().getCurrentCell();
+            let activeCellValue = selectedCell.getValue();
+
+            if (ignoreWhitespace && typeof activeCellValue === 'string') {
+                activeCellValue = activeCellValue.trim();
+                // If the cell is empty after trimming, consider it valid (or skip validation)
+                if (activeCellValue === '') {
+                    return {
+                        a1n: selectedCell.getA1Notation(),
+                        isValid: true,
+                        cellValue: activeCellValue
+                    };
+                }
+            }
+
+            try {
+                JSON.parse(activeCellValue);
+                return {
+                    a1n: selectedCell.getA1Notation(),
+                    isValid: true,
+                    cellValue: activeCellValue
+                };
+            }
+            catch (error) {
+                return {
+                    a1n: selectedCell.getA1Notation(),
+                    isValid: false,
+                    cellValue: activeCellValue,
+                    error: error.message
+                };
+            }
         }
 
         static trimValue(value) {
@@ -346,6 +471,65 @@ Addon.Modules = {
             }
             return value;
         }
+    },
+    GeminiAPI: class {
+        static get DEFAULT_MODEL() {
+            return 'gemini-3-flash-preview';
+        }
+
+        static get MODELS() {
+            return {
+                'gemini-3-flash-preview': 'gemini-3-flash-preview',
+                'gemini-2.5-pro': 'gemini-2.5-pro'
+            };
+        }
+
+        static get API_ENDPOINT_URL() {
+            return 'https://generativelanguage.googleapis.com/v1beta/models/';
+        }
+
+        /**
+         * Generates content using the Gemini API.
+         * @param {string} apiKey - The API key for authentication.
+         * @param {string} model - The model name to use for content generation.
+         * @param {{}} payload - The payload to send in the request.
+         * @returns {{}} - The response content from the Gemini API.
+         * @throws {Error} - If the API request fails.
+         */
+        static generateContent(apiKey, model, payload) {
+            const url = `${this.API_ENDPOINT_URL}${model}:generateContent`;
+            const options = {
+                method: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'x-goog-api-key': apiKey,
+                },
+                payload: JSON.stringify(payload)
+            };
+
+            const response = UrlFetchApp.fetch(url, options);
+            if (response.getResponseCode() === 200) {
+                return JSON.parse(response.getContentText());
+            } else {
+                throw new Error(`Gemini API request failed with status ${response.getResponseCode()}: ${response.getContentText()}`);
+            }
+        }
+
+        static saveApiKey(apiKey) {
+            PropertiesService.getScriptProperties().setProperty(Addon.INPUT_PARAMETERS.gemini_api_key, apiKey);
+        }
+
+        static getApiKey() {
+            return PropertiesService.getScriptProperties().getProperty(Addon.INPUT_PARAMETERS.gemini_api_key);
+        }
+
+        static saveModel(model = this.DEFAULT_MODEL) {
+            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.gemini_model, model);
+        }
+
+        static getModel() {
+            return PropertiesService.getUserProperties().getProperty(Addon.INPUT_PARAMETERS.gemini_model) || this.DEFAULT_MODEL;
+        }
     }
 };
 
@@ -355,6 +539,13 @@ Addon.Home = {
     short_description: 'JSON editing tools for Sheets',
     description: 'A collection of tools for editing and managing JSON data in Google Sheets.',
     version: '1.0.0',
+    listOfTools: [
+        { name: 'Validate', emoji: '✅', description: 'Verify selected JSON.', icon: 'check', action: 'Addon.Home.Controller.Validate', premium: false },
+        { name: 'Beautify', emoji: '🎨', description: 'Format your JSON data for better readability.', icon: 'brush', action: 'Addon.Home.Controller.Beautify', premium: false },
+        { name: 'Minify', emoji: '💬', description: 'Minify your JSON data for compact representation.', icon: 'compress', action: 'Addon.Home.Controller.Minify', premium: false },
+        { name: 'Fix Syntax', emoji: '🛠️', description: 'Automatically fix JSON syntax errors using AI.', icon: 'build', action: 'Addon.GeminiAssistant.Controller.FixJsonInActiveCell', premium: true },
+        { name: 'Generate JSON', emoji: '⚡', description: 'Generate JSON content using AI based on sheet data.', icon: 'flash_on', action: 'Addon.GeminiAssistant.Controller.GenerateJsonContent', premium: true }
+    ],
     Controller: {
         Load: (e) => {
             // Build and return the Home Card
@@ -650,6 +841,9 @@ Addon.Home = {
             return cardBuilder.build();
         },
         _BuildPluginHubSection: (data = {}) => {
+            // List of tools with name, emoji, description, icon, and action function name
+
+            // Build the plugin hub section
             const pluginHub = CardService.newCardSection()
                 .setHeader('🛠️ Available Tools')
                 .setCollapsible(false);
@@ -657,68 +851,31 @@ Addon.Home = {
             // Add divider
             pluginHub.addWidget(CardService.newDivider());
 
-            // Add a tool - Beautify JSON
-            const beautifyJson = CardService.newDecoratedText()
-                .setTopLabel('🎨 Beautify')
-                .setBottomLabel('Format your JSON data for better readability.')
-                .setWrapText(true)
-                .setButton(
-                    CardService.newTextButton()
-                        .setText('Format')
-                        .setAltText('Beautify JSON within selected cells')
-                        .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
-                        .setMaterialIcon(
-                            CardService.newMaterialIcon()
-                                .setName('format_indent_increase')
-                                .setFill(false)
-                        )
-                        .setOnClickAction(
-                            CardService.newAction()
-                                .setFunctionName(`Addon.Home.Controller.Beautify`)
-                        )
-                );
+            // Add each tool as a decorated text with an action button
+            Addon.Home.listOfTools.forEach(tool => {
+                const decoratedText = CardService.newDecoratedText()
+                    .setText(`${tool.emoji} ${tool.name}`)
+                    .setBottomLabel(tool.description)
+                    .setWrapText(true)
+                    .setButton(
+                        CardService.newTextButton()
+                            .setDisabled(tool.premium && !data.isPremium)
+                            .setText(tool.name)
+                            .setAltText(`${tool.name} JSON within selected cells`)
+                            .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
+                            .setMaterialIcon(
+                                CardService.newMaterialIcon()
+                                    .setName(tool.icon)
+                                    .setFill(false)
+                            )
+                            .setOnClickAction(
+                                CardService.newAction()
+                                    .setFunctionName(`${tool.action}`)
+                            )
+                    );
 
-            pluginHub.addWidget(beautifyJson);
-
-            // Add another tool - Minify JSON
-            const minifyJson = CardService.newDecoratedText()
-                .setTopLabel('🗜️ Minify')
-                .setBottomLabel('Compress your JSON data for efficient storage.')
-                .setWrapText(true)
-                .setButton(
-                    CardService.newTextButton()
-                        .setText('Minify')
-                        .setAltText('Minify JSON within selected cells')
-                        .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
-                        .setMaterialIcon(
-                            CardService.newMaterialIcon().setName('compress'))
-                        .setOnClickAction(
-                            CardService.newAction()
-                                .setFunctionName(`Addon.Home.Controller.Minify`)
-                        )
-                );
-
-            pluginHub.addWidget(minifyJson);
-
-            // Add another tool - Validate JSON
-            const validateJson = CardService.newDecoratedText()
-                .setTopLabel('✅ Validate')
-                .setBottomLabel('Check your JSON data for errors.')
-                .setWrapText(true)
-                .setButton(
-                    CardService.newTextButton()
-                        .setText('Validate')
-                        .setAltText('Validate JSON within selected cells')
-                        .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
-                        .setMaterialIcon(
-                            CardService.newMaterialIcon().setName('check_circle'))
-                        .setOnClickAction(
-                            CardService.newAction()
-                                .setFunctionName(`Addon.Home.Controller.Validate`)
-                        )
-                );
-
-            pluginHub.addWidget(validateJson);
+                pluginHub.addWidget(decoratedText);
+            });
 
             // Return the completed plugin hub section
             return pluginHub;
@@ -899,88 +1056,17 @@ Addon.Settings = {
                     .setImageUrl(Addon.Settings.imageUrl)
                     .setImageAltText('Settings Logo'));
 
-            // Indentation Level Selector (only for premium users)
-            const advancedSettingsSection = CardService.newCardSection()
-                .setHeader('⚙️ Advanced Settings');
+            // Add audit settings section
+            const auditSettingsSection = Addon.Settings.View.BuildAuditSettingsSection(data);
+            cardBuilder.addSection(auditSettingsSection);
 
-            // create show errors card decorated text with switch widget
-            const showErrorsDecoratedText = CardService.newDecoratedText()
-                .setText('Show Errors After JSON Operations')
-                .setBottomLabel('Display detailed error reports after performing JSON operations.')
-                .setWrapText(true)
-                .setStartIcon(
-                    CardService.newIconImage().setMaterialIcon(
-                        CardService.newMaterialIcon()
-                            .setName('error_outline')
-                    ))
-                .setSwitchControl(
-                    CardService.newSwitch()
-                        .setFieldName(Addon.INPUT_PARAMETERS.show_errors_switch)
-                        .setValue('ON')
-                        .setSelected(data.show_errors_switch === 'ON')
-                        .setControlType(CardService.SwitchControlType.CHECK_BOX)
-                );
+            // Add parsing settings section
+            const parsingSettingsSection = Addon.Settings.View.BuildParseOptionsSection(data);
+            cardBuilder.addSection(parsingSettingsSection);
 
-            advancedSettingsSection.addWidget(showErrorsDecoratedText);
-            // add divider
-            advancedSettingsSection.addWidget(CardService.newDivider());
-
-            // add ignore whitespace decorated text with switch widget
-            const ignoreWhitespaceDecoratedText = CardService.newDecoratedText()
-                .setText('Ignore Whitespace')
-                .setBottomLabel('Ignore empty cells or cells with only whitespace during JSON operations.')
-                .setWrapText(true)
-                .setStartIcon(
-                    CardService.newIconImage().setMaterialIcon(
-                        CardService.newMaterialIcon()
-                            .setName('format_indent_increase')
-                    ))
-                .setSwitchControl(
-                    CardService.newSwitch()
-                        .setFieldName(Addon.INPUT_PARAMETERS.ignore_whitespace_switch)
-                        .setValue('ON')
-                        .setSelected(data.ignore_whitespace_switch === 'ON')
-                        .setControlType(CardService.SwitchControlType.CHECK_BOX)
-                );
-
-            advancedSettingsSection.addWidget(ignoreWhitespaceDecoratedText);
-            // add divider
-            advancedSettingsSection.addWidget(CardService.newDivider());
-
-            // Create a selection input for indentation spaces
-            const indentationLevelSelector =
-                CardService.newSelectionInput()
-                    .setType(CardService.SelectionInputType.DROPDOWN)
-                    // Enable for premium users
-                    .setTitle('Indentation Spaces')
-                    .setFieldName(Addon.INPUT_PARAMETERS.indentation_spaces)
-                    .addItem('1 {.}', '1', data.indentation_spaces === 1)
-                    .addItem('2 {..} (default)', '2', data.indentation_spaces === 2) // Default selected
-                    .addItem('4 {....}', '4', data.indentation_spaces === 4)
-                    .addItem('6 {......}', '6', data.indentation_spaces === 6)
-                    .addItem('8 {........}', '8', data.indentation_spaces === 8);
-
-            // Add the selection input to the card section
-            advancedSettingsSection.addWidget(indentationLevelSelector);
-            // add divider
-            advancedSettingsSection.addWidget(CardService.newDivider());
-            // Create a selection input for indentation spaces
-            const highlightColor =
-                CardService.newSelectionInput()
-                    .setType(CardService.SelectionInputType.DROPDOWN)
-                    // Enable for premium users
-                    .setTitle('Highlight Color')
-                    .setFieldName(Addon.INPUT_PARAMETERS.highlight_color)
-                    .addItem('🔴 Red', '#FF0000', data.highlight_color === '#FF0000')
-                    .addItem('🟢 Green', '#00FF00', data.highlight_color === '#00FF00')
-                    .addItem('🔵 Blue', '#0000FF', data.highlight_color === '#0000FF')
-                    .addItem('🟡 Yellow', '#FFFF00', data.highlight_color === '#FFFF00')
-                    .addItem('🟣 Purple', '#800080', data.highlight_color === '#800080');
-            // Add the selection input to the card section
-            advancedSettingsSection.addWidget(highlightColor);
-
-            // Add the advanced settings section to the card
-            cardBuilder.addSection(advancedSettingsSection);
+            // Add UX settings section
+            const uxSettingsSection = Addon.Settings.View.BuildUxOptionsSection(data);
+            cardBuilder.addSection(uxSettingsSection);
 
             // Professional Fixed Footer
             // High-contrast primary button for the "Save" action
@@ -1000,6 +1086,480 @@ Addon.Settings = {
             cardBuilder.setFixedFooter(fixedFooter);
 
             return cardBuilder.build();
+        },
+        BuildAuditSettingsSection(data = {}) {
+            const auditSection = CardService.newCardSection()
+                .setHeader('Audit Settings')
+                .setCollapsible(true)
+                .setNumUncollapsibleWidgets(0);
+            // Add a divider
+            auditSection.addWidget(CardService.newDivider());
+
+            // create enable terminal output decorated text with switch widget
+            const enableTerminalOutput = CardService.newDecoratedText()
+                .setText('Enable Terminal Output')
+                .setBottomLabel('Toggle to enable or disable output of detailed logs and information to the sheet terminal for debugging purposes.')
+                .setWrapText(true)
+                .setStartIcon(
+                    CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon()
+                            .setName('terminal')
+                    ))
+                .setSwitchControl(
+                    CardService.newSwitch()
+                        .setFieldName(Addon.INPUT_PARAMETERS.terminal_output_switch)
+                        .setValue('ON')
+                        .setSelected(data?.[Addon.INPUT_PARAMETERS.terminal_output_switch] === 'ON')
+                        .setControlType(CardService.SwitchControlType.CHECK_BOX)
+                );
+
+            auditSection.addWidget(enableTerminalOutput);
+
+            return auditSection;
+        },
+        BuildParseOptionsSection(data = {}) {
+            const parsingSection = CardService.newCardSection()
+                .setHeader('Parsing Settings')
+                .setCollapsible(true)
+                .setNumUncollapsibleWidgets(0);
+
+            // add ignore whitespace decorated text with switch widget
+            const ignoreWhitespaceDecoratedText = CardService.newDecoratedText()
+                .setText('Ignore Whitespace')
+                .setBottomLabel('Ignore empty cells or cells with only whitespace during JSON operations.')
+                .setWrapText(true)
+                .setStartIcon(
+                    CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon()
+                            .setName('ignore_changes')
+                    ))
+                .setSwitchControl(
+                    CardService.newSwitch()
+                        .setFieldName(Addon.INPUT_PARAMETERS.ignore_whitespace_switch)
+                        .setValue('ON')
+                        .setSelected(data.ignore_whitespace_switch === 'ON')
+                        .setControlType(CardService.SwitchControlType.CHECK_BOX)
+                );
+
+            parsingSection.addWidget(ignoreWhitespaceDecoratedText);
+
+            // Create a selection input for indentation spaces
+            const indentationLevelSelector =
+                CardService.newSelectionInput()
+                    .setType(CardService.SelectionInputType.DROPDOWN)
+                    // Enable for premium users
+                    .setTitle('Indentation Spaces')
+                    .setFieldName(Addon.INPUT_PARAMETERS.indentation_spaces)
+                    .addItem('1 {.}', '1', data.indentation_spaces === 1)
+                    .addItem('2 {..} (default)', '2', data.indentation_spaces === 2) // Default selected
+                    .addItem('4 {....}', '4', data.indentation_spaces === 4)
+                    .addItem('6 {......}', '6', data.indentation_spaces === 6)
+                    .addItem('8 {........}', '8', data.indentation_spaces === 8);
+
+            // Add the selection input to the card section
+            parsingSection.addWidget(indentationLevelSelector);
+
+            // add divider
+            parsingSection.addWidget(CardService.newDivider());
+
+            // Create a selection input for highlight color
+            const highlightColor =
+                CardService.newSelectionInput()
+                    .setType(CardService.SelectionInputType.DROPDOWN)
+                    // Enable for premium users
+                    .setTitle('Highlight Color')
+                    .setFieldName(Addon.INPUT_PARAMETERS.highlight_color)
+                    .addItem('🔴 Red', '#FF0000', data.highlight_color === '#FF0000')
+                    .addItem('🟢 Green', '#00FF00', data.highlight_color === '#00FF00')
+                    .addItem('🔵 Blue', '#0000FF', data.highlight_color === '#0000FF')
+                    .addItem('🟡 Yellow', '#FFFF00', data.highlight_color === '#FFFF00')
+                    .addItem('🟣 Purple', '#800080', data.highlight_color === '#800080');
+            // Add the selection input to the card section
+            parsingSection.addWidget(highlightColor);
+
+            return parsingSection;
+        },
+        BuildUxOptionsSection(data = {}) {
+            const uxSection = CardService.newCardSection()
+                .setHeader('UX Settings')
+                .setCollapsible(true)
+                .setNumUncollapsibleWidgets(0);
+
+            // create show errors card decorated text with switch widget
+            const showErrorsDecoratedText = CardService.newDecoratedText()
+                .setText('Show Errors After JSON Operations')
+                .setBottomLabel('Display detailed error reports after performing JSON operations.')
+                .setWrapText(true)
+                .setStartIcon(
+                    CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon()
+                            .setName('error_outline')
+                    ))
+                .setSwitchControl(
+                    CardService.newSwitch()
+                        .setFieldName(Addon.INPUT_PARAMETERS.show_errors_switch)
+                        .setValue('ON')
+                        .setSelected(data.show_errors_switch === 'ON')
+                        .setControlType(CardService.SwitchControlType.CHECK_BOX)
+                );
+
+            uxSection.addWidget(showErrorsDecoratedText);
+
+            return uxSection;
+        }
+    }
+};
+
+Addon.GeminiAssistant = {
+    id: 'GeminiAssistantPlugin',
+    name: 'Gemini Assistant',
+    short_description: 'AI-powered assistant for your JSON data',
+    description: 'Get intelligent suggestions and improvements for your JSON data using Gemini AI. This plugin analyzes your JSON and provides recommendations for optimization, error correction, and best practices.',
+    version: '1.0.0',
+    imageUrl: Addon.Media.BIG_TIME_IMG_URL,
+    Controller: {
+        PushHomeCard(e) {
+            try {
+                // Extract any necessary data from the event object if needed
+                // const formInputs = e?.commonEventObject?.formInputs || {};
+                const geminiApiKey = Addon.Modules.GeminiAPI.getApiKey();
+                let data = Addon.Modules.App.getData();
+                data[Addon.INPUT_PARAMETERS.gemini_api_key] = geminiApiKey;
+
+                return CardService.newActionResponseBuilder()
+                    .setNavigation(
+                        CardService.newNavigation()
+                            .pushCard(
+                                Addon.GeminiAssistant.View.HomeCard(data))
+                    ).build();
+            }
+            catch (error) {
+                return CardService.newActionResponseBuilder()
+                    .setNotification(CardService.newNotification()
+                        .setText('An error occurred while loading Gemini Suggestions.'))
+                    .build();
+            }
+        },
+        PushSetupCard(e) {
+            try {
+                const apiKey = Addon.Modules.GeminiAPI.getApiKey();
+                const model = Addon.Modules.GeminiAPI.getModel();
+                let data = Addon.Modules.App.getData();
+                data[Addon.INPUT_PARAMETERS.gemini_api_key] = apiKey;
+                data[Addon.INPUT_PARAMETERS.gemini_model] = model;
+
+                return CardService.newActionResponseBuilder()
+                    .setNavigation(
+                        CardService.newNavigation()
+                            .pushCard(
+                                Addon.GeminiAssistant.View.SetupCard(data))
+                    ).build();
+            }
+            catch (error) {
+                return CardService.newActionResponseBuilder()
+                    .setNotification(CardService.newNotification()
+                        .setText('An error occurred while loading Gemini API settings.'))
+                    .build();
+            }
+        },
+        SaveSettings(e) {
+            try {
+                const formInputs = e?.commonEventObject?.formInputs || {};
+                const apiKey = formInputs?.[Addon.INPUT_PARAMETERS.gemini_api_key]?.stringInputs?.value[0];
+
+                if (apiKey) {
+                    Addon.Modules.GeminiAPI.saveApiKey(apiKey);
+                    return CardService.newActionResponseBuilder()
+                        .setNotification(CardService.newNotification()
+                            .setText('Gemini API key saved successfully.'))
+                        .build();
+                } else {
+                    return CardService.newActionResponseBuilder()
+                        .setNotification(CardService.newNotification()
+                            .setText('Please enter a valid Gemini API key.'))
+                        .build();
+                }
+            } catch (error) {
+                return CardService.newActionResponseBuilder()
+                    .setNotification(CardService.newNotification()
+                        .setText('An error occurred while saving Gemini API key.'))
+                    .build();
+            }
+        },
+        FixJsonInActiveCell(e) {
+            const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+
+            try {
+                const apiKey = Addon.Modules.GeminiAPI.getApiKey();
+                const model = Addon.Modules.GeminiAPI.getModel();
+
+                const sheet = activeSpreadsheet.getActiveSheet();
+
+                // The cell wich content we want to fix or generate new content for.
+                const activeCell = sheet.getActiveCell();
+
+                const systemInstruction = {
+                    "parts": [
+                        {
+                            "text": "You are a helpful assistant integrated within Google Sheets, designed to analyze sheet contents and generate JSON content given cell (active cell) based on the data in the sheet. The user wants to generate JSON content for the active cell based on the data in the sheet. The active cell may contain incomplete or unformatted JSON content, and your task is to analyze the content of the active cell along with the data from the sheet and generate properly formatted and structured JSON content that can be used within Google Sheets. Your response should be concise, accurate, and formatted according to the specified schema for easy integration back into Google Sheets."
+                        }
+                    ]
+                };
+                // Sheet name and values (relative to the active cell) to learn from.
+                const learningRange = sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn());
+                const learningValues = learningRange.getValues();
+                if (!learningValues || learningValues.length === 0) {
+                    throw new Error('No data found in the sheet. Please ensure your sheet contains data to generate JSON content from.');
+                }
+                const payload = {
+                    systemInstruction,
+                    "generationConfig": {
+                        "responseMimeType": "application/json",
+                        "thinkingConfig": {
+                            "includeThoughts": false,
+                            "thinkingLevel": "MINIMAL"
+                        },
+                        // Optional. Controls the randomness of the output.
+                        // When using Gemini 3 models, we strongly recommend keeping the temperature at its default value of 1.0 to maintain the quality and relevance of the generated suggestions. Adjusting the temperature can lead to less coherent or less useful responses, as Gemini 3 models are optimized for a balanced output at this setting. If you choose to experiment with different temperature values, please do so with caution and thoroughly evaluate the results to ensure they meet your expectations for accuracy and usefulness in analyzing JSON data.
+                        "temperature": 1.0,
+                        // The maximum cumulative probability of tokens to consider when sampling.
+                        //"topP": 0.9,
+                        // The maximum number of tokens to consider when sampling.
+                        //"topK": 40,
+                        // "maxOutputTokens": 1000,
+                        "responseSchema": {
+                            "type": "string",
+                            "format": "json",
+                            "nullable": false,
+                            // A regex pattern to ensure the generated content is a valid JSON string, starting with { and ending with }, allowing for nested structures. This pattern helps to validate that the AI's response adheres to the expected JSON format, which is crucial for parsing and utilizing the generated suggestions effectively within Google Sheets.
+                            "pattern": "^\\{(?:[^{}]|(?R))*\\}$",
+                            "title": "Fixed JSON Content",
+                            "description": "This string contains the generated fixed JSON content based on the analysis of the input data and system instructions. The content is formatted as a JSON string, which can be parsed and utilized within Google Sheets for various purposes such as data manipulation, error correction, or optimization suggestions. The structure and content of the generated JSON will depend on the specific instructions provided to the AI model and the input data it analyzed."
+                        }
+                    },
+                    "contents": [
+                        {
+                            "role": "user",
+                            "parts": [
+                                {
+                                    "text": `The user is working on a sheet named "${sheet.getName()}" and wants to generate JSON content based on the data in the sheet. The active cell is ${activeCell.getA1Notation()} (A1 Notation) and contains the following content: ${activeCell.getValue()}. Please generate new JSON content for the active cell based on the data in the sheet, ensuring that the generated content is properly formatted and structured for use within Google Sheets.`
+                                },
+                                {
+                                    "text": "Here is the data matrix from the sheet to learn from: " + JSON.stringify(learningValues)
+                                }
+                            ]
+                        }
+                    ]
+                };
+                const result = Addon.Modules.GeminiAPI.generateContent(apiKey, model, payload);
+
+                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+                const fixedJsonSyntax = JSON.stringify(JSON.parse(generatedText), null, 2);
+
+                activeCell.setValue(fixedJsonSyntax);
+
+                return CardService.newActionResponseBuilder()
+                    .setNotification(CardService.newNotification()
+                        .setText('JSON syntax has been fixed in the active cell. (use Ctrl+Z to undo)'))
+                    .build();
+            }
+            catch (error) {
+                return CardService.newActionResponseBuilder()
+                    .setNotification(CardService.newNotification()
+                        .setText('An error occurred while fixing JSON in the active cell.' + error.toString()))
+                    .build();
+            }
+        },
+        GenerateJsonContent(e) {
+            const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+
+            try {
+                const apiKey = Addon.Modules.GeminiAPI.getApiKey();
+                const model = Addon.Modules.GeminiAPI.getModel();
+
+                const sheet = activeSpreadsheet.getActiveSheet();
+
+                // The cell wich content we want to fix or generate new content for.
+                const activeCell = sheet.getCurrentCell();
+                if (!activeCell) {
+                    throw new Error('No active cell found. Please select a cell to generate JSON content for.');
+                }
+
+                // Sheet name and values (relative to the active cell) to learn from.
+                const dataRange = sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn());
+                const dataValues = dataRange.getValues();
+                if (!dataValues || dataValues.length === 0) {
+                    throw new Error('No data found in the sheet. Please ensure your sheet contains data to generate JSON content from.');
+                }
+
+                const systemInstruction = {
+                    "parts": [
+                        {
+                            "text": "You are a helpful assistant integrated within Google Sheets, designed to analyze sheet contents and generate JSON content given cell (active cell) based on the data in the sheet. The user wants to generate JSON content for the active cell based on the data in the sheet. The active cell may contain incomplete or unformatted JSON content, and your task is to analyze the content of the active cell along with the data from the sheet and generate properly formatted and structured JSON content that can be used within Google Sheets. Your response should be concise, accurate, and formatted according to the specified schema for easy integration back into Google Sheets."
+                        }
+                    ]
+                };
+
+                const payload = {
+                    systemInstruction,
+                    "generationConfig": {
+                        "responseMimeType": "application/json",
+                        "thinkingConfig": {
+                            "includeThoughts": false,
+                            "thinkingLevel": "MINIMAL"
+                        },
+                        // Optional. Controls the randomness of the output.
+                        // When using Gemini 3 models, we strongly recommend keeping the temperature at its default value of 1.0 to maintain the quality and relevance of the generated suggestions. Adjusting the temperature can lead to less coherent or less useful responses, as Gemini 3 models are optimized for a balanced output at this setting. If you choose to experiment with different temperature values, please do so with caution and thoroughly evaluate the results to ensure they meet your expectations for accuracy and usefulness in analyzing JSON data.
+                        "temperature": 1.0,
+                        // The maximum cumulative probability of tokens to consider when sampling.
+                        //"topP": 0.9,
+                        // The maximum number of tokens to consider when sampling.
+                        //"topK": 40,
+                        // "maxOutputTokens": 1000,
+                        "responseSchema": {
+                            "type": "string",
+                            "format": "json",
+                            "nullable": false,
+                            // A regex pattern to ensure the generated content is a valid JSON string, starting with { and ending with }, allowing for nested structures. This pattern helps to validate that the AI's response adheres to the expected JSON format, which is crucial for parsing and utilizing the generated suggestions effectively within Google Sheets.
+                            "pattern": "^\\{(?:[^{}]|(?R))*\\}$",
+                            "title": "Generated JSON Content",
+                            "description": "This string contains the generated JSON content based on the analysis of the input data and system instructions. The content is formatted as a JSON string, which can be parsed and utilized within Google Sheets for various purposes such as data manipulation, error correction, or optimization suggestions. The structure and content of the generated JSON will depend on the specific instructions provided to the AI model and the input data it analyzed."
+                        }
+                    },
+                    "contents": [
+                        {
+                            "role": "user",
+                            "parts": [
+                                {
+                                    "text": `The user is working on a sheet named "${sheet.getName()}" and wants to generate JSON content based on the data in the sheet. The active cell is ${activeCell.getA1Notation()} (A1 Notation) and contains the following content: ${activeCell.getValue()}. Please generate new JSON content for the active cell based on the data in the sheet, ensuring that the generated content is properly formatted and structured for use within Google Sheets.`
+                                },
+                                {
+                                    "text": "Here is the data matrix of the sheet content to base the JSON generation on: " + JSON.stringify(dataValues)
+                                }
+                            ]
+                        }
+                    ]
+                };
+                const result = Addon.Modules.GeminiAPI.generateContent(apiKey, model, payload);
+
+                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+                const fixedJsonSyntax = JSON.stringify(JSON.parse(generatedText), null, 2);
+
+                activeCell.setValue(fixedJsonSyntax);
+
+                return CardService.newActionResponseBuilder()
+                    .setNotification(CardService.newNotification()
+                        .setText('JSON content has been generated for the active cell. (use Ctrl+Z to undo)'))
+                    .build();
+            }
+            catch (error) {
+                return CardService.newActionResponseBuilder()
+                    .setNotification(CardService.newNotification()
+                        .setText('An error occurred while generating JSON content for the active cell. ' + error.toString()))
+                    .build();
+            }
+        }
+    },
+    View: {
+        HomeCard: (data = {}) => {
+            const cardBuilder = CardService.newCardBuilder()
+                .setName(Addon.GeminiAssistant.id + '-Home')
+                .setHeader(CardService.newCardHeader()
+                    .setTitle(Addon.GeminiAssistant.name)
+                    .setSubtitle(Addon.GeminiAssistant.short_description)
+                    .setImageStyle(CardService.ImageStyle.SQUARE)
+                    .setImageUrl(Addon.GeminiAssistant.imageUrl)
+                    .setImageAltText('Gemini Assistant Logo'));
+
+            cardBuilder.addSection(
+                Addon.GeminiAssistant.View
+                    .BuildModelSelectorSection(data));
+
+            return cardBuilder.build();
+        },
+        SetupCard: (data = {}) => {
+            const cardBuilder = CardService.newCardBuilder()
+                .setName(Addon.GeminiAssistant.id + '-Results');
+
+            // Add a section for Gemini API key input
+            cardBuilder.addSection(
+                Addon.GeminiAssistant.View
+                    .BuildGeminiApiKeyInputSection(data));
+
+            // Add a section for selecting Gemini model
+            cardBuilder.addSection(
+                Addon.GeminiAssistant.View
+                    .BuildModelSelectorSection(data));
+
+            // Add a button to save Gemini API settings
+            cardBuilder.addSection(
+                CardService.newCardSection()
+                    .addWidget(CardService.newTextButton()
+                        .setText('Save Gemini API Settings')
+                        .setOnClickAction(CardService.newAction()
+                            .setFunctionName('Plugins.GeminiAssistant.Controller.SaveSettings'))));
+
+            return cardBuilder.build();
+        },
+        BuildWelcomeSection(data = {}, hasApiKey = false) {
+            const section = CardService.newCardSection();
+
+            // Add a welcoming message prompting the user to enter their Gemini API key in the settings
+            section.addWidget(CardService.newTextParagraph()
+                .setText('Welcome! Please enter your Gemini API key in the settings to get started.'));
+
+            // Add a text input for the gemini API key.
+            section.addWidget(CardService.newTextInput()
+                .setVisibility(hasApiKey ? CardService.Visibility.HIDDEN : CardService.Visibility.VISIBLE)
+                .setFieldName(Addon.INPUT_PARAMETERS.gemini_api_key)
+                .setTitle('Gemini API Key')
+                .setHint('Enter your Gemini API key')
+                .setValue(data[Addon.INPUT_PARAMETERS.gemini_api_key] || ''));
+
+            // Add divider
+            section.addWidget(CardService.newDivider());
+
+            // Add Launch Gemini Assistant button
+            section.addWidget(CardService.newTextButton()
+                .setText('Launch Gemini Assistant')
+                .setMaterialIcon(CardService.newMaterialIcon().setName('rocket_launch'))
+                .setOnClickAction(CardService.newAction()
+                    .setFunctionName('Plugins.GeminiAssistant.Controller.Load')
+                    .addRequiredWidget(Addon.INPUT_PARAMETERS.gemini_api_key)));
+
+            return section;
+        },
+        BuildModelSelectorSection(data = {}) {
+            const section = CardService.newCardSection();
+
+            // Add a dropdown to select the Gemini model
+            const geminiModelSelector = CardService.newSelectionInput()
+                .setType(CardService.SelectionInputType.DROPDOWN)
+                .setTitle('Select Gemini Model')
+                .setFieldName(Addon.INPUT_PARAMETERS.gemini_model);
+
+            // Loop through the available Gemini models and add them as options to the selector
+            const geminiModels = Addon.Modules.GeminiAPI.MODELS;
+            for (const modelKey in geminiModels) {
+                const model = geminiModels[modelKey];
+                geminiModelSelector.addItem(model, modelKey, data[Addon.INPUT_PARAMETERS.gemini_model] === modelKey);
+            }
+
+            section.addWidget(geminiModelSelector);
+
+            return section;
+        },
+        BuildGeminiApiKeyInputSection(data = {}) {
+            return CardService.newCardSection()
+                .setHeader('Gemini API Key Configuration')
+                // Add divider
+                .addWidget(CardService.newDivider())
+                // Add text input for Gemini API key
+                .addWidget(CardService.newTextInput()
+                    .setFieldName(Addon.INPUT_PARAMETERS.gemini_api_key)
+                    .setTitle('Gemini API Key')
+                    .setHint('Enter your Gemini API key')
+                    .setValue(data[Addon.INPUT_PARAMETERS.gemini_api_key] || '[YOUR GEMINI API KEY]'));
         }
     }
 };
@@ -1031,26 +1591,19 @@ Addon.UserProfile = {
         ActivatePremium(e) {
             try {
                 // Simulate activation logic
-                // In a real implementation, you would interact with a payment gateway or licensing server here
-                const membership = {
-                    licenseKey: 'SAMPLE_LICENSE_KEY',
-                    type: 'premium',
-                    activatedAt: new Date().toISOString(),
-                    // Add one 90 days to the current date
-                    expiresAt: new Date(new Date().setDate(new Date().getDate() + 90)).toISOString(),
-                    balance: 0
-                }
-
-                // Save membership info to user properties
-                PropertiesService.getUserProperties().setProperty('membership', JSON.stringify(membership));
+                Addon.Modules.Membership.activate(
+                    Addon.Modules.Membership.DEFAULT_TRIAL_DAYS,
+                    Addon.Modules.Membership.DEFAULT_TRIAL_BALANCE,
+                    'trial');
 
                 // Build and return the Home Card
-                const appModelData = Addon.Modules.App.getData();
+                const data = Addon.Modules.App.getData();
                 return CardService.newActionResponseBuilder()
                     .setNavigation(
                         CardService.newNavigation()
                             .popToRoot()
-                            .updateCard(Addon.Home.View.HomeCard({ ...appModelData }))
+                            .updateCard(
+                                Addon.Home.View.HomeCard(data))
                     ).build();
             } catch (error) {
                 return this.handleOperationError(error);
@@ -1071,17 +1624,18 @@ Addon.UserProfile = {
             });
         },
         RevokeLicense(e) {
-            const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
             try {
-                // Simulate revocation logic
-                PropertiesService.getUserProperties().deleteProperty('membership');
+                // Simulate license revocation logic
+                Addon.Modules.Membership.revoke();
+
                 // Build and return the Home Card
-                const appModelData = Addon.Modules.App.getData();
+                const data = Addon.Modules.App.getData();
                 return CardService.newActionResponseBuilder()
                     .setNavigation(
                         CardService.newNavigation()
                             .popToRoot()
-                            .updateCard(Addon.Home.View.HomeCard({ ...appModelData }))
+                            .updateCard(
+                                Addon.Home.View.HomeCard(data))
                     ).build();
             } catch (error) {
                 // Return error notification
@@ -1109,8 +1663,8 @@ Addon.UserProfile = {
                     .setImageUrl(Addon.Media.YOU_GOT_IT_IMG_URL)
                     .setImageAltText('User Profile Avatar'));
 
-            // 1. Membership Status Section
-            cardBuilder.addSection(Addon.UserProfile.View.buildMembershipSection(data));
+            // 1. Membership Status & details Section            
+            cardBuilder.addSection(Addon.UserProfile.View._BuildMembershipSection(data));
 
             // 2. Feature Comparison Section (Professional Touch)
             const featureSection = CardService.newCardSection()
@@ -1130,15 +1684,15 @@ Addon.UserProfile = {
                     .setText(f.name)
                     .setStartIcon(CardService.newIconImage().setMaterialIcon(
                         CardService.newMaterialIcon().setName('check_circle').setFill(false)))
-                    .setBottomLabel(data.isPremium ? 'Active' : 'Premium Only'));
+                    .setBottomLabel(data?.[Addon.INPUT_PARAMETERS.isPremium] ? 'Active' : 'Premium Only'));
             });
 
             cardBuilder.addSection(featureSection);
 
             return cardBuilder.build();
         },
-        buildMembershipSection: (data = {}) => {
-            const isPremium = data.isPremium ?? false;
+        _BuildMembershipSection: (data = {}, membershipData = {}) => {
+            const isPremium = data?.[Addon.INPUT_PARAMETERS.isPremium] || false;
 
             const newSection = CardService.newCardSection()
                 .setHeader('Membership & Billing');
@@ -1155,6 +1709,28 @@ Addon.UserProfile = {
                 .setWrapText(true));
 
             if (isPremium) {
+                // Calculate days left until expiration
+                const expiresAt = membershipData?.[Addon.INPUT_PARAMETERS.expiresAt] ? new Date(membershipData[Addon.INPUT_PARAMETERS.expiresAt]) : null;
+                const daysLeft = expiresAt ? Math.ceil((expiresAt - new Date()) / (1000 * 60 * 60 * 24)) : null;
+
+                // Display days left until expiration if available
+                newSection.addWidget(CardService.newDecoratedText()
+                    .setTopLabel(`Membership Expiration`)
+                    .setText(expiresAt ? expiresAt.toDateString() : 'N/A')
+                    .setStartIcon(CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon().setName('event').setFill(false)))
+                    .setBottomLabel(typeof daysLeft === 'number' ? `${daysLeft} day(s) left` : '')
+                    .setWrapText(true));
+
+                // Display balance if available
+                newSection.addWidget(CardService.newDecoratedText()
+                    .setTopLabel('Balance')
+                    .setText(`${membershipData?.[Addon.INPUT_PARAMETERS.balance] || 0}`)
+                    .setStartIcon(CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon().setName('account_balance_wallet').setFill(false)))
+                    .setWrapText(true));
+
+                // Add a "Cancel Subscription" button for premium users
                 newSection.addWidget(CardService.newTextButton()
                     .setText('Cancel Subscription')
                     .setTextButtonStyle(CardService.TextButtonStyle.TEXT)

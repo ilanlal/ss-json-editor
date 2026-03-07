@@ -1,5 +1,5 @@
-require('..');
-const { Addon } = require('../../src/Addon');
+require('.');
+const { Addon } = require('../src/Addon');
 
 describe('Addon Package', () => {
     it('should have required properties', () => {
