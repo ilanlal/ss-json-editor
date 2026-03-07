@@ -8,10 +8,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "build": "webpack --mode development",
-    "start": "webpack-dev-server --mode development",
-    "publish": "npm publish --access public --tag latest --registry https://npm.pkg.github.com",
-    "prepublishOnly": "npm version patch && npm run test && npm run build",
-    "prepack": "npm run build"
+    "start": "webpack-dev-server --mode development"
   },
   "repository": {
     "type": "git",
