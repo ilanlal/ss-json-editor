@@ -97,9 +97,9 @@ Addon.Modules = {
             const balance = membershipInfo.balance || 0;
             const isPremium = (expiresAt && expiresAt > new Date()) || balance > 0;
             const indentationSpaces = userProperties.getProperty(INP.indentation_spaces) || MDL.App.DEFAULT_INDENTATION_SPACES;
-            const showErrorsSwitch = userProperties.getProperty(INP.show_errors_switch) || 'ON';
+            const showErrorsSwitch = userProperties.getProperty(INP.show_errors_switch) || 'OFF';
             const highlightColor = userProperties.getProperty(INP.highlight_color) || '#FFFF00';
-            const terminalOutputSwitch = userProperties.getProperty(INP.terminal_output_switch) || 'OFF';
+            const terminalOutputSwitch = userProperties.getProperty(INP.terminal_output_switch) || 'ON';
             const focusTerminalOutput = userProperties.getProperty(INP.focus_terminal_output) || 'OFF';
             const ignoreWhitespaceSwitch = userProperties.getProperty(INP.ignore_whitespace_switch) || 'ON';
             const geminiApiKey = MDL.GeminiAPI.getApiKey();
@@ -276,7 +276,7 @@ Addon.Modules = {
         static get SHEET_META() {
             return {
                 name: '💻 Terminal Output',
-                columns: ['Timestamp', 'Source', 'Message', 'Event Object', 'More Info']
+                columns: ['Timestamp', 'Source', 'Message', 'Event Object', 'Details 1', 'Details 2', 'Details 3']
             };
         }
 
@@ -285,11 +285,11 @@ Addon.Modules = {
 
             // Check if terminal output is enabled
             const terminalOutputEnabled = PropertiesService.getUserProperties()
-                .getProperty('terminal_output_switch') || 'OFF';
+                .getProperty(Addon.INPUT_PARAMETERS.terminal_output_switch) || 'OFF';
 
             // Check if terminal output is enabled
             const focusTerminalOutput = PropertiesService.getUserProperties()
-                .getProperty('focus_terminal_output') || 'OFF';
+                .getProperty(Addon.INPUT_PARAMETERS.focus_terminal_output) || 'OFF';
 
             if (terminalOutputEnabled !== 'ON') {
                 return;
@@ -320,7 +320,67 @@ Addon.Modules = {
 
             // Set active selection to the last row
             const lastRow = sheet.getLastRow();
-            const lastRowA1Notation = `A${lastRow}:G${lastRow}`;
+            const lastRowA1Notation = `A${lastRow}:E${lastRow}`;
+            sheet.setActiveSelection(lastRowA1Notation);
+            return sheet;
+        }
+
+        static writeGeminiResponse(
+            activeSpreadsheet, e, payload, response) {
+
+            // Check if terminal output is enabled
+            const terminalOutputEnabled = PropertiesService.getUserProperties()
+                .getProperty(Addon.INPUT_PARAMETERS.terminal_output_switch) || 'ON';
+
+            // Check if terminal output is enabled
+            const focusTerminalOutput = PropertiesService.getUserProperties()
+                .getProperty(Addon.INPUT_PARAMETERS.focus_terminal_output) || 'OFF';
+
+            // Check if terminal output is enabled
+            if (terminalOutputEnabled !== 'ON') {
+                return;
+            }
+
+            const sheet = Addon.Modules.Sheet
+                .getSheet(activeSpreadsheet, this.SHEET_META);
+            const genratedText = response?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            sheet.appendRow([
+                // Created On as iso string
+                new Date().toISOString(),
+                // Prompt (if available in payload)
+                payload?.contents?.[0]?.parts?.[0]?.text || '',
+                // Generated Text (if available in response) ({"candidates":[{"content":{"parts":[{"text": "generated text here"}]}}]})
+                (typeof genratedText === 'string') ? genratedText : JSON.stringify(genratedText),
+                // Model Version (if available in response, otherwise use input model or default to 'unknown')
+                response?.modelVersion || 'unknown',
+                // Event Object
+                (typeof e === 'object' || Array.isArray(e)) ? JSON.stringify(e) : String(e || ''),
+                // Payload
+                (typeof payload === 'object' || Array.isArray(payload)) ? JSON.stringify(payload) : String(payload || ''),
+                // Response
+                (typeof response === 'object' || Array.isArray(response)) ? JSON.stringify(response) : String(response || ''),
+                // Total Token Count (if available in response.usageMetadata)
+                response?.usageMetadata?.totalTokenCount || 0,
+                // Prompt Token Count (if available in response.usageMetadata)
+                response?.usageMetadata?.promptTokenCount || 0,
+                // Thoughts Token Count (if available in response.usageMetadata)
+                response?.usageMetadata?.thoughtsTokenCount || 0,
+                // cachedContentTokenCount (if available in response.usageMetadata)
+                response?.usageMetadata?.cachedContentTokenCount || 0,
+                // candidatesTokenCount (if available in response.usageMetadata)
+                response?.usageMetadata?.candidatesTokenCount || 0,
+                // toolUsePromptTokenCount (if available in response.usageMetadata)
+                response?.usageMetadata?.toolUsePromptTokenCount || 0
+            ]);
+
+            // Focus the last row if enabled
+            if (focusTerminalOutput !== 'ON') {
+                return sheet;
+            }
+
+            // Set active selection to the last row
+            const lastRow = sheet.getLastRow();
+            const lastRowA1Notation = `A${lastRow}:E${lastRow}`;
             sheet.setActiveSelection(lastRowA1Notation);
             return sheet;
         }
@@ -512,12 +572,12 @@ Addon.Modules = {
             try {
                 response = UrlFetchApp.fetch(url, options);
                 // Log the full response for debugging purposes
-                Addon.Modules.TerminalOutput.write(
+                Addon.Modules.TerminalOutput.writeGeminiResponse(
                     SpreadsheetApp.getActiveSpreadsheet(),
-                    'GeminiAPI.generateContent',
+                    { url, options },
                     payload,
-                    response.getContentText(),
-                    model, url, options);
+                    JSON.parse(response.getContentText()));
+                    
             } catch (error) {
                 // Log the error for debugging purposes
                 Addon.Modules.TerminalOutput.write(
@@ -1117,6 +1177,11 @@ Addon.Settings = {
                 ?.stringInputs?.value[0] || "ON";
             PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.terminal_output_switch, terminalOutputState);
 
+            // focus_terminal_output
+            const focusTerminalOutputState = e?.commonEventObject
+                ?.formInputs?.[Addon.INPUT_PARAMETERS.focus_terminal_output]
+                ?.stringInputs?.value[0] || "OFF";
+            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.focus_terminal_output, focusTerminalOutputState);
 
             // Build and return the Home Card
             const data = Addon.Modules.App.getData();
@@ -1174,9 +1239,9 @@ Addon.Settings = {
         },
         _BuildAuditSettingsSection(data = {}) {
             const auditSection = CardService.newCardSection()
-                .setHeader('🛠️ Audit & Debug Settings')
+                .setHeader('📊 Audit Settings')
                 .setCollapsible(true)
-                .setNumUncollapsibleWidgets(1);
+                .setNumUncollapsibleWidgets(2);
             // Add a divider
             auditSection.addWidget(CardService.newDivider());
 
@@ -1204,9 +1269,12 @@ Addon.Settings = {
         },
         _BuildParseOptionsSection(data = {}) {
             const parsingSection = CardService.newCardSection()
-                .setHeader('Parsing Options')
+                .setHeader('⚙️ Parsing Options')
                 .setCollapsible(true)
-                .setNumUncollapsibleWidgets(2);
+                .setNumUncollapsibleWidgets(3);
+
+            // Add a divider
+            parsingSection.addWidget(CardService.newDivider());
 
             // add ignore whitespace decorated text with switch widget
             const ignoreWhitespaceDecoratedText = CardService.newDecoratedText()
@@ -1268,7 +1336,10 @@ Addon.Settings = {
             const uxSection = CardService.newCardSection()
                 .setHeader('🛠️ UX Options')
                 .setCollapsible(true)
-                .setNumUncollapsibleWidgets(1);
+                .setNumUncollapsibleWidgets(2);
+
+            // Add a divider
+            uxSection.addWidget(CardService.newDivider());
 
             // create show errors card decorated text with switch widget
             const showErrorsDecoratedText = CardService.newDecoratedText()
@@ -1289,6 +1360,26 @@ Addon.Settings = {
                 );
 
             uxSection.addWidget(showErrorsDecoratedText);
+
+            // create focus terminal output decorated text with switch widget
+            const focusTerminalOutput = CardService.newDecoratedText()
+                .setText('Focus Terminal Output After JSON Operations')
+                .setBottomLabel('Automatically focus the terminal output after performing JSON operations.')
+                .setWrapText(true)
+                .setStartIcon(
+                    CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon()
+                            .setName('terminal')
+                    ))
+                .setSwitchControl(
+                    CardService.newSwitch()
+                        .setFieldName(Addon.INPUT_PARAMETERS.focus_terminal_output)
+                        .setValue('ON')
+                        .setSelected(data.focus_terminal_output === 'ON')
+                        .setControlType(CardService.SwitchControlType.CHECK_BOX)
+                );
+
+            uxSection.addWidget(focusTerminalOutput);
 
             return uxSection;
         }
