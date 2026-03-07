@@ -146,12 +146,14 @@ describe('Addon.Home tests', () => {
         const View = Addon.Home.View;
 
         beforeEach(() => {
+            PropertiesService.getScriptProperties().deleteAllProperties();
+            
             // UrlFetchAppStubConfiguration.reset();
         });
 
         describe('HomeCard', () => {
-            // default
-            it('should build Home Card with no Gemini API key and welcome section', () => {
+            // HomeCard test 1 - should build Home Card with Welcome to Gemini Assistant section if API key is not present
+            it('should build Home Card with Welcome to Gemini Assistant section', () => {
                 const data = Addon.Modules.App.getData();
 
                 const homeCard = View.HomeCard(data);
@@ -164,6 +166,21 @@ describe('Addon.Home tests', () => {
                 //console.log(JSON.stringify(cardData, null, 2));
                 const welcomeSection = cardData.sections.find(section => section.header === 'Welcome to Gemini Assistant!');
                 expect(welcomeSection).toBeDefined();
+            });
+
+            // HomeCard test 2 - should build Home Card without Welcome to Gemini Assistant section if API key is present
+            it('should build Home Card without Welcome to Gemini Assistant section', () => {
+                // Set Gemini API key in script properties to simulate user having entered it
+                Addon.Modules.GeminiAPI.saveApiKey('test-api-key');
+
+                const data = Addon.Modules.App.getData();
+                const homeCard = View.HomeCard(data);
+                expect(homeCard).toBeDefined();
+                const cardData = homeCard.getData();
+                expect(cardData).toBeDefined();
+                expect(cardData.name).toBe(Addon.Home.id + '-Home');
+                const welcomeSection = cardData.sections.find(section => section.header === 'Welcome to Gemini Assistant!');
+                expect(welcomeSection).toBeUndefined();
             });
         });
 

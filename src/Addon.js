@@ -751,7 +751,7 @@ Addon.Home = {
                     CardService.newTextParagraph()
                         .setText('Select a range of cells containing JSON data in your sheet, then use the tools below to parse or validate the JSON.')));
 
-            if (!data[Addon.INPUT_PARAMETERS.gemini_api_key]) {
+            if (!data[Addon.INPUT_PARAMETERS.gemini_api_key.toLowerCase()]) {
                 cardBuilder.addSection(
                     Addon.GeminiAssistant.View.BuildWelcomeSection(data));
             }
