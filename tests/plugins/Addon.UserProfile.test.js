@@ -15,8 +15,8 @@ describe('Addon.UserProfile', () => {
             PropertiesService.getScriptProperties().setProperty(INP.gemini_api_key, apiKey);
         });
 
-        // Load test
-        it('should handle Load', () => {
+        // PushHomeCard test
+        it('should handle PushHomeCard', () => {
             const e = { parameters: {} };
             // Call the controller method expecte no errors and the response to contain the expected data
             let actionResponse = Controller.PushHomeCard(e);

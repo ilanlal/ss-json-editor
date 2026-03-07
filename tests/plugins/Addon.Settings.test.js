@@ -10,8 +10,8 @@ describe('Addon.Settings', () => {
     });
 
     describe('Controller', () => {
-        // Load test
-        it('should handle Load', () => {
+        // PushHomeCard test
+        it('should handle PushHomeCard', () => {
             // mock event parameters
             const e = { parameters: {} };
             const settingsCard = controller.PushHomeCard(e);
@@ -23,8 +23,8 @@ describe('Addon.Settings', () => {
             expect(cardData.notification).toBeUndefined();
         });
 
-        // Save test
-        it('should handle Save', () => {
+        // SaveSettings test
+        it('should handle SaveSettings', () => {
             // mock event parameters
             const e = {
                 commonEventObject: {

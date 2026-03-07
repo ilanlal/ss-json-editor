@@ -1056,16 +1056,17 @@ Addon.Settings = {
                 ).build();
         },
         SaveSettings: (e) => {
+            // ignore_whitespace_switch
+            const ignoreWhitespaceState = e?.commonEventObject
+                ?.formInputs?.[Addon.INPUT_PARAMETERS.ignore_whitespace_switch]
+                ?.stringInputs?.value[0] || "ON";
+            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.ignore_whitespace_switch, ignoreWhitespaceState);
+
+            // indentation_spaces
             const selectedSpaces = e?.commonEventObject
                 ?.formInputs?.[Addon.INPUT_PARAMETERS.indentation_spaces]
                 ?.stringInputs?.value[0] || "2";
             PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.indentation_spaces, selectedSpaces);
-
-            // show_errors_switch
-            const showErrorsState = e?.commonEventObject
-                ?.formInputs?.[Addon.INPUT_PARAMETERS.show_errors_switch]
-                ?.stringInputs?.value[0] || "OFF";
-            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.show_errors_switch, showErrorsState);
 
             // highlight_color
             const highlightColor = e?.commonEventObject
@@ -1073,11 +1074,19 @@ Addon.Settings = {
                 ?.stringInputs?.value[0] || "#FFFF00";
             PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.highlight_color, highlightColor);
 
-            // ignore_whitespace_switch
-            const ignoreWhitespaceState = e?.commonEventObject
-                ?.formInputs?.[Addon.INPUT_PARAMETERS.ignore_whitespace_switch]
+
+            // show_errors_switch
+            const showErrorsState = e?.commonEventObject
+                ?.formInputs?.[Addon.INPUT_PARAMETERS.show_errors_switch]
                 ?.stringInputs?.value[0] || "OFF";
-            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.ignore_whitespace_switch, ignoreWhitespaceState);
+            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.show_errors_switch, showErrorsState);
+
+            // terminal_output_switch
+            const terminalOutputState = e?.commonEventObject
+                ?.formInputs?.[Addon.INPUT_PARAMETERS.terminal_output_switch]
+                ?.stringInputs?.value[0] || "ON";
+            PropertiesService.getUserProperties().setProperty(Addon.INPUT_PARAMETERS.terminal_output_switch, terminalOutputState);
+
 
             // Build and return the Home Card
             const appModelData = Addon.Modules.App.getData();
@@ -1087,28 +1096,6 @@ Addon.Settings = {
                         .popToRoot()
                         .updateCard(Addon.Home.View.HomeCard({ ...appModelData }))
                 ).build();
-        },
-        ToggleAction(e) {
-            try {
-                const actionName = e?.commonEventObject?.parameters?.actionName;
-                // actionName like: 'debug_mode_switch' or 'form_input_switch_key'
-                const preState = e?.commonEventObject?.formInputs?.[actionName]?.stringInputs?.value?.[0];
-                // store the new state within user properties or perform necessary actions
-                PropertiesService.getUserProperties().setProperty(actionName, preState === 'ON' ? 'ON' : 'OFF');
-                // return success notification
-                return CardService.newActionResponseBuilder()
-                    .setNotification(
-                        CardService.newNotification()
-                            .setText(`${actionName} set to ${preState}`))
-                    .build();
-            } catch (error) {
-                return CardService.newActionResponseBuilder()
-                    .setNotification(
-                        CardService.newNotification()
-                            .setText(
-                                error.toString()))
-                    .build();
-            }
         }
     },
     View: {
@@ -1124,15 +1111,15 @@ Addon.Settings = {
                     .setImageAltText('Settings Logo'));
 
             // Add audit settings section
-            const auditSettingsSection = Addon.Settings.View.BuildAuditSettingsSection(data);
+            const auditSettingsSection = Addon.Settings.View._BuildAuditSettingsSection(data);
             cardBuilder.addSection(auditSettingsSection);
 
             // Add parsing settings section
-            const parsingSettingsSection = Addon.Settings.View.BuildParseOptionsSection(data);
+            const parsingSettingsSection = Addon.Settings.View._BuildParseOptionsSection(data);
             cardBuilder.addSection(parsingSettingsSection);
 
             // Add UX settings section
-            const uxSettingsSection = Addon.Settings.View.BuildUxOptionsSection(data);
+            const uxSettingsSection = Addon.Settings.View._BuildUxOptionsSection(data);
             cardBuilder.addSection(uxSettingsSection);
 
             // Professional Fixed Footer
@@ -1154,7 +1141,7 @@ Addon.Settings = {
 
             return cardBuilder.build();
         },
-        BuildAuditSettingsSection(data = {}) {
+        _BuildAuditSettingsSection(data = {}) {
             const auditSection = CardService.newCardSection()
                 .setHeader('Audit Settings')
                 .setCollapsible(true)
@@ -1184,7 +1171,7 @@ Addon.Settings = {
 
             return auditSection;
         },
-        BuildParseOptionsSection(data = {}) {
+        _BuildParseOptionsSection(data = {}) {
             const parsingSection = CardService.newCardSection()
                 .setHeader('Parsing Settings')
                 .setCollapsible(true)
@@ -1246,7 +1233,7 @@ Addon.Settings = {
 
             return parsingSection;
         },
-        BuildUxOptionsSection(data = {}) {
+        _BuildUxOptionsSection(data = {}) {
             const uxSection = CardService.newCardSection()
                 .setHeader('UX Settings')
                 .setCollapsible(true)
