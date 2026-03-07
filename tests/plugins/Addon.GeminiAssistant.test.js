@@ -104,34 +104,34 @@ describe('Addon.GeminiAssistant', () => {
         // GenerateJsonContent test
         it('should handle GenerateJsonContent', () => {
             const e = { parameters: {} };
-            const validJson = '{"name":"John","age":30,"city":"New York"}';
-            const invalidJson = '{"name":"John","age":30,"city":"New York"'; // Missing closing brace
+
             // set up active spreadsheet
             const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
             // set A1 value to valid JSON
-            activeSpreadsheet.getActiveSheet().appendRow([validJson]);
-            // set A2 value to invalid JSON
-            activeSpreadsheet.getActiveSheet().appendRow([invalidJson]);
+            activeSpreadsheet.getActiveSheet().appendRow(['']);
+
             // set A1 as active cell
             activeSpreadsheet.getActiveSheet().setCurrentCell(
                 activeSpreadsheet.getActiveSheet().getRange('A1')
             );
 
             // Mock the UrlFetchApp response for the Gemini API generateContent call
-            const expectedResponse = '{"name":"John","age":30,"city":"New York"}';
+            const expectedResponse = JSON.stringify({
+                name: 'John',
+                age: 30,
+                city: 'New York'
+            });
             const model = MDL.GeminiAPI.MODELS['gemini-3-flash-preview'];
             const url = MDL.GeminiAPI.API_ENDPOINT_URL + model + ':generateContent';
             UrlFetchAppStubConfiguration.when(url)
                 .return(new HttpResponse()
                     .setContentText(
                         JSON.stringify({
-                            data: {
-                                candidates: [{
+                            candidates: [{
                                     content: {
                                         parts: [{ 'text': expectedResponse }]
                                     }
                                 }]
-                            }
                         })
                     )
                 );
@@ -143,6 +143,9 @@ describe('Addon.GeminiAssistant', () => {
             // Verify that the response contains a notification with the expected message
             expect(data.notification).toBeDefined();
             expect(data.notification.text.toLowerCase()).not.toContain('error');
+            // Verify that the active cell value has been updated with the generated JSON content
+            const activeCellValue = activeSpreadsheet.getActiveSheet().getCurrentCell().getValue();
+            expect(activeCellValue).toEqual(JSON.stringify(JSON.parse(expectedResponse), null, 2));
         });
 
         afterEach(() => {

@@ -1417,9 +1417,9 @@ Addon.GeminiAssistant = {
                 const result = Addon.Modules.GeminiAPI.generateContent(apiKey, model, payload);
 
                 const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-                const fixedJsonSyntax = JSON.stringify(JSON.parse(generatedText), null, 2);
+                // const fixedJsonSyntax = JSON.stringify(JSON.parse(generatedText), null, 2);
 
-                activeCell.setValue(fixedJsonSyntax);
+                activeCell.setValue(JSON.parse(generatedText));
 
                 return CardService.newActionResponseBuilder()
                     .setNotification(CardService.newNotification()
@@ -1506,9 +1506,10 @@ Addon.GeminiAssistant = {
                 const result = Addon.Modules.GeminiAPI.generateContent(apiKey, model, payload);
 
                 const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-                const fixedJsonSyntax = JSON.stringify(JSON.parse(generatedText), null, 2);
+                const parsedJson = JSON.parse(generatedText);
+                //const fixedJsonSyntax = JSON.stringify(parsedJson, null, 2);
 
-                activeCell.setValue(fixedJsonSyntax);
+                activeCell.setValue(JSON.stringify(parsedJson, null, 2));
 
                 return CardService.newActionResponseBuilder()
                     .setNotification(CardService.newNotification()
