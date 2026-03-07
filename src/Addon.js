@@ -581,41 +581,44 @@ Addon.Home = {
     Controller: {
         PushHomeCard: (e) => {
             // Build and return the Home Card
-            const appModelData = Addon.Modules.App.getData();
-
-            // Build and return the Home Card
-            const homeCard = Addon.Home.View.HomeCard({ ...appModelData });
-
-            let cardNavigation = null;
-            if (e.parameters && e.parameters.refresh === 'true') {
-                cardNavigation = CardService.newNavigation()
-                    .updateCard(homeCard);
-            } else {
-                cardNavigation = CardService.newNavigation()
-                    .pushCard(homeCard);
-            }
+            const data = Addon.Modules.App.getData();
 
             // Return action response to update card
             return CardService.newActionResponseBuilder()
-                .setNavigation(cardNavigation)
+                .setNavigation(
+                    CardService.newNavigation()
+                        .pushCard(
+                            Addon.Home.View.HomeCard(data)))
+                .build();
+        },
+        UpdateHomeCard: (e) => {
+            // Build and return the Home Card
+            const data = Addon.Modules.App.getData();
+
+            // Return action response to update card
+            return CardService.newActionResponseBuilder()
+                .setNavigation(
+                    CardService.newNavigation()
+                        .updateCard(
+                            Addon.Home.View.HomeCard(data)))
                 .build();
         },
         PushAboutCard: (e) => {
             // Build and return the About Card
-            const appModelData = Addon.Modules.App.getData();
+            const data = Addon.Modules.App.getData();
             return CardService.newActionResponseBuilder()
                 .setNavigation(
                     CardService.newNavigation()
-                        .pushCard(Addon.Home.View.AboutCard({ ...appModelData }))
+                        .pushCard(Addon.Home.View.AboutCard(data))
                 ).build();
         },
         PushHelpCard: (e) => {
             // Build and return the Help Card
-            const appModelData = Addon.Modules.App.getData();
+            const data = Addon.Modules.App.getData();
             return CardService.newActionResponseBuilder()
                 .setNavigation(
                     CardService.newNavigation()
-                        .pushCard(Addon.Home.View.HelpCard({ ...appModelData }))
+                        .pushCard(Addon.Home.View.HelpCard(data))
                 ).build();
         },
         Beautify: (e) => {
@@ -769,7 +772,7 @@ Addon.Home = {
                         .setText('💎 Upgrade to Premium')
                         .setBackgroundColor(Addon.primaryColor())
                         .setOnClickAction(CardService.newAction()
-                            .setFunctionName('Addon.UserProfile.Controller.Load'))));
+                            .setFunctionName('Addon.UserProfile.Controller.PushHomeCard'))));
             }
 
             return cardBuilder.build();
@@ -957,15 +960,15 @@ Addon.Home = {
                     .addButton(CardService.newTextButton()
                         .setText('Settings')
                         .setOnClickAction(CardService.newAction()
-                            .setFunctionName('Addon.Settings.Controller.Load')))
+                            .setFunctionName('Addon.Settings.Controller.PushHomeCard')))
                     .addButton(CardService.newTextButton()
                         .setText('Help & Support')
                         .setOnClickAction(CardService.newAction()
-                            .setFunctionName('Addon.Home.Controller.Help')))
+                            .setFunctionName('Addon.Home.Controller.PushHelpCard')))
                     .addButton(CardService.newTextButton()
                         .setText('About')
                         .setOnClickAction(CardService.newAction()
-                            .setFunctionName('Addon.Home.Controller.About')))
+                            .setFunctionName('Addon.Home.Controller.PushAboutCard')))
                 );
         },
         _BuildAdvancedSettingsSection: (data = {}) => {
@@ -1089,12 +1092,13 @@ Addon.Settings = {
 
 
             // Build and return the Home Card
-            const appModelData = Addon.Modules.App.getData();
+            const data = Addon.Modules.App.getData();
             return CardService.newActionResponseBuilder()
                 .setNavigation(
                     CardService.newNavigation()
                         .popToRoot()
-                        .updateCard(Addon.Home.View.HomeCard({ ...appModelData }))
+                        .updateCard(
+                            Addon.Home.View.HomeCard(data))
                 ).build();
         }
     },
@@ -1578,7 +1582,7 @@ Addon.GeminiAssistant = {
                 .setText('Launch Gemini Assistant')
                 .setMaterialIcon(CardService.newMaterialIcon().setName('rocket_launch'))
                 .setOnClickAction(CardService.newAction()
-                    .setFunctionName('Plugins.GeminiAssistant.Controller.Load')
+                    .setFunctionName('Plugins.GeminiAssistant.Controller.PushHomeCard')
                     .addRequiredWidget(Addon.INPUT_PARAMETERS.gemini_api_key)));
 
             return section;
@@ -1671,7 +1675,7 @@ Addon.UserProfile = {
             const onClickParameters = e?.commonEventObject?.parameters || {};
 
             // Push Confirmation Card
-            return Addon.ConfirmationCard.Controller.Load({
+            return Addon.ConfirmationCard.Controller.PushHomeCard({
                 commonEventObject: {
                     parameters: { title, message, onClickFunctionName, onClickParameters }
                 }
