@@ -14,8 +14,8 @@ function onOpen(e) {
     SpreadsheetApp
         .getUi()
         .createAddonMenu()
-        .addItem('Format', 'onMenuFormatRange')
-        .addItem('Minify', 'onMenuMinifyRange')
+        .addItem('Format', 'MenuTriggers.onMenuFormatRange')
+        .addItem('Minify', 'MenuTriggers.onMenuMinifyRange')
         .addToUi();
 }
 

@@ -1,4 +1,5 @@
 .clasp.json
+package-lock.json
 *.clasp.json
 .vscode
 .vscode/launch.json
@@ -9,7 +10,7 @@ dist/
 *.iml
 *.log
 .*.swp
-package-lock.json
 
 .npmrc
 .env
+
