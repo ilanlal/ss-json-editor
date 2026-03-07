@@ -540,11 +540,45 @@ Addon.Home = {
     description: 'A collection of tools for editing and managing JSON data in Google Sheets.',
     version: '1.0.0',
     listOfTools: [
-        { name: 'Validate', emoji: '✅', description: 'Verify selected JSON.', icon: 'check', action: 'Addon.Home.Controller.Validate', premium: false },
-        { name: 'Beautify', emoji: '🎨', description: 'Format your JSON data for better readability.', icon: 'brush', action: 'Addon.Home.Controller.Beautify', premium: false },
-        { name: 'Minify', emoji: '💬', description: 'Minify your JSON data for compact representation.', icon: 'compress', action: 'Addon.Home.Controller.Minify', premium: false },
-        { name: 'Fix Syntax', emoji: '🛠️', description: 'Automatically fix JSON syntax errors using AI.', icon: 'build', action: 'Addon.GeminiAssistant.Controller.FixJsonInActiveCell', premium: true },
-        { name: 'Generate JSON', emoji: '⚡', description: 'Generate JSON content using AI based on sheet data.', icon: 'flash_on', action: 'Addon.GeminiAssistant.Controller.GenerateJsonContent', premium: true }
+        {   // Validate Tool
+            name: 'Validate',
+            emoji: '✅',
+            description: 'Verify selected JSON.',
+            icon: 'check',
+            action: 'Addon.Home.Controller.Validate',
+            premium: false
+        },
+        {   // Beautify Tool
+            name: 'Beautify',
+            emoji: '🎨',
+            description: 'Format your JSON data for better readability.',
+            icon: 'brush',
+            action: 'Addon.Home.Controller.Beautify',
+            premium: false
+        },
+        {   // Minify Tool
+            name: 'Minify',
+            emoji: '💬',
+            description: 'Minify your JSON data for compact representation.',
+            icon: 'compress',
+            action: 'Addon.Home.Controller.Minify',
+            premium: false
+        },
+        {   // Fix Syntax Tool - Premium
+            name: 'Fix Syntax',
+            emoji: '💫',
+            description: 'Automatically fix JSON syntax errors using AI.',
+            icon: 'build', action: 'Addon.GeminiAssistant.Controller.FixJsonInActiveCell',
+            premium: true
+        },
+        {   // Generate JSON Tool - Premium
+            name: 'Generate JSON',
+            emoji: '💫',
+            description: 'Generate JSON content using AI based on sheet data.',
+            icon: 'flash_on',
+            action: 'Addon.GeminiAssistant.Controller.GenerateJsonContent',
+            premium: true
+        }
     ],
     Controller: {
         Load: (e) => {

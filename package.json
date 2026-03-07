@@ -1,7 +1,7 @@
 {
   "name": "@ilanlal/ss-json-editor",
-  "version": "1.0.0",
-  "description": "A Google Sheets add-on to edit JSON data in a spreadsheet format.",
+  "version": "1.1.0",
+  "description": "A Google Sheets add-on to edit and manage JSON data.",
   "main": "./src/index.js",
   "type": "commonjs",
   "scripts": {
