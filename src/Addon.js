@@ -906,26 +906,9 @@ Addon.Home = {
             const requirementsMet = !tool.requires || tool.requires.every(req => data[req]);
 
             const section = CardService.newCardSection()
-                .setHeader(`${tool.emoji} ${tool.name}`)
+                //.setHeader(`${tool.emoji} ${tool.name}`)
                 .setCollapsible(true)
-                .setNumUncollapsibleWidgets(0);
-
-            // If requirements are not met, show a warning and disable the button
-            if (!requirementsMet) {
-                // Determine which requirements are not met for the warning message
-                const unmetRequirements = tool.requires.filter(req => !data[req]);
-                const requirementMessages = {
-                    [Addon.INPUT_PARAMETERS.isPremium]: 'Premium Membership required',
-                    [Addon.INPUT_PARAMETERS.GEMINI_API_KEY]: 'Gemini API Key required'
-                };
-                const unmetMessages = unmetRequirements.map(req => requirementMessages[req] || 'Unknown requirement').join(' & ');
-                section.addWidget(CardService.newDecoratedText()
-                    .setText(`⚠️ ${unmetMessages}`)
-                    .setWrapText(true)
-                    .setStartIcon(CardService.newIconImage().setMaterialIcon(
-                        CardService.newMaterialIcon().setName('warning')
-                    )));
-            }
+                .setNumUncollapsibleWidgets(1);
 
             // Build the decorated text with a button for the tool
             const decoratedText = CardService.newDecoratedText()
@@ -952,6 +935,24 @@ Addon.Home = {
 
             // Add the decorated text to the section
             section.addWidget(decoratedText);
+
+            // If requirements are not met, show a warning and disable the button
+            if (!requirementsMet) {
+                // Determine which requirements are not met for the warning message
+                const unmetRequirements = tool.requires.filter(req => !data[req]);
+                const requirementMessages = {
+                    [Addon.INPUT_PARAMETERS.isPremium]: 'Premium Membership required',
+                    [Addon.INPUT_PARAMETERS.GEMINI_API_KEY]: 'Gemini API Key required'
+                };
+                const unmetMessages = unmetRequirements.map(req => requirementMessages[req] || 'Unknown requirement').join(' & ');
+                section.addWidget(CardService.newDecoratedText()
+                    .setText(`⚠️ ${unmetMessages}`)
+                    .setWrapText(true)
+                    .setStartIcon(CardService.newIconImage().setMaterialIcon(
+                        CardService.newMaterialIcon().setName('warning')
+                    )));
+            }
+
             return section;
         },
         _BuildQuickAccessSection: (data = {}) => {
@@ -1151,9 +1152,9 @@ Addon.Settings = {
         },
         _BuildAuditSettingsSection(data = {}) {
             const auditSection = CardService.newCardSection()
-                .setHeader('Audit Settings')
+                .setHeader('🛠️ Audit & Debug Settings')
                 .setCollapsible(true)
-                .setNumUncollapsibleWidgets(0);
+                .setNumUncollapsibleWidgets(1);
             // Add a divider
             auditSection.addWidget(CardService.newDivider());
 
@@ -1181,9 +1182,9 @@ Addon.Settings = {
         },
         _BuildParseOptionsSection(data = {}) {
             const parsingSection = CardService.newCardSection()
-                .setHeader('Parsing Settings')
+                .setHeader('Parsing Options')
                 .setCollapsible(true)
-                .setNumUncollapsibleWidgets(0);
+                .setNumUncollapsibleWidgets(2);
 
             // add ignore whitespace decorated text with switch widget
             const ignoreWhitespaceDecoratedText = CardService.newDecoratedText()
@@ -1193,7 +1194,7 @@ Addon.Settings = {
                 .setStartIcon(
                     CardService.newIconImage().setMaterialIcon(
                         CardService.newMaterialIcon()
-                            .setName('ignore_changes')
+                            .setName('format_color_reset')
                     ))
                 .setSwitchControl(
                     CardService.newSwitch()
@@ -1243,9 +1244,9 @@ Addon.Settings = {
         },
         _BuildUxOptionsSection(data = {}) {
             const uxSection = CardService.newCardSection()
-                .setHeader('UX Settings')
+                .setHeader('🛠️ UX Options')
                 .setCollapsible(true)
-                .setNumUncollapsibleWidgets(0);
+                .setNumUncollapsibleWidgets(1);
 
             // create show errors card decorated text with switch widget
             const showErrorsDecoratedText = CardService.newDecoratedText()
@@ -1314,7 +1315,7 @@ Addon.GeminiAssistant = {
             catch (error) {
                 return CardService.newActionResponseBuilder()
                     .setNotification(CardService.newNotification()
-                        .setText('An error occurred while loading Gemini API settings.'))
+                        .setText('An error occurred while loading Gemini API settings. ' + error.toString()))
                     .build();
             }
         },
@@ -1331,10 +1332,16 @@ Addon.GeminiAssistant = {
                 // Save the Gemini model selection
                 Addon.Modules.GeminiAPI.saveModel(model);
 
+                // Build and return the Home Card
+                const data = Addon.Modules.App.getData();
                 return CardService.newActionResponseBuilder()
-                    .setNotification(CardService.newNotification()
-                        .setText('Settings saved successfully.'))
-                    .build();
+                    .setNavigation(
+                        CardService.newNavigation()
+                            .popToRoot()
+                            .updateCard(
+                                Addon.Home.View.HomeCard(data))
+                    ).build();
+
             } catch (error) {
                 return CardService.newActionResponseBuilder()
                     .setNotification(CardService.newNotification()
@@ -1535,7 +1542,7 @@ Addon.GeminiAssistant = {
         },
         SetupCard: (data = {}) => {
             const cardBuilder = CardService.newCardBuilder()
-                .setName(Addon.GeminiAssistant.id + '-Results');
+                .setName(Addon.GeminiAssistant.id + '-Setup');
 
             // Add a section for Gemini API key input
             cardBuilder.addSection(
@@ -1553,7 +1560,7 @@ Addon.GeminiAssistant = {
                     .addWidget(CardService.newTextButton()
                         .setText('Save Gemini API Settings')
                         .setOnClickAction(CardService.newAction()
-                            .setFunctionName('Plugins.GeminiAssistant.Controller.SaveSettings')
+                            .setFunctionName('Addon.GeminiAssistant.Controller.SaveSettings')
                             .addRequiredWidget(Addon.INPUT_PARAMETERS.GEMINI_API_KEY)
                             .addRequiredWidget(Addon.INPUT_PARAMETERS.GEMINI_MODEL))));
 
@@ -1567,23 +1574,12 @@ Addon.GeminiAssistant = {
             section.addWidget(CardService.newTextParagraph()
                 .setText('Welcome! Please enter your Gemini API key in the settings to get started.'));
 
-            // Add a text input for the gemini API key.
-            section.addWidget(CardService.newTextInput()
-                .setVisibility(hasApiKey ? CardService.Visibility.HIDDEN : CardService.Visibility.VISIBLE)
-                .setFieldName(Addon.INPUT_PARAMETERS.GEMINI_API_KEY)
-                .setTitle('Gemini API Key')
-                .setHint('Enter your Gemini API key')
-                .setValue(data[Addon.INPUT_PARAMETERS.GEMINI_API_KEY] || ''));
-
-            // Add divider
-            section.addWidget(CardService.newDivider());
-
             // Add Launch Gemini Assistant button
             section.addWidget(CardService.newTextButton()
                 .setText('Launch Gemini Assistant')
                 .setMaterialIcon(CardService.newMaterialIcon().setName('rocket_launch'))
                 .setOnClickAction(CardService.newAction()
-                    .setFunctionName('Plugins.GeminiAssistant.Controller.PushSetupCard')));
+                    .setFunctionName('Addon.GeminiAssistant.Controller.PushSetupCard')));
 
             return section;
         },
@@ -1617,7 +1613,7 @@ Addon.GeminiAssistant = {
                     .setFieldName(Addon.INPUT_PARAMETERS.GEMINI_API_KEY)
                     .setTitle('Gemini API Key')
                     .setHint('Enter your Gemini API key')
-                    .setValue(data[Addon.INPUT_PARAMETERS.GEMINI_API_KEY] || '[YOUR GEMINI API KEY]'));
+                    .setValue(data[Addon.INPUT_PARAMETERS.GEMINI_API_KEY] || ''));
         }
     }
 };
@@ -1675,7 +1671,7 @@ Addon.UserProfile = {
             const onClickParameters = e?.commonEventObject?.parameters || {};
 
             // Push Confirmation Card
-            return Addon.ConfirmationCard.Controller.PushHomeCard({
+            return Addon.ConfirmationCard.Controller.Confirm({
                 commonEventObject: {
                     parameters: { title, message, onClickFunctionName, onClickParameters }
                 }

@@ -54,7 +54,7 @@ describe('Addon.GeminiAssistant', () => {
 
             const cardData = data.cardNavigations[0].pushCard;
             expect(cardData).toBeDefined();
-            expect(cardData.name).toBe(Addon.GeminiAssistant.id + '-Results');
+            expect(cardData.name).toBe(Addon.GeminiAssistant.id + '-Setup');
         });
 
         // FixJsonInActiveCell test
