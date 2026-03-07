@@ -1628,15 +1628,11 @@ Addon.UserProfile = {
     Controller: {
         PushHomeCard(e) {
             try {
-                const membershipStr = PropertiesService.getUserProperties().getProperty('membership') || null;
-                const membership = membershipStr ? JSON.parse(membershipStr) : null;
-                const isPremium = membership && membership.type === 'premium' && new Date(membership.expiresAt) > new Date();
-
-                const appModelData = Addon.Modules.App.getData();
+                const data = Addon.Modules.App.getData();
                 return CardService.newActionResponseBuilder()
                     .setNavigation(
                         CardService.newNavigation()
-                            .pushCard(Addon.UserProfile.View.HomeCard({ ...appModelData, isPremium }))
+                            .pushCard(Addon.UserProfile.View.HomeCard(data))
                     ).build();
             } catch (error) {
                 return this.handleOperationError(error);
