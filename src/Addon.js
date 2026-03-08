@@ -577,7 +577,7 @@ Addon.Modules = {
                     { url, options },
                     payload,
                     JSON.parse(response.getContentText()));
-                    
+
             } catch (error) {
                 // Log the error for debugging purposes
                 Addon.Modules.TerminalOutput.write(
@@ -1530,12 +1530,14 @@ Addon.GeminiAssistant = {
                 const result = Addon.Modules.GeminiAPI.generateContent(apiKey, model, payload);
 
                 let generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-                // Remove any leading/trailing quotes
-                generatedText = generatedText.trim().replace(/^"+|"+$/g, '');
+                let parsedJson = JSON.parse(generatedText);
+                // If the parsed JSON is a string, attempt to parse it again to handle double-encoded JSON scenarios.
+                if (typeof parsedJson === 'string') {
+                    parsedJson = JSON.parse(parsedJson);
+                }
 
-                // const fixedJsonSyntax = JSON.stringify(JSON.parse(generatedText), null, 2);
-
-                activeCell.setValue(JSON.parse(generatedText));
+                // Update the active cell with the fixed JSON string. Use JSON.stringify to ensure it's stored as a string in the cell.
+                activeCell.setValue(JSON.stringify(parsedJson));
 
                 return CardService.newActionResponseBuilder()
                     .setNotification(CardService.newNotification()
@@ -1629,7 +1631,7 @@ Addon.GeminiAssistant = {
                     parsedJson = JSON.parse(parsedJson);
                 }
 
-                activeCell.setValue(JSON.stringify(parsedJson, null, 2));
+                activeCell.setValue(JSON.stringify(parsedJson));
 
                 return CardService.newActionResponseBuilder()
                     .setNotification(CardService.newNotification()

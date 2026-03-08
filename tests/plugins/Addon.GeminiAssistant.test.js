@@ -145,7 +145,7 @@ describe('Addon.GeminiAssistant', () => {
             if (typeof parsedExpectedResponse === 'string') {
                 parsedExpectedResponse = JSON.parse(parsedExpectedResponse);
             }
-            expect(activeCellValue).toEqual(JSON.stringify(parsedExpectedResponse, null, 2));
+            expect(activeCellValue).toEqual(JSON.stringify(parsedExpectedResponse));
         });
 
         afterEach(() => {
