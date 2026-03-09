@@ -347,16 +347,16 @@ Addon.Modules = {
             sheet.appendRow([
                 // Created On as iso string
                 new Date().toISOString(),
-                // Prompt (if available in payload)
-                payload?.contents?.[0]?.parts?.[0]?.text || '',
-                // Generated Text (if available in response) ({"candidates":[{"content":{"parts":[{"text": "generated text here"}]}}]})
-                (typeof genratedText === 'string') ? genratedText : JSON.stringify(genratedText),
-                // Model Version (if available in response, otherwise use input model or default to 'unknown')
-                response?.modelVersion || 'unknown',
                 // Event Object
                 (typeof e === 'object' || Array.isArray(e)) ? JSON.stringify(e) : String(e || ''),
                 // Payload
                 (typeof payload === 'object' || Array.isArray(payload)) ? JSON.stringify(payload) : String(payload || ''),
+                // Prompt (if available in payload)
+                payload?.contents?.[0]?.parts?.[0]?.text || '',
+                // Model Version (if available in response, otherwise use input model or default to 'unknown')
+                response?.modelVersion || 'unknown',
+                // Generated Text (if available in response) ({"candidates":[{"content":{"parts":[{"text": "generated text here"}]}}]})
+                (typeof genratedText === 'string') ? genratedText : JSON.stringify(genratedText),
                 // Response
                 (typeof response === 'object' || Array.isArray(response)) ? JSON.stringify(response) : String(response || ''),
                 // Total Token Count (if available in response.usageMetadata)
@@ -574,7 +574,7 @@ Addon.Modules = {
                 // Log the full response for debugging purposes
                 Addon.Modules.TerminalOutput.writeGeminiResponse(
                     SpreadsheetApp.getActiveSpreadsheet(),
-                    { url, options },
+                    { model, url, options },
                     payload,
                     JSON.parse(response.getContentText()));
 
